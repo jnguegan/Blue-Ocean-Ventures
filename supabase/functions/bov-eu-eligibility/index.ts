@@ -91,13 +91,13 @@ Deno.serve(async (req: Request) => {
     let query = db.from("bov_eu_funding_calls").select("id,title,summary,eligibility_notes,partner_requirements,official_url,deadline,country_region").order("created_at", { ascending: false }).limit(500);
     if (typeof body.call_id === "string") query = query.eq("id", body.call_id);
     const { data: calls, error: readError } = await query;
-    if (readError) return respond({ error: "Unable to read funding opportunities" }, 500);
+    if (readError) { console.error("EU funding read failed", { code: readError.code, message: readError.message }); return respond({ error: "Unable to read funding opportunities", database_code: readError.code || "unknown", database_message: readError.message }, 500); }
     const counts = { preliminarily_eligible: 0, ineligible: 0, unconfirmed: 0 };
     let processed = 0;
     for (const call of (calls || []) as Call[]) {
       const assessment = assess(call);
       const { error: writeError } = await db.from("bov_eu_eligibility_assessments").insert({ call_id: call.id, ...assessment });
-      if (writeError) return respond({ error: "Unable to save assessment", processed }, 500);
+      if (writeError) { console.error("EU assessment write failed", { code: writeError.code, message: writeError.message }); return respond({ error: "Unable to save assessment", database_code: writeError.code || "unknown", database_message: writeError.message, processed }, 500); }
       counts[assessment.result] += 1;
       processed += 1;
     }
