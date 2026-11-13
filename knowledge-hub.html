@@ -85,14 +85,24 @@ function aFindMatches(){
   // Relevance report only: 60% broad thematic overlap, 40% core-mandate overlap.
   // Related agricultural transformation is surfaced as a research avenue, not a confirmed match.
   const score=pct(60*direct.length/areas.length+40*primary.length/areas.length);
-  const notes=[];
+  const notes=[],related=[];
   if(!hasContext)notes.push('Core beneficiary context not established: '+special.label);
   if(agency==='UNOPS')notes.push('Project implementation is distinct from grant funding');
-  if(agency==='UNIDO'&&(areas.includes('Agriculture and food security')||/agro.processing|food processing|agricultural transformation|value.chain/i.test(evidence)))notes.push('Explore agro-processing and agricultural value-chain transformation; project evidence required');
-  return {agency,mandate,direct,primary,score,notes,hasContext}
- }).sort((a,b)=>b.score-a.score||a.agency.localeCompare(b.agency));
- const header=el('div');header.append(el('h3','Report 1 — Institutional relevance'),el('p','Based only on selected project themes and mapped agency mandates. 60% thematic alignment + 40% core mandate alignment. This report does not depend on whether funding is currently available. Percentages are indicative relevance scores, not eligibility or funding probabilities.','muted'),el('p','Selected areas: '+areas.join(' · '),'muted'));out.append(header);
- for(const m of ranked){const card=el('div',null,'item');card.append(el('strong',m.agency+' · '+m.mandate.name),el('p',m.score+'% institutional relevance','muted'),bar(m.score),el('p','Thematic alignment: '+(m.direct.join(' · ')||'none')+' · Core mandate: '+(m.primary.join(' · ')||'none'),'muted'));if(m.notes.length)card.append(el('p','Research considerations: '+m.notes.join('; '),'muted'));const ref=records.find(p=>p.agency===m.agency&&p.title==='Institutional partnership and programme pathways')||records.find(p=>p.agency===m.agency);if(ref)source(card,ref.source_url);out.append(card)}
+  if(agency==='UNIDO'&&areas.includes('Agriculture and food security')){
+   related.push('Agriculture and food security → agro-processing / food manufacturing');
+   notes.push('Conditional route only: confirm that the project actually includes processing, manufacturing or agricultural value-chain development. Agricultural production alone is not an industrial mandate match.');
+  }
+  if(agency==='UNIDO'&&/agro.processing|food processing|agricultural transformation|value.chain|food manufactur/i.test(evidence)){
+   notes.push('Project text mentions possible industrial transformation; validate activities before treating this as direct alignment.');
+  }
+  if(agency==='UNIDO'&&areas.includes('Infrastructure and housing')){
+   related.push('Infrastructure and housing → industrial facilities only');
+   notes.push('Ordinary school, housing or sports construction is not automatically UNIDO-relevant.');
+  }
+  return {agency,mandate,direct,primary,score,notes,related,hasContext}
+ }).sort((a,b)=>b.score-a.score||(b.related.length?1:0)-(a.related.length?1:0)||a.agency.localeCompare(b.agency));
+ const header=el('div');header.append(el('h3','Report 1 — Institutional relevance'),el('p','Based only on selected project themes and mapped agency mandates. 60% thematic alignment + 40% core mandate alignment. This report does not depend on whether funding is currently available. Conditional related pathways are shown separately and never inflate the direct score without confirmed project activities. Percentages are indicative relevance scores, not eligibility or funding probabilities.','muted'),el('p','Selected areas: '+areas.join(' · '),'muted'));out.append(header);
+ for(const m of ranked){const card=el('div',null,'item');card.append(el('strong',m.agency+' · '+m.mandate.name),el('p',m.score+'% institutional relevance','muted'),bar(m.score),el('p','Thematic alignment: '+(m.direct.join(' · ')||'none')+' · Core mandate: '+(m.primary.join(' · ')||'none'),'muted'));if(m.related.length)card.append(el('p','Conditional / related pathways (not counted in the direct relevance score): '+m.related.join(' · '),'muted'));if(m.notes.length)card.append(el('p','Research considerations: '+m.notes.join('; '),'muted'));const ref=records.find(p=>p.agency===m.agency&&p.title==='Institutional partnership and programme pathways')||records.find(p=>p.agency===m.agency);if(ref)source(card,ref.source_url);out.append(card)}
  const divider=el('hr');divider.style.margin='30px 0';out.append(divider,el('h3','Report 2 — Funding availability'),el('p','This report checks recorded funding mechanisms and verified open calls separately from institutional relevance. An unverified record means availability is unknown, NOT that the agency has no funding. Programme-specific geography, applicant rules and deadlines must be verified.','muted'));
  const pathways=records.filter(p=>p.title!=='Institutional partnership and programme pathways');
  const active=pathways.filter(p=>aEvidenceComplete(p));
