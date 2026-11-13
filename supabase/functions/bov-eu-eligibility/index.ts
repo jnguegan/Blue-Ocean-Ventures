@@ -1,48 +1,94 @@
-// Evidence-first automatic eligibility assessment. No LLM or keyword guess can grant eligibility.
-// Deploy as Supabase Edge Function with verify_jwt=false and private x-eu-scan-secret.
-// For opportunity screening: POST {} or {"call_id":"uuid"}. All reads/writes stay server-side.
+// Blue Ocean Ventures: staff-authenticated, evidence-limited EU opportunity screening.
+// Authentication: Supabase Auth user JWT + server-side bov_hub_access() check.
+// No EU_SCAN_SECRET, no public privileged endpoint. Deploy with Verify JWT OFF:
+// auth.getUser(token) verifies JWT inside the function (supports modern signing keys).
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-type Rule={key:string;result:"pass"|"fail"|"unknown";reason:string;source:string};
-function assess(call:Record<string,unknown>){
- const text=[call.title,call.summary,call.eligibility_notes,call.partner_requirements].filter(Boolean).join(" ");
- const source=String(call.official_url||"");
- const rules:Rule[]=[];
- const add=(key:string,result:Rule["result"],reason:string)=>rules.push({key,result,reason,source});
- const applicantEvidence=String(call.eligibility_notes||"");
- // We deliberately do NOT treat broad promotional summaries as authoritative eligibility rules.
- if(/(?:only|exclusively)\s+(?:public authorities|government bodies|public administrations|municipalities)\b/i.test(applicantEvidence))
-   add("private_applicant","fail","Official eligibility notes explicitly restrict applicants to public authorities");
- else if(/(?:eligible applicants?|beneficiaries?)\s*[:\-]\s*[^.\n]{0,150}\b(?:SMEs?|micro.?enterprises?|private (?:companies|enterprises)|entrepreneurs?|farmers?|start.?ups?|cooperatives?)\b/i.test(applicantEvidence))
-   add("private_applicant","pass","Eligibility notes explicitly list private applicants");
- else add("private_applicant","unknown","No explicit verified private-applicant rule available");
- if(!source.startsWith("https://"))add("official_source","unknown","Official HTTPS source missing");
- else add("official_source","pass","HTTPS source URL recorded; authenticity and document content not independently validated");
- const deadline=String(call.deadline||"");
- if(deadline&&/^\d{4}-\d{2}-\d{2}$/.test(deadline)){
-  const today=new Date().toISOString().slice(0,10);
-  add("deadline",deadline<today?"fail":"pass",deadline<today?"Recorded deadline has passed":"Recorded deadline has not passed; official current status still requires confirmation");
- }else add("deadline","unknown","Deadline unavailable or unparseable");
- const geography=String(call.country_region||"");
- add("geography",geography?"unknown":"unknown",geography?"Recorded geography: "+geography+"; project-specific eligibility not assessed":"Eligible territories not documented");
- const result=rules.some(r=>r.result==="fail")?"ineligible":rules.every(r=>r.result==="pass")?"preliminarily_eligible":"unconfirmed";
- return {result,rule_snapshot:{applicant_type:"private_enterprise",geography,deadline},evidence:rules.filter(r=>r.result!=="unknown").map(r=>({rule:r.key,source:r.source,reason:r.reason})),reasons:rules.map(r=>({rule:r.key,status:r.result,reason:r.reason})),missing_information:rules.filter(r=>r.result==="unknown").map(r=>r.reason)};
+
+type Status = "pass" | "fail" | "unknown";
+type Rule = { key: string; status: Status; reason: string; source: string };
+type Call = { id: string; title: string; summary: string | null; eligibility_notes: string | null; partner_requirements: string | null; official_url: string; deadline: string | null; country_region: string | null };
+const json = (data: unknown, status = 200) => Response.json(data, { status, headers: { "Cache-Control": "no-store" } });
+const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function assess(call: Call) {
+  const rules: Rule[] = [];
+  const source = call.official_url || "";
+  const add = (key: string, status: Status, reason: string) => rules.push({ key, status, reason, source });
+  const notes = call.eligibility_notes || "";
+  // Treat these notes as recorded evidence, not as independently verified official rules.
+  if (/(?:only|exclusively)\s+(?:public authorities|government bodies|public administrations|municipalities)\b/i.test(notes)) {
+    add("private_applicant", "fail", "Recorded notes restrict applicants to public authorities; verify against the official call");
+  } else if (/(?:eligible applicants?|beneficiaries?)\s*[:\-]\s*[^.\n]{0,150}\b(?:SMEs?|micro.?enterprises?|private (?:companies|enterprises)|entrepreneurs?|farmers?|start.?ups?|cooperatives?)\b/i.test(notes)) {
+    add("private_applicant", "pass", "Recorded eligibility notes mention private applicants; official conditions still require verification");
+  } else {
+    add("private_applicant", "unknown", "Explicit private-applicant eligibility not established");
+  }
+  add("official_source", /^https:\/\//i.test(source) ? "pass" : "unknown", "An HTTPS URL is recorded; its authenticity and content have not been independently checked");
+  const deadline = call.deadline || "";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(deadline)) {
+    const past = deadline < new Date().toISOString().slice(0, 10);
+    add("deadline", past ? "fail" : "pass", past ? "Recorded deadline has passed" : "Recorded deadline has not passed; official status needs verification");
+  } else add("deadline", "unknown", "Deadline not recorded");
+  add("geography", "unknown", call.country_region ? "Recorded territory: " + call.country_region + "; applicant/project location not supplied" : "Territorial eligibility not established");
+  // Opportunity-only screening cannot certify applicant-specific eligibility.
+  const result = rules.some(r => r.status === "fail") ? "ineligible" : "unconfirmed";
+  return {
+    assessment_type: "opportunity",
+    result,
+    applicant_type: "private_enterprise",
+    rule_snapshot: { applicant_type: "private_enterprise", geography: call.country_region, deadline },
+    evidence: rules.filter(r => r.status !== "unknown").map(r => ({ rule: r.key, source: r.source, reason: r.reason })),
+    reasons: rules.map(r => ({ rule: r.key, status: r.status, reason: r.reason })),
+    missing_information: rules.filter(r => r.status === "unknown").map(r => r.reason),
+    engine_version: "rules-v2-auth",
+  };
 }
-Deno.serve(async req=>{
- if(req.method!=="POST")return Response.json({error:"Method not allowed"},{status:405});
- const secret=Deno.env.get("EU_SCAN_SECRET"),url=Deno.env.get("SUPABASE_URL"),key=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
- if(!secret||!url||!key)return Response.json({error:"Server not configured"},{status:503});
- if(req.headers.get("x-eu-scan-secret")!==secret)return Response.json({error:"Unauthorized"},{status:401});
- let body:Record<string,unknown>={};try{body=await req.json()}catch{}
- const db=createClient(url,key,{auth:{persistSession:false}});
- let q=db.from("bov_eu_funding_calls").select("id,title,summary,eligibility_notes,partner_requirements,official_url,deadline,country_region").limit(500);
- if(typeof body.call_id==="string")q=q.eq("id",body.call_id);
- const {data,error}=await q;if(error)return Response.json({error:error.message},{status:500});
- const results=[];
- for(const call of data||[]){
-  const assessment=assess(call);
-  const {error:writeError}=await db.from("bov_eu_eligibility_assessments").insert({call_id:call.id,assessment_type:"opportunity",...assessment});
-  if(writeError)return Response.json({error:writeError.message,processed:results.length},{status:500});
-  results.push({call_id:call.id,result:assessment.result});
- }
- return Response.json({ok:true,processed:results.length,counts:{preliminarily_eligible:results.filter(r=>r.result==="preliminarily_eligible").length,ineligible:results.filter(r=>r.result==="ineligible").length,unconfirmed:results.filter(r=>r.result==="unconfirmed").length},note:"Evidence-limited preliminary screening; not an official eligibility determination"});
+
+Deno.serve(async (req: Request) => {
+  try {
+    if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
+    const url = Deno.env.get("SUPABASE_URL");
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!url || !anonKey || !serviceKey) return json({ error: "Server configuration incomplete" }, 503);
+
+    const auth = req.headers.get("authorization") || "";
+    const token = /^Bearer\s+(.+)$/i.exec(auth)?.[1]?.trim();
+    if (!token) return json({ error: "Authentication required: send the signed-in staff user's Bearer access token" }, 401);
+
+    const userClient = createClient(url, anonKey, {
+      global: { headers: { Authorization: "Bearer " + token } },
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+    const { data: userData, error: userError } = await userClient.auth.getUser(token);
+    if (userError || !userData.user) return json({ error: "Invalid or expired staff session" }, 401);
+    const { data: allowed, error: permissionError } = await userClient.rpc("bov_hub_access");
+    if (permissionError) return json({ error: "Staff permission check failed" }, 500);
+    if (allowed !== true) return json({ error: "Staff Knowledge Hub access required" }, 403);
+
+    let payload: unknown;
+    try { payload = await req.json(); } catch { return json({ error: "Request body must be valid JSON" }, 400); }
+    if (!payload || typeof payload !== "object" || Array.isArray(payload)) return json({ error: "Request body must be a JSON object" }, 400);
+    const body = payload as Record<string, unknown>;
+    if (body.call_id !== undefined && (typeof body.call_id !== "string" || !uuid.test(body.call_id))) return json({ error: "call_id must be a UUID" }, 400);
+
+    const db = createClient(url, serviceKey, { auth: { autoRefreshToken: false, persistSession: false } });
+    let query = db.from("bov_eu_funding_calls").select("id,title,summary,eligibility_notes,partner_requirements,official_url,deadline,country_region").order("created_at", { ascending: false }).limit(500);
+    if (typeof body.call_id === "string") query = query.eq("id", body.call_id);
+    const { data: calls, error: readError } = await query;
+    if (readError) return json({ error: "Unable to read funding opportunities" }, 500);
+    const counts = { preliminarily_eligible: 0, ineligible: 0, unconfirmed: 0 };
+    let processed = 0;
+    for (const call of (calls || []) as Call[]) {
+      const assessment = assess(call);
+      const { error: writeError } = await db.from("bov_eu_eligibility_assessments").insert({ call_id: call.id, ...assessment });
+      if (writeError) return json({ error: "Unable to save assessment", processed }, 500);
+      counts[assessment.result] += 1;
+      processed += 1;
+    }
+    return json({ ok: true, processed, counts, note: "Opportunity screening only. Client-specific eligibility and official terms remain unverified." });
+  } catch (error) {
+    console.error("bov-eu-eligibility unexpected error", error instanceof Error ? error.message : "unknown");
+    return json({ error: "Internal function error" }, 500);
+  }
 });
