@@ -363,10 +363,11 @@ function docRender(){
  }
  let shown=0;
  for(const group of [...grouped.values()].sort((a,b)=>a.project.localeCompare(b.project))){
-  const files=group.files.filter(d=>!q||[group.project,group.organisation,d.file_name].some(v=>(v||'').toLocaleLowerCase().includes(q)));
+  const country=(docProjectCountries.get(docKey(group))||'');
+  const files=group.files.filter(d=>!q||[group.project,group.organisation,country,d.file_name].some(v=>(v||'').toLocaleLowerCase().includes(q)));
   if(!files.length)continue;shown++;
   const folder=document.createElement('details');folder.className='doc-folder';
-  const head=document.createElement('summary');head.textContent=group.project+' · '+group.organisation+' ('+group.files.length+' files)';folder.append(head);
+  const head=document.createElement('summary');head.textContent=group.project+' · '+group.organisation+(country?' · '+country:'')+' ('+group.files.length+' files)';folder.append(head);
   const table=document.createElement('div');table.className='doc-folder-files';
   for(const d of files){
    const row=el('div',null,'doc-file-row'),info=el('div',null,'doc-file-info');
@@ -381,10 +382,20 @@ function docRender(){
  $('docLibraryStatus').textContent=shown+' project folder(s) · '+docRecords.length+' stored file(s)'+(q?' · search active':'');
  if(!shown)folders.append(el('p',q?'No matching project documents.':'No project documents uploaded yet.','muted'));
 }
+const docProjectCountries=new Map();
 async function docLoad(){
- const {data,error}=await db.from('bov_hub_project_documents').select('id,project_name,organisation_name,file_name,storage_path,file_size,created_at').order('created_at',{ascending:false}).limit(1000);
- if(error){$('docStatus').textContent='Document list unavailable: '+error.message;$('docLibraryStatus').textContent='Document library unavailable: '+error.message;return}
- docRecords=data||[];docRender();
+ const [documents,projects]=await Promise.all([
+  db.from('bov_hub_project_documents').select('id,project_name,organisation_name,file_name,storage_path,file_size,created_at').order('created_at',{ascending:false}).limit(1000),
+  db.from('bov_projects').select('project_name,organisation_name,country').limit(1000)
+ ]);
+ if(documents.error){$('docStatus').textContent='Document list unavailable: '+documents.error.message;$('docLibraryStatus').textContent='Document library unavailable: '+documents.error.message;return}
+ docRecords=documents.data||[];docProjectCountries.clear();
+ if(!projects.error)for(const p of projects.data||[]){
+  const key=[p.project_name,p.organisation_name].map(v=>(v||'').trim().toLocaleLowerCase()).join('|');
+  if(p.country)docProjectCountries.set(key,p.country);
+ }
+ docRender();
+ if(projects.error)$('docLibraryStatus').textContent+=' · Country search unavailable: '+projects.error.message;
 }
 $('docLibrarySearch').addEventListener('input',docRender);
 $('docLibraryRefresh').onclick=docLoad;
