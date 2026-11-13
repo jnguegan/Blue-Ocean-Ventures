@@ -37,6 +37,17 @@ $('aSave').onclick=async()=>{if(phase6Role!=='admin'){$('aStatus').textContent='
 $('aPrint').onclick=()=>{const s=aScreen();if(!s)return;const content=[['Project',s.form.project_name],['Organisation',s.form.organisation_name],['Legal type',s.form.applicant_type],['Country',s.form.country],['Theme',s.form.theme],['Budget',String(s.form.project_budget??'Unknown')+' '+s.form.currency],['Funding requested',String(s.form.requested_funding??'Unknown')+' '+s.form.currency],['Programme',s.programme?.title||'Not selected'],['Outcome',s.overall],...s.checks.map(c=>[c.name,c.state+' — '+c.why]),['Evidence',s.form.evidence_url||'Not supplied'],['Notes','Preliminary internal screening; not approved for client distribution.']];const w=window.open('','_blank');if(!w){$('aStatus').textContent='Allow popups to print the assessment.';return}w.opener=null;const doc=w.document;doc.title='Blue Ocean Ventures — Preliminary Assessment';const style=doc.createElement('style');style.textContent='body{font:15px Arial,sans-serif;margin:40px;color:#17365c}h1{font-size:23px}p{border-bottom:1px solid #ddd;padding:9px 0}strong{display:inline-block;width:190px}';doc.head.append(style);doc.body.append(el('h1','Blue Ocean Ventures — Preliminary Assessment'));for(const [k,v] of content){const row=doc.createElement('p'),b=doc.createElement('strong');b.textContent=k;row.append(b,doc.createTextNode(v));doc.body.append(row)}w.print()};
 
 
+// Keep Staff Vault metadata in sync with the Phase 7 assessment.
+// Source fields remain editable; no client-side storage or database writes occur here.
+function syncAssessmentToVault(){
+ const pairs=[['aName','docProject'],['aOrg','docOrg']];
+ for(const [source,target] of pairs){
+  const value=$(source).value.trim();
+  if($(target).value!==value)$(target).value=value;
+ }
+}
+for(const id of ['aName','aOrg'])$(id).addEventListener('input',syncAssessmentToVault);
+syncAssessmentToVault();
 const DOC_BUCKET='bov-hub-project-documents';
 async function docLoad(){
  const {data,error}=await db.from('bov_hub_project_documents').select('id,project_name,organisation_name,file_name,storage_path,file_size,created_at').order('created_at',{ascending:false}).limit(100);
