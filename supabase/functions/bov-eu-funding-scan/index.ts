@@ -2,7 +2,7 @@
 // Deploy with Verify JWT OFF. Staff JWT is verified in-function; scheduled callers may use EU_SCAN_SECRET.
 // Only imports official European Commission grants, not tenders or fabricated regional calls.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-const API="https://api.tech.ec.europa.eu/search-api/prod/rest/search?apiKey=SEDIA&language=en&pageSize=100&pageNumber=1";
+const API="https://api.tech.ec.europa.eu/search-api/prod/rest/search?apiKey=SEDIA&text=*&language=en&pageSize=100&pageNumber=1";
 const ORIGIN="https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/";
 const keywords=/agricultur|farm|food|rural|sme|small business|entrepreneur|start.up|renewable|solar|energy|touris|hospitality|digital|innovation|manufactur|circular|bioeconomy|local develop/i;
 function field(x,...keys){for(const k of keys){const v=x?.[k];if(typeof v==="string"&&v.trim())return v.trim();if(typeof v==="number")return String(v);if(Array.isArray(v)&&v.length&&typeof v[0]==="string")return v[0]}return ""}
@@ -41,9 +41,9 @@ Deno.serve(async req=>{
  let fetched=0,inserted=0,updated=0;
  try{
   const query={bool:{must:[{terms:{type:["1","2","8"]}},{terms:{status:["31094501","31094502","31094503"]}}]}};
-  const form=new FormData();form.append("query",new Blob([JSON.stringify(query)],{type:"application/json"}),"query.json");
+  const form=new FormData();form.append("query",new Blob([JSON.stringify(query)],{type:"application/json"}),"query.json");form.append("languages",new Blob([JSON.stringify(["en"])],{type:"application/json"}),"languages.json");form.append("displayLanguage","en");
   const response=await fetch(API,{method:"POST",body:form,signal:AbortSignal.timeout(25000)});
-  if(!response.ok)throw Error("EU API returned HTTP "+response.status);
+  if(!response.ok){const diagnostic=(await response.text()).slice(0,600);throw Error("EU API returned HTTP "+response.status+(diagnostic?": "+diagnostic:""));}
   const payload=await response.json(),results=rowsFrom(payload);fetched=results.length;
   if(!results.length)throw Error("EU API returned no recognisable result rows; check response schema before import");
   const now=new Date().toISOString(),today=now.slice(0,10);
