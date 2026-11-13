@@ -27,7 +27,7 @@ Deno.serve(async req=>{
  const provided=req.headers.get("x-eu-scan-secret");
  const scheduled=!!secret&&!!provided&&provided===secret;
  if(!scheduled){
-  const token=/^Bearer\\s+(.+)$/i.exec(req.headers.get("authorization")||"")?.[1]?.trim();
+  const token=/^Bearer\s+(.+)$/i.exec(req.headers.get("authorization")||"")?.[1]?.trim();
   if(!token)return reply({error:"Staff sign-in required"},401);
   const userDb=createClient(url,anon,{global:{headers:{Authorization:"Bearer "+token}},auth:{persistSession:false,autoRefreshToken:false}});
   const {data:userData,error:userError}=await userDb.auth.getUser(token);
