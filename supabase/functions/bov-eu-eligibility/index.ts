@@ -7,7 +7,19 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 type Status = "pass" | "fail" | "unknown";
 type Rule = { key: string; status: Status; reason: string; source: string };
 type Call = { id: string; title: string; summary: string | null; eligibility_notes: string | null; partner_requirements: string | null; official_url: string; deadline: string | null; country_region: string | null };
-const json = (data: unknown, status = 200) => Response.json(data, { status, headers: { "Cache-Control": "no-store" } });
+// Browser calls originate from the Blue Ocean Ventures site, not the Supabase domain.
+const allowedOrigins = new Set(["https://blueoceanventures.co", "https://www.blueoceanventures.co"]);
+function cors(req: Request): Record<string, string> {
+  const origin = req.headers.get("origin") || "";
+  return {
+    ...(allowedOrigins.has(origin) ? { "Access-Control-Allow-Origin": origin, "Vary": "Origin" } : {}),
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
+    "Access-Control-Max-Age": "3600",
+    "Cache-Control": "no-store",
+  };
+}
+const json = (data: unknown, status = 200, headers: Record<string, string> = {}) => Response.json(data, { status, headers: { ...headers, "Cache-Control": "no-store" } });
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function assess(call: Call) {
@@ -45,50 +57,53 @@ function assess(call: Call) {
 }
 
 Deno.serve(async (req: Request) => {
+  const headers = cors(req);
+  const respond = (data: unknown, status = 200) => json(data, status, headers);
+  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers });
   try {
-    if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
+    if (req.method !== "POST") return respond({ error: "Method not allowed" }, 405);
     const url = Deno.env.get("SUPABASE_URL");
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    if (!url || !anonKey || !serviceKey) return json({ error: "Server configuration incomplete" }, 503);
+    if (!url || !anonKey || !serviceKey) return respond({ error: "Server configuration incomplete" }, 503);
 
     const auth = req.headers.get("authorization") || "";
     const token = /^Bearer\s+(.+)$/i.exec(auth)?.[1]?.trim();
-    if (!token) return json({ error: "Authentication required: send the signed-in staff user's Bearer access token" }, 401);
+    if (!token) return respond({ error: "Authentication required: send the signed-in staff user's Bearer access token" }, 401);
 
     const userClient = createClient(url, anonKey, {
       global: { headers: { Authorization: "Bearer " + token } },
       auth: { autoRefreshToken: false, persistSession: false },
     });
     const { data: userData, error: userError } = await userClient.auth.getUser(token);
-    if (userError || !userData.user) return json({ error: "Invalid or expired staff session" }, 401);
+    if (userError || !userData.user) return respond({ error: "Invalid or expired staff session" }, 401);
     const { data: allowed, error: permissionError } = await userClient.rpc("bov_hub_access");
-    if (permissionError) return json({ error: "Staff permission check failed" }, 500);
-    if (allowed !== true) return json({ error: "Staff Knowledge Hub access required" }, 403);
+    if (permissionError) return respond({ error: "Staff permission check failed" }, 500);
+    if (allowed !== true) return respond({ error: "Staff Knowledge Hub access required" }, 403);
 
     let payload: unknown;
-    try { payload = await req.json(); } catch { return json({ error: "Request body must be valid JSON" }, 400); }
-    if (!payload || typeof payload !== "object" || Array.isArray(payload)) return json({ error: "Request body must be a JSON object" }, 400);
+    try { payload = await req.json(); } catch { return respond({ error: "Request body must be valid JSON" }, 400); }
+    if (!payload || typeof payload !== "object" || Array.isArray(payload)) return respond({ error: "Request body must be a JSON object" }, 400);
     const body = payload as Record<string, unknown>;
-    if (body.call_id !== undefined && (typeof body.call_id !== "string" || !uuid.test(body.call_id))) return json({ error: "call_id must be a UUID" }, 400);
+    if (body.call_id !== undefined && (typeof body.call_id !== "string" || !uuid.test(body.call_id))) return respond({ error: "call_id must be a UUID" }, 400);
 
     const db = createClient(url, serviceKey, { auth: { autoRefreshToken: false, persistSession: false } });
     let query = db.from("bov_eu_funding_calls").select("id,title,summary,eligibility_notes,partner_requirements,official_url,deadline,country_region").order("created_at", { ascending: false }).limit(500);
     if (typeof body.call_id === "string") query = query.eq("id", body.call_id);
     const { data: calls, error: readError } = await query;
-    if (readError) return json({ error: "Unable to read funding opportunities" }, 500);
+    if (readError) return respond({ error: "Unable to read funding opportunities" }, 500);
     const counts = { preliminarily_eligible: 0, ineligible: 0, unconfirmed: 0 };
     let processed = 0;
     for (const call of (calls || []) as Call[]) {
       const assessment = assess(call);
       const { error: writeError } = await db.from("bov_eu_eligibility_assessments").insert({ call_id: call.id, ...assessment });
-      if (writeError) return json({ error: "Unable to save assessment", processed }, 500);
+      if (writeError) return respond({ error: "Unable to save assessment", processed }, 500);
       counts[assessment.result] += 1;
       processed += 1;
     }
-    return json({ ok: true, processed, counts, note: "Opportunity screening only. Client-specific eligibility and official terms remain unverified." });
+    return respond({ ok: true, processed, counts, note: "Opportunity screening only. Client-specific eligibility and official terms remain unverified." });
   } catch (error) {
     console.error("bov-eu-eligibility unexpected error", error instanceof Error ? error.message : "unknown");
-    return json({ error: "Internal function error" }, 500);
+    return respond({ error: "Internal function error" }, 500);
   }
 });
