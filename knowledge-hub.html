@@ -74,40 +74,47 @@ function aFindMatches(){
   const applicant=p.applicant_types?.length?p.applicant_types.some(t=>String(t).toLowerCase()===x.applicant_type.toLowerCase()):null;
   return {country,applicant}
  }
- function scoreAgency(agency){
-  const mandate=aAgencyMandates[agency],core=aCoreMandates[agency]||[];
-  const matched=areas.filter(a=>mandate.areas.includes(a)),primary=areas.filter(a=>core.includes(a));
-  const special=aSpecialContext[agency],context=special?special.pattern.test(evidence):null;
-  // Weighted screening: themes 40%, core mandate 25%, geography 15%, applicant 10%, financing 10%.
-  // Unknown criteria contribute zero, not a false confirmation; display the evidence gap separately.
-  const themePoints=40*matched.length/areas.length,corePoints=25*primary.length/areas.length;
-  const agencyRecords=records.filter(p=>p.agency===agency&&p.title!=='Institutional partnership and programme pathways');
-  const geo=agencyRecords.some(p=>fit(p).country===true)?'recorded match':agencyRecords.some(p=>fit(p).country===false)?'recorded mismatch':'unverified';
-  const applicant=agencyRecords.some(p=>fit(p).applicant===true)?'recorded match':agencyRecords.some(p=>fit(p).applicant===false)?'recorded mismatch':'unverified';
-  const mechanism=agencyRecords.some(p=>p.status==='open'&&p.verified_on)?'verified active record':'unverified';
-  let total=themePoints+corePoints+(geo==='recorded match'?15:0)+(applicant==='recorded match'?10:0)+(mechanism==='verified active record'?10:0);
-  const flags=[];
-  if(special&&!context){total=Math.min(total,39);flags.push('Core context not established: '+special.label)}
-  if(agency==='UNOPS')flags.push('Implementation/procurement mandate does not establish grant funding');
-  if(geo==='unverified')flags.push('Geographic eligibility not verified');
-  if(applicant==='unverified')flags.push('Applicant eligibility not verified');
-  if(mechanism==='unverified')flags.push('No verified active funding mechanism');
-  return {agency,mandate,matched,primary,score:Math.round(Math.min(100,total)),geo,applicant,mechanism,flags}
- }
+ function aIsSpecificCall(p){
+ const generic=/institutional partnership and programme pathways|country programme implementing partnerships|civil society programme partnerships|country programme technical cooperation|rural development grants and country programmes|^technical cooperation$/i;
+ return !generic.test(p.title||'');
+}
+function aEvidenceComplete(p){
+ const current=new Date().toISOString().slice(0,10);
+ return aIsSpecificCall(p)&&p.status==='open'&&!!p.verified_on&&!!p.deadline&&p.deadline>=current&&!!p.eligibility&&p.applicant_types?.length>0&&!!p.source_url&&/^https:\/\//.test(p.source_url);
+}
+function scoreAgency(agency){
+ const mandate=aAgencyMandates[agency],core=aCoreMandates[agency]||[];
+ const matched=areas.filter(a=>mandate.areas.includes(a)),primary=areas.filter(a=>core.includes(a));
+ const special=aSpecialContext[agency],context=special?special.pattern.test(evidence):null;
+ const agencyRecords=records.filter(p=>p.agency===agency&&aIsSpecificCall(p));
+ // Geography and applicant eligibility are credited only for independently reviewed, specific calls.
+ const verified=agencyRecords.filter(aEvidenceComplete);
+ const geo=verified.some(p=>fit(p).country===true)?'verified match':verified.some(p=>fit(p).country===false)?'verified mismatch':'unverified';
+ const applicant=verified.some(p=>fit(p).applicant===true)?'verified match':verified.some(p=>fit(p).applicant===false)?'verified mismatch':'unverified';
+ const mechanism=verified.length?'verified active call':'unverified';
+ let total=40*matched.length/areas.length+25*primary.length/areas.length+(geo==='verified match'?15:0)+(applicant==='verified match'?10:0)+(verified.length?10:0);
+ const flags=[];
+ if(special&&!context){total=Math.min(total,39);flags.push('Core context not established: '+special.label)}
+ if(agency==='UNOPS')flags.push('Implementation/procurement mandate does not establish grant funding');
+ if(geo==='unverified')flags.push('Geographic eligibility not independently verified');
+ if(applicant==='unverified')flags.push('Applicant eligibility not independently verified');
+ if(mechanism==='unverified')flags.push('No verified active call with complete eligibility evidence');
+ return {agency,mandate,matched,primary,score:Math.round(Math.min(100,total)),geo,applicant,mechanism,flags}
+}
  const institutional=Object.keys(aAgencyMandates).map(scoreAgency).sort((a,b)=>b.score-a.score||a.agency.localeCompare(b.agency));
- out.append(el('h3','Institutional and funding intelligence'),el('p','Selected project areas: '+areas.join(' · ')+'. Screening index: thematic relevance 40%, core mandate 25%, recorded geographic fit 15%, recorded applicant fit 10%, verified active mechanism 10%. Missing evidence receives no points, not an adverse eligibility decision. Scores are indicative research priorities, NOT grant eligibility or funding probability.','muted'));
+ out.append(el('h3','Institutional and funding intelligence'),el('p','Selected project areas: '+areas.join(' · ')+'. Screening index: thematic relevance 40%, core mandate 25%, verified geographic fit 15%, verified applicant fit 10%, verified active call 10%. Unverified research leads do not earn eligibility points. Missing evidence receives no points, not an adverse eligibility decision. Scores are indicative research priorities, NOT grant eligibility or funding probability.','muted'));
  function meter(percent){const track=el('div');track.style.cssText='height:11px;background:#e5eaf2;border-radius:8px;overflow:hidden;margin:9px 0';const fill=el('div');fill.style.cssText='height:100%;width:'+percent+'%;background:'+(percent>=70?'#19856d':percent>=35?'#d39c32':'#8b9eb5');track.append(fill);return track}
  function link(card,url){if(url&&/^https:\/\//.test(url)){const l=el('a','Official source');l.href=url;l.target='_blank';l.rel='noopener noreferrer';card.append(l)}}
  function choose(card,p){const btn=el('button','Select for detailed screening');btn.style.marginLeft='12px';btn.onclick=()=>{$('aOpportunity').value=p.id;$('aEvidence').value=p.source_url||'';$('aStatus').textContent='Selected for evidence review; no eligibility decision.';$('aOpportunity').scrollIntoView({behavior:'smooth',block:'center'})};card.append(btn)}
- out.append(el('h3','1. Institutional suitability — all 14 agencies'),el('p','Research scoring uses mapped mandates and existing database evidence. Country or applicant matches in unverified research leads are provisional; verify official requirements before recommending.','muted'));
+ out.append(el('h3','1. Institutional suitability — all 14 agencies'),el('p','Research scoring uses mapped mandates and existing database evidence. Country and applicant points require a specific, documented active call with verified eligibility evidence; generic institutional references cannot earn these points.','muted'));
  for(const m of institutional){const card=el('div',null,'item');card.append(el('strong',m.agency+' · '+m.mandate.name),el('p',m.score+'% indicative screening index','muted'),meter(m.score),el('p','Thematic: '+(m.matched.join(' · ')||'none')+' · Core mandate: '+(m.primary.join(' · ')||'none'),'muted'),el('p','Geography: '+m.geo+' · Applicant: '+m.applicant+' · Funding mechanism: '+m.mechanism,'muted'));if(m.flags.length)card.append(el('p','Review required: '+m.flags.join('; '),'muted'));const record=records.find(p=>p.agency===m.agency&&p.title==='Institutional partnership and programme pathways')||records.find(p=>p.agency===m.agency);if(record)link(card,record.source_url);out.append(card)}
  const programme=records.filter(p=>p.title!=='Institutional partnership and programme pathways').map(p=>({p,agency:institutional.find(m=>m.agency===p.agency)})).sort((a,b)=>(b.agency?.score||0)-(a.agency?.score||0));
  out.append(el('h3','2. Recorded programmes and partnership mechanisms'),el('p','These entries include legacy descriptive research leads. Parent-agency scores are NOT programme-level eligibility assessments; confirm official programme names and conditions.','muted'));
- if(!programme.length)out.append(el('p','No programme records currently available.','muted'));
- for(const m of programme){const p=m.p,f=fit(p),card=el('div',null,'item');card.append(el('strong',p.agency+' · '+p.title),el('p',(m.agency?.score||0)+'% parent-agency screening index — not programme eligibility','muted'),meter(m.agency?.score||0),el('p','Country: '+(f.country===null?'unverified':f.country?'recorded match':'recorded mismatch')+' · Applicant: '+(f.applicant===null?'unverified':f.applicant?'recorded match':'recorded mismatch')+' · Status: '+p.status+' · Deadline: '+(p.deadline||'not documented'),'muted'));link(card,p.source_url);choose(card,p);out.append(card)}
+ if(!programme.length)out.append(el('p','No programme records currently available.','muted'));out.append(el('p','Verification checklist for each lead: official programme title and URL; country eligibility; eligible applicant types; original eligibility rules; funding amount where published; opening date and deadline; date independently checked. A general agency homepage is not evidence of an open call.','muted'));
+ for(const m of programme){const p=m.p,f=fit(p),card=el('div',null,'item');card.append(el('strong',p.agency+' · '+p.title),el('p',aIsSpecificCall(p)?'Named programme — source and rules require review':'Descriptive research pathway — not a verified programme title','muted'),el('p',(m.agency?.score||0)+'% parent-agency screening index — not programme eligibility','muted'),meter(m.agency?.score||0),el('p','Country: '+(f.country===null?'unverified':f.country?'recorded match':'recorded mismatch')+' · Applicant: '+(f.applicant===null?'unverified':f.applicant?'recorded match':'recorded mismatch')+' · Status: '+p.status+' · Deadline: '+(p.deadline||'not documented'),'muted'));link(card,p.source_url);choose(card,p);out.append(card)}
  out.append(el('h3','3. Verified active funding opportunities'));
- const active=programme.filter(m=>m.p.status==='open'&&m.p.verified_on&&(!m.p.deadline||m.p.deadline>=new Date().toISOString().slice(0,10)));
- if(!active.length)out.append(el('p','No verified active calls are recorded. This is a database coverage gap, not evidence that no calls exist.','muted'));
+ const active=programme.filter(m=>aEvidenceComplete(m.p));
+ if(!active.length)out.append(el('p','No verified active calls with complete source, eligibility, applicant and deadline evidence are recorded. This is a database coverage gap, not evidence that no calls exist.','muted'));
  for(const m of active){const p=m.p,card=el('div',null,'item');card.append(el('strong',p.agency+' · '+p.title),el('p','Recorded open · Verified: '+p.verified_on+' · Deadline: '+(p.deadline||'not documented'),'muted'));link(card,p.source_url);choose(card,p);out.append(card)}
  $('aStatus').textContent=institutional.length+' institutional mandates and '+records.length+' funding references screened. '+active.length+' verified active calls recorded. No eligibility decision made.';
 }
