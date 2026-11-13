@@ -21,26 +21,60 @@ $('runMatch').addEventListener('click',()=>{const theme=$('matchTheme').value.tr
 
 let aOpportunities=[],aScreening=null;
 // Advisory shortlist from existing staff-only opportunity records; never equates keyword overlap with eligibility.
+
+const aAgencyMandates={
+ 'UNDP':{name:'United Nations Development Programme',areas:['Community development','Vocational training','Entrepreneurship and employment','Climate and environment','Women and gender equality','Digital innovation','Education']},
+ 'UNICEF':{name:"United Nations Children's Fund",areas:['Education','Sport and youth development','Water and sanitation','Health and wellbeing','Community development','Women and gender equality']},
+ 'UNESCO':{name:'United Nations Educational, Scientific and Cultural Organization',areas:['Education','Vocational training','Sport and youth development','Digital innovation','Community development']},
+ 'FAO':{name:'Food and Agriculture Organization of the United Nations',areas:['Agriculture and food security','Water and sanitation','Climate and environment','Vocational training','Community development']},
+ 'IFAD':{name:'International Fund for Agricultural Development',areas:['Agriculture and food security','Community development','Entrepreneurship and employment','Vocational training','Climate and environment']},
+ 'UNIDO':{name:'United Nations Industrial Development Organization',areas:['Industry and manufacturing','Vocational training','Entrepreneurship and employment','Renewable energy','Digital innovation','Climate and environment']},
+ 'UN Women':{name:'United Nations Entity for Gender Equality and the Empowerment of Women',areas:['Women and gender equality','Entrepreneurship and employment','Education','Community development','Vocational training']},
+ 'UNFPA':{name:'United Nations Population Fund',areas:['Health and wellbeing','Sport and youth development','Women and gender equality','Education','Community development']},
+ 'WHO':{name:'World Health Organization',areas:['Health and wellbeing','Water and sanitation','Community development']},
+ 'WFP':{name:'World Food Programme',areas:['Agriculture and food security','Humanitarian assistance','Community development','Climate and environment','Health and wellbeing']},
+ 'UNHCR':{name:'United Nations High Commissioner for Refugees',areas:['Humanitarian assistance','Community development','Education','Water and sanitation','Infrastructure and housing']},
+ 'IOM':{name:'International Organization for Migration',areas:['Humanitarian assistance','Community development','Vocational training','Entrepreneurship and employment','Health and wellbeing']},
+ 'UN-Habitat':{name:'United Nations Human Settlements Programme',areas:['Infrastructure and housing','Community development','Water and sanitation','Climate and environment']},
+ 'UNOPS':{name:'United Nations Office for Project Services',areas:['Infrastructure and housing','Health and wellbeing','Education','Water and sanitation','Renewable energy']}
+};
 function aFindMatches(){
  const x=aForm(),out=$('aResults');out.replaceChildren();
- if(!x.country||!x.theme||!x.applicant_type){$('aStatus').textContent='Enter project country, sector/theme and applicant legal type before matching.';return}
- if(!aOpportunities.length){out.append(el('h3','No funding programmes recorded yet'),el('p','Add sourced programme records in Funding Intelligence Operations before matching. General agency mandates are not eligible funding calls.'));$('aStatus').textContent='No programme records available for comparison.';return}
- const words=[...new Set((x.theme+' '+x.project_description).toLowerCase().match(/[a-z]{4,}/g)||[])].filter(w=>!['project','development','programme','programmes','activities','providing'].includes(w));
- const ranked=aOpportunities.map(p=>{
-  const context=[p.title,p.theme,p.eligibility,p.notes].filter(Boolean).join(' ').toLowerCase();
-  const overlaps=words.filter(w=>context.includes(w));
-  const country=p.country?String(p.country).trim().toLowerCase()===x.country.toLowerCase():null;
-  const applicant=Array.isArray(p.applicant_types)&&p.applicant_types.length?p.applicant_types.some(t=>String(t).toLowerCase()===x.applicant_type.toLowerCase()):null;
-  const amount=p.currency===x.currency&&x.requested_funding!=null&&(p.funding_min!=null||p.funding_max!=null)?(p.funding_min==null||x.requested_funding>=p.funding_min)&&(p.funding_max==null||x.requested_funding<=p.funding_max):null;
-  return {p,overlaps,country,applicant,amount,score:overlaps.length+(country===true?3:0)+(applicant===true?2:0)-(country===false?4:0)-(applicant===false?3:0)-(amount===false?3:0)};
- }).filter(x=>x.overlaps.length||x.country===true).sort((a,b)=>b.score-a.score).slice(0,12);
- out.append(el('h3','Potential funding programmes — research shortlist'),el('p','Selected project areas: '+x.theme+'. Indicative matching only; scores reflect thematic overlap, not funding probability or eligibility. Verify call status, geography, applicant eligibility, budget and deadline.'));
- if(!ranked.length){out.append(el('p','No thematic or country matches found in recorded programmes. Expand the funding database or adjust the project description.'));return}
- for(const m of ranked){const p=m.p,card=el('div',null,'item');card.append(el('strong',p.agency+' · '+p.title));const pct=Math.min(100,Math.round(m.overlaps.length/Math.max(1,words.length)*100));card.append(el('p',pct+'% keyword alignment (indicative)','muted'));const track=el('div');track.style.cssText='height:9px;background:#e4eaf2;border-radius:7px;overflow:hidden;margin:8px 0';const fill=el('div');fill.style.cssText='height:100%;width:'+pct+'%;background:'+(pct>=65?'#19856d':pct>=30?'#d49b31':'#8a9bb1');track.append(fill);card.append(track);card.append(el('p','Theme overlap: '+(m.overlaps.slice(0,7).join(', ')||'Not established')+' · Country: '+(m.country===null?'Unverified':m.country?'Potential fit':'Mismatch')+' · Applicant: '+(m.applicant===null?'Unverified':m.applicant?'Potential fit':'Mismatch')+' · Amount: '+(m.amount===null?'Unverified':m.amount?'Within recorded limits':'Outside recorded limits'),'muted'),el('p','Recorded call status: '+(p.status||'unknown')+'; deadline: '+(p.deadline||'not documented')));
- if(p.source_url&&/^https:\/\//.test(p.source_url)){const link=el('a','Official source');link.href=p.source_url;link.target='_blank';link.rel='noopener noreferrer';card.append(link)}
- const choose=el('button','Select for detailed screening');choose.style.marginLeft='12px';choose.onclick=()=>{$('aOpportunity').value=p.id;if(p.source_url&&/^https:\/\//.test(p.source_url))$('aEvidence').value=p.source_url;$('aStatus').textContent='Programme selected. Review official eligibility evidence, then screen. Selection is not approval.';$('aOpportunity').scrollIntoView({behavior:'smooth',block:'center'})};card.append(choose);out.append(card)
+ if(!x.country||!x.theme||!x.applicant_type){$('aStatus').textContent='Enter project country, select project areas and applicant legal type.';return}
+ const selected=[...document.querySelectorAll('#aThemeChoices input:checked')].map(c=>c.value);
+ const areas=selected.length?selected:x.theme.split(',').map(t=>t.trim()).filter(Boolean);
+ const records=aOpportunities||[];
+ out.append(el('h3','Institutional and funding intelligence'));
+ out.append(el('p','Selected project areas: '+areas.join(' · ')+'. Percentages indicate indicative mandate relevance only, NOT eligibility, an available grant, or probability of funding. Institutional categories are research classifications, not official UN funding-programme titles.','muted'));
+ function meter(percent){
+  const track=el('div');track.style.cssText='height:11px;background:#e5eaf2;border-radius:8px;overflow:hidden;margin:9px 0';
+  const fill=el('div');fill.style.cssText='height:100%;width:'+percent+'%;background:'+(percent>=70?'#19856d':percent>=35?'#d39c32':'#8b9eb5');track.append(fill);return track
  }
- $('aStatus').textContent=ranked.length+' potential programme records compared. No eligibility decision made.';
+ function link(card,url){if(url&&/^https:\/\//.test(url)){const l=el('a','Official source');l.href=url;l.target='_blank';l.rel='noopener noreferrer';card.append(l)}}
+ function countryFit(p){return p.country?String(p.country).trim().toLowerCase()===x.country.toLowerCase():null}
+ function applicantFit(p){return p.applicant_types?.length?p.applicant_types.some(t=>String(t).toLowerCase()===x.applicant_type.toLowerCase()):null}
+ function select(card,p){const btn=el('button','Select for detailed screening');btn.style.marginLeft='12px';btn.onclick=()=>{$('aOpportunity').value=p.id;$('aEvidence').value=p.source_url||'';$('aStatus').textContent='Selected for detailed evidence review; no funding eligibility decision.';$('aOpportunity').scrollIntoView({behavior:'smooth',block:'center'})};card.append(btn)}
+ const institutional=Object.entries(aAgencyMandates).map(([agency,mandate])=>{
+  const matched=areas.filter(a=>mandate.areas.includes(a));
+  const score=Math.round(100*matched.length/Math.max(1,areas.length));
+  return {agency,mandate,matched,score}
+ }).sort((a,b)=>b.score-a.score||a.agency.localeCompare(b.agency));
+ out.append(el('h3','1. Institutional alignment — all 14 agencies'));
+ out.append(el('p','Scores reflect how many selected project areas align with the agency’s broad mandate mapping. This is a transparent research heuristic; it does not assess the specific programme’s legal or financial eligibility.','muted'));
+ for(const m of institutional){const card=el('div',null,'item');card.append(el('strong',m.agency+' · '+m.mandate.name),el('p',m.score+'% mandate alignment','muted'),meter(m.score),el('p','Aligned project areas: '+(m.matched.join(' · ')||'None of the selected areas mapped')+' ('+m.matched.length+' of '+areas.length+')','muted'));const record=records.find(p=>p.agency===m.agency&&p.title==='Institutional partnership and programme pathways')||records.find(p=>p.agency===m.agency);if(record)link(card,record.source_url);out.append(card)}
+ const programme=records.filter(p=>p.title!=='Institutional partnership and programme pathways').map(p=>{
+  const mapped=aAgencyMandates[p.agency];const aligned=mapped?areas.filter(a=>mapped.areas.includes(a)):[];
+  return {p,score:Math.round(100*aligned.length/Math.max(1,areas.length)),aligned}
+ }).sort((a,b)=>b.score-a.score||a.p.agency.localeCompare(b.p.agency));
+ out.append(el('h3','2. Named programmes and recorded mechanisms'));
+ out.append(el('p','Programme titles are shown as recorded in the database. Some legacy titles are descriptive research leads, not verified official programme names. Programme-level fit and eligibility require source review.','muted'));
+ if(!programme.length)out.append(el('p','No programme or mechanism records available.','muted'));
+ for(const m of programme){const p=m.p,card=el('div',null,'item');card.append(el('strong',p.agency+' · '+p.title),el('p',m.score+'% parent-agency mandate alignment (not programme eligibility)','muted'),meter(m.score),el('p','Aligned areas: '+(m.aligned.join(' · ')||'none')+' · Country: '+(countryFit(p)===null?'not specified':countryFit(p)?'recorded match':'recorded mismatch')+' · Applicant: '+(applicantFit(p)===null?'not specified':applicantFit(p)?'recorded match':'recorded mismatch'),'muted'),el('p','Recorded call status: '+p.status+' · Deadline: '+(p.deadline||'not documented'),'muted'));link(card,p.source_url);select(card,p);out.append(card)}
+ out.append(el('h3','3. Confirmed active funding opportunities'));
+ const active=programme.filter(m=>m.p.status==='open'&&m.p.verified_on&&(!m.p.deadline||m.p.deadline>=new Date().toISOString().slice(0,10)));
+ if(!active.length)out.append(el('p','No independently verified active calls are currently recorded. This does not mean the agencies have no open opportunities.','muted'));
+ for(const m of active){const card=el('div',null,'item'),p=m.p;card.append(el('strong',p.agency+' · '+p.title),el('p','Current recorded status: open · Last verified: '+p.verified_on+' · Deadline: '+(p.deadline||'not recorded'),'muted'));link(card,p.source_url);select(card,p);out.append(card)}
+ $('aStatus').textContent='14 institutional mandates and '+records.length+' funding reference records reviewed. '+active.length+' confirmed active calls in database. No eligibility decision made.';
 }
 $('aFind').onclick=aFindMatches;
 for(let i=1;i<=17;i++){const o=el('option','SDG '+i+' · '+names[i-1]);o.value=i;$('aSdg').append(o)}
