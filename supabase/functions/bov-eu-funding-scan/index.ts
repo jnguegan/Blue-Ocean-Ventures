@@ -1,5 +1,5 @@
 // Supabase Edge Function: bov-eu-funding-scan
-// Deploy with JWT verification ON. Scheduled calls use the private EU_SCAN_SECRET header.
+// Deploy with Verify JWT OFF. Staff JWT is verified in-function; scheduled callers may use EU_SCAN_SECRET.
 // Only imports official European Commission grants, not tenders or fabricated regional calls.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const API="https://api.tech.ec.europa.eu/search-api/prod/rest/search?apiKey=SEDIA&language=en&pageSize=100&pageNumber=1";
@@ -9,15 +9,35 @@ function field(x,...keys){for(const k of keys){const v=x?.[k];if(typeof v==="str
 function rowsFrom(x){for(const a of [x?.results,x?.items,x?.data?.results,x?.data?.items,x?.response?.results,x?.hits?.hits,x?.results?.results,x?.results?.items])if(Array.isArray(a))return a;return []}
 function dateOf(v){if(!v)return null;const s=String(v);const match=s.match(/\d{4}-\d{2}-\d{2}/);if(match)return match[0];if(/^\d{13}$/.test(s))return new Date(Number(s)).toISOString().slice(0,10);return null}
 function classify(text){return /\b(public authorities only|public administrations only|government bodies only)\b/i.test(text)?"public_only":/\b(sme|micro.enterprise|entrepreneur|start.up|farmer|private enterprise|business|company|cooperative)\b/i.test(text)?"private_possible":"unreviewed"}
+const allowedOrigins=new Set(["https://blueoceanventures.co","https://www.blueoceanventures.co"]);
 Deno.serve(async req=>{
- if(req.method!=="POST")return new Response("Method not allowed",{status:405});
+ const origin=req.headers.get("origin")||"";
+ const headers:Record<string,string>={
+  ...(allowedOrigins.has(origin)?{"Access-Control-Allow-Origin":origin,"Vary":"Origin"}:{}),
+  "Access-Control-Allow-Methods":"POST, OPTIONS",
+  "Access-Control-Allow-Headers":"authorization, apikey, content-type, x-client-info, x-eu-scan-secret",
+  "Cache-Control":"no-store",
+ };
+ const reply=(data:unknown,status=200)=>Response.json(data,{status,headers});
+ if(req.method==="OPTIONS")return new Response(null,{status:204,headers});
+ if(req.method!=="POST")return reply({error:"Method not allowed"},405);
  const service=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"),url=Deno.env.get("SUPABASE_URL"),secret=Deno.env.get("EU_SCAN_SECRET");
- if(!service||!url||!secret)return Response.json({error:"Missing server configuration"},{status:503});
+ const anon=Deno.env.get("SUPABASE_ANON_KEY");
+ if(!service||!url||!anon)return reply({error:"Missing Supabase server configuration"},503);
  const provided=req.headers.get("x-eu-scan-secret");
- if(provided!==secret)return Response.json({error:"Not authorised"},{status:401});
+ const scheduled=!!secret&&!!provided&&provided===secret;
+ if(!scheduled){
+  const token=/^Bearer\\s+(.+)$/i.exec(req.headers.get("authorization")||"")?.[1]?.trim();
+  if(!token)return reply({error:"Staff sign-in required"},401);
+  const userDb=createClient(url,anon,{global:{headers:{Authorization:"Bearer "+token}},auth:{persistSession:false,autoRefreshToken:false}});
+  const {data:userData,error:userError}=await userDb.auth.getUser(token);
+  if(userError||!userData.user)return reply({error:"Invalid staff session"},401);
+  const {data:allowed,error:accessError}=await userDb.rpc("bov_hub_access");
+  if(accessError||allowed!==true)return reply({error:"Knowledge Hub staff permission required"},403);
+ }
  const db=createClient(url,service,{auth:{persistSession:false}});
  const {data:run,error:runErr}=await db.from("bov_eu_scan_runs").insert({source_key:"eu-ft"}).select("id").single();
- if(runErr)return Response.json({error:"Scanner migration missing or scan log unavailable",detail:runErr.message},{status:500});
+ if(runErr)return reply({error:"Scanner migration missing or scan log unavailable",detail:runErr.message},500);
  let fetched=0,inserted=0,updated=0;
  try{
   const query={bool:{must:[{terms:{type:["1","2","8"]}},{terms:{status:["31094501","31094502","31094503"]}}]}};
@@ -53,11 +73,11 @@ Deno.serve(async req=>{
   }
   await db.from("bov_eu_scan_runs").update({finished_at:new Date().toISOString(),status:"success",fetched_count:fetched,inserted_count:inserted,updated_count:updated}).eq("id",run.id);
   await db.from("bov_eu_funding_sources").update({last_scanned_at:new Date().toISOString(),scan_status:"success",last_error:null}).eq("source_key","eu-ft");
-  return Response.json({ok:true,fetched,inserted,updated,source:"EU Funding & Tenders official API",note:"Imported records require eligibility and deadline verification"});
+  return reply({ok:true,fetched,inserted,updated,source:"EU Funding & Tenders official API",note:"Imported records require eligibility and deadline verification"});
  }catch(e){
   const message=e instanceof Error?e.message:String(e);
   await db.from("bov_eu_scan_runs").update({finished_at:new Date().toISOString(),status:"error",fetched_count:fetched,inserted_count:inserted,updated_count:updated,error_message:message.slice(0,1500)}).eq("id",run.id);
   await db.from("bov_eu_funding_sources").update({scan_status:"error",last_error:message.slice(0,1000)}).eq("source_key","eu-ft");
-  return Response.json({ok:false,error:message},{status:502});
+  return reply({ok:false,error:message},502);
  }
 });
