@@ -108,14 +108,35 @@ async function detail(){
   box.append(funding);
   target.append(box);
  }
+ function printStoredReport(r){
+  const win=window.open('','_blank');if(!win){$('projectsStatus').textContent='Allow pop-ups to print the assessment.';return}
+  win.opener=null;const doc=win.document;doc.title='Blue Ocean Ventures — Saved assessment';
+  const style=doc.createElement('style');style.textContent='body{font:13px Arial,sans-serif;color:#17365c;margin:30px}h1{font-size:21px}h2{font-size:17px;margin-top:22px}table{border-collapse:collapse;width:100%;margin:12px 0}th,td{padding:8px;border:1px solid #d9e2ec;text-align:left;vertical-align:top}th{background:#edf4fb}.note{color:#586e84}';doc.head.append(style);
+  doc.body.append(txt('h1','Blue Ocean Ventures — Saved project assessment'));
+  doc.body.append(txt('p',selected.project_name+' · '+selected.organisation_name+' · '+(selected.country||'')));
+  doc.body.append(txt('p','Version '+r.version+' · '+new Date(r.created_at).toLocaleString()));
+  doc.body.append(txt('h2','Report 1 — Institutional relevance'));
+  const agencies=r.relevance_report?.agencies||[];
+  const agencyTable=makeTable(['Agency','Relevance','Matching project areas'],agencies.map(a=>[a.agency,a.score+'%',a.direct?.join(', ')||'No direct match recorded']));doc.body.append(agencyTable);
+  doc.body.append(txt('h2','Report 2 — Funding intelligence'));
+  const f=r.funding_report||{},calls=f.verified_open_calls||[],pending=f.pathways_requiring_verification||[];
+  doc.body.append(txt('p',calls.length+' verified open calls · '+pending.length+' pathways requiring verification'));
+  doc.body.append(makeTable(['Agency','Programme / pathway','Verification'],[...calls.map(x=>[x.agency,x.title,'Verified open at assessment']),...pending.map(x=>[x.agency,x.title,'Requires verification'])]));
+  doc.body.append(txt('p','Internal research only. Relevance does not imply eligibility approval or funding probability.'));
+  win.focus();win.print();
+ }
+ function reportPrintControl(r){
+  const button=txt('button','Print report v'+r.version);button.type='button';button.className='btn alt';button.style.margin='10px 0';
+  button.onclick=()=>printStoredReport(r);return button;
+ }
  function reportSummary(r,isLatest){
   const agencies=r.relevance_report?.agencies||[],f=r.funding_report||{};
   const top=agencies.length?agencies[0].agency+' '+agencies[0].score+'%':'No agency scores';
   return (isLatest?'Latest · ':'')+'Report v'+r.version+' · '+new Date(r.created_at).toLocaleDateString()+' · '+top+' · '+(f.verified_open_calls||[]).length+' open calls';
  }
  const current=document.createElement('details');current.className='report-disclosure';
- current.append(txt('summary',reportSummary(latest,true)));renderReport(current,latest);$('projectLatest').append(current);
- for(const r of reports.slice(1)){const d=document.createElement('details');d.className='report-disclosure';d.append(txt('summary',reportSummary(r,false)));renderReport(d,r);$('projectHistory').append(d)}
+ current.append(txt('summary',reportSummary(latest,true)));current.append(reportPrintControl(latest));renderReport(current,latest);$('projectLatest').append(current);
+ for(const r of reports.slice(1)){const d=document.createElement('details');d.className='report-disclosure';d.append(txt('summary',reportSummary(r,false)));d.append(reportPrintControl(r));renderReport(d,r);$('projectHistory').append(d)}
  if(reports.length===1)$('projectHistory').append(txt('p','No previous assessment versions.'));
 
 }
