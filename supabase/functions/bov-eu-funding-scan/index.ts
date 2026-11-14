@@ -2,6 +2,7 @@
 // Deploy with Verify JWT OFF. Staff JWT is verified in-function; scheduled callers may use EU_SCAN_SECRET.
 // Only imports official European Commission grants, not tenders or fabricated regional calls.
 //
+// v2.2: saves a truncated raw sample to bov_eu_scan_runs.raw_sample (optional column).
 // v2.1: multipart body sent as fixed-size bytes; GET fallback; detailed network error causes.
 // v2 changes:
 //  - Small pages (PAGE_SIZE) fetched one after another, instead of one huge 100-row reply
@@ -158,6 +159,14 @@ async function readRows(response: Response, pageNumber: number): Promise<any[]> 
   catch { throw Object.assign(Error(`EU API page ${pageNumber} was not valid JSON: ${text.slice(0, 300)}`), { noRetry: true }); }
 }
 
+// Shorten long strings so a raw sample stays small.
+function trimDeep(v: any, depth = 0): any {
+  if (typeof v === "string") return v.length > 400 ? v.slice(0, 400) + "…" : v;
+  if (Array.isArray(v)) return v.slice(0, 8).map((x) => trimDeep(x, depth + 1));
+  if (v && typeof v === "object" && depth < 6) return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, trimDeep(x, depth + 1)]));
+  return v;
+}
+
 const allowedOrigins = new Set(["https://blueoceanventures.co", "https://www.blueoceanventures.co"]);
 
 Deno.serve(async (req) => {
@@ -198,6 +207,7 @@ Deno.serve(async (req) => {
   let sampleKeys: { top: string[]; metadata: string[] } | null = null;
   let partialError: string | null = null;
   let method = "";
+  let rawSample: any = null;
 
   try {
     const now = new Date().toISOString(), today = now.slice(0, 10);
@@ -220,7 +230,8 @@ Deno.serve(async (req) => {
         break;
       }
       fetched += results.length;
-      if (!sampleKeys) {
+      if (!rawSample && results.length) rawSample = { method, rows: trimDeep(results.slice(0, 3)) };
+      if (!sampleKeys && results.length) {
         const r = results[0];
         sampleKeys = { top: Object.keys(r ?? {}), metadata: Object.keys(r?.metadata ?? r?._source?.metadata ?? {}) };
       }
@@ -273,6 +284,7 @@ Deno.serve(async (req) => {
     }).eq("id", run.id);
     await db.from("bov_eu_funding_sources").update({ last_scanned_at: finished, scan_status: "success", last_error: partialError }).eq("source_key", "eu-ft");
 
+    if (rawSample) await db.from("bov_eu_scan_runs").update({ raw_sample: rawSample }).eq("id", run.id);
     return reply({ ok: true, method, pages, fetched, inserted, updated, skipped, partialError, sampleKeys,
       source: "EU Funding & Tenders official API", note: "Imported records require eligibility and deadline verification" });
   } catch (e) {
@@ -280,6 +292,7 @@ Deno.serve(async (req) => {
     await db.from("bov_eu_scan_runs").update({ finished_at: new Date().toISOString(), status: "error", fetched_count: fetched,
       inserted_count: inserted, updated_count: updated, error_message: message.slice(0, 1500) }).eq("id", run.id);
     await db.from("bov_eu_funding_sources").update({ scan_status: "error", last_error: message.slice(0, 1000) }).eq("source_key", "eu-ft");
+    if (rawSample) await db.from("bov_eu_scan_runs").update({ raw_sample: rawSample }).eq("id", run.id);
     return reply({ ok: false, error: message, pages, fetched, inserted, sampleKeys }, 502);
   }
 });
