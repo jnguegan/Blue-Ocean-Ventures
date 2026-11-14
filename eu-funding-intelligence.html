@@ -1,4 +1,273 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><title>EU Funding Intelligence | Blue Ocean Ventures</title><style>body{margin:0;font:16px/1.6 system-ui,Arial;background:#f5f8fc;color:#243850}*{box-sizing:border-box}header{background:#102d55;color:white;padding:20px 5%}header a{color:white;float:right}main{max-width:1150px;margin:32px auto;padding:0 20px}h1{margin-bottom:4px}p{color:#61738a}.tabs{display:flex;gap:9px;flex-wrap:wrap;margin:25px 0}.tabs button{border:1px solid #ccd9e9;background:white;color:#102d55;border-radius:8px;padding:13px 17px;cursor:pointer;font-weight:700}.tabs button[aria-selected=true]{background:#1767c9;color:white}.panel{background:white;border:1px solid #dce6f0;border-radius:13px;padding:22px;margin:16px 0}.filters{display:flex;gap:12px;flex-wrap:wrap}.filters input,.filters select{font:inherit;padding:11px;border:1px solid #cbd8e6;border-radius:8px;min-width:210px}.filters input{flex:2}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:14px}.card{border:1px solid #dce6f0;border-radius:12px;padding:19px;background:#fff}.card h3{margin:0 0 8px}.tag{display:inline-block;background:#edf3fa;color:#1459ad;border-radius:20px;padding:3px 10px;font-size:12px;margin:3px}a{color:#1767c9}.card a{font-weight:700}.small{font-size:13px}</style><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><style>#eu-map{height:430px;border-radius:12px;background:#e8f1f8}.funding-pin{background:#1767c9;color:#fff;border:2px solid white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;box-shadow:0 2px 8px #1235}</style><style>.workspace-nav{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0}.workspace-nav a{padding:9px 14px;border:1px solid #d7e4f0;border-radius:9px;background:#fff;text-decoration:none;font-size:14px;font-weight:700}.secondary-area{background:#fff;border:1px solid #dce6f0;border-radius:13px;margin:18px 0}.secondary-area>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:15px;padding:22px;color:#102d55}.secondary-area>summary::-webkit-details-marker{display:none}.secondary-area>summary strong{font-size:19px}.secondary-area>summary small{display:block;color:#65768b;font-size:13px;margin-top:5px}.secondary-content{padding:0 18px 16px}.secondary-content>.panel{margin:0;border:0;padding:12px 4px}.secondary-area[open]>summary{border-bottom:1px solid #e3eaf3}#opportunity-map{scroll-margin-top:20px}#live{scroll-margin-top:20px}@media(max-width:650px){.workspace-nav a{font-size:12px;padding:8px 10px}}</style><style>.funding-layout{display:grid;grid-template-columns:224px minmax(0,1fr);gap:20px;align-items:start;margin-top:20px}.funding-sidebar{position:sticky;top:16px;background:#102d55;color:#fff;border-radius:13px;padding:20px 12px;min-height:390px}.sidebar-heading{font-size:11px;letter-spacing:.1em;color:#b6cee8;font-weight:800;padding:5px 10px 15px}.funding-side-nav{display:grid;gap:6px}.funding-side-nav button{border:0;border-radius:9px;padding:13px 12px;text-align:left;background:transparent;color:#dce8f6;font:700 14px system-ui;cursor:pointer}.funding-side-nav button:hover,.funding-side-nav button[aria-current="page"]{background:#1767c9;color:white}.sidebar-footer{border-top:1px solid #456080;margin-top:22px;padding:17px 10px;display:grid;gap:12px}.sidebar-footer a{font-size:12px;color:#e0efff}.funding-main{min-width:0}.funding-main .panel{margin-top:0}.funding-view[hidden]{display:none!important}#eu-map{height:500px}.funding-main .filters select{min-width:170px}.funding-main .grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}@media(max-width:750px){.funding-layout{grid-template-columns:1fr}.funding-sidebar{position:static;min-height:0;padding:13px}.sidebar-heading{padding:5px 8px 8px}.funding-side-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.funding-side-nav button{padding:10px}.sidebar-footer{margin-top:8px;padding:10px 8px;display:flex;gap:16px;flex-wrap:wrap}#eu-map{height:380px}}</style></head><body><header><strong>BLUE OCEAN VENTURES · FUNDING INTELLIGENCE</strong><a href="/knowledge-hub.html">← Knowledge Hub</a></header><main><h1>EU Funding Opportunities</h1><p>Private intelligence workspace for funding available to entrepreneurs, SMEs, family businesses, farmers and project promoters. Explore recorded opportunities on the map, then consult programme guidance or scanner sources when needed. Records are not verified grants unless explicitly confirmed.</p><section class="panel" style="border-left:5px solid #1767c9"><h2>Looking for funding for a project?</h2><p><strong>Use the same project intake and document upload for UN and EU funding.</strong> In the Knowledge Hub, enter project details, upload supporting documents to the private Staff Vault, and complete the existing assessment. This explorer is an internal research register, not a separate project application.</p><a href="/knowledge-hub.html#phase7" style="font-weight:700">Open project assessment &amp; document upload →</a></section><div class="funding-layout"><aside class="funding-sidebar" id="funding-sidebar" aria-label="EU funding navigation"><div class="sidebar-heading">FUNDING INTELLIGENCE</div><nav class="funding-side-nav" aria-label="Funding sections"><button type="button" data-funding-view="opportunity-map" aria-current="page">Opportunities &amp; Map</button><button type="button" data-funding-view="live">Grant Register</button><button type="button" data-funding-view="programmes">Programmes</button><button type="button" data-funding-view="scanner-admin">Scanner</button></nav><div class="sidebar-footer"><a href="/knowledge-hub.html#phase7">Project Assessment ↗</a><a href="/knowledge-hub.html">Knowledge Hub ↗</a></div></aside><div class="funding-main" id="funding-main"><div id="opportunity-map" class="funding-view"><section class="panel"><h2>Funding opportunities · interactive EU map</h2><p>Recorded EU funding opportunities for SMEs, entrepreneurs, family businesses, start-ups and individual promoters. Public-sector opportunities remain available as a secondary category. Markers indicate approximate eligible geography, not the funding authority location.</p><div class="filters"><select id="applicant-filter"><option value="private">Private enterprise focus</option><option value="all">All applicant types</option></select><select id="sector-filter"><option value="">All sectors</option><option value="agricultur">Agriculture &amp; farming</option><option value="food">Food processing</option><option value="touris">Tourism &amp; hospitality</option><option value="energy">Renewable energy</option><option value="rural">Rural development</option><option value="innovation">Innovation &amp; start-ups</option></select></div><p id="map-state" role="status">Checking staff access…</p><div id="eu-map" aria-label="EU funding opportunity map"></div><p id="map-notes" class="small"></p></section></div><section class="panel funding-view" id="live" hidden><h2>Recorded EU funding opportunities</h2><p>Search recorded funding opportunities below. These are funding-source records, not client projects; use the Knowledge Hub for project submissions. Automatic scanning is not yet active.</p><p id="authstate" role="status">Checking staff access…</p><div id="staffarea" hidden><div class="filters"><input id="callsearch" placeholder="Search recorded calls" aria-label="Search recorded calls"><select id="callstatus"><option value="">All statuses</option><option>research</option><option>open</option><option>upcoming</option><option>closed</option><option>archived</option></select><button id="newcall" type="button">Record EU opportunity</button></div><p class="small" id="callcount"></p><div id="callcards" class="grid"></div><form id="callform" class="panel" hidden><h3 id="formtitle">Add funding call</h3><input type="hidden" id="callid"><div class="filters"><input id="ftitle" required maxlength="250" placeholder="Official call title"><input id="fprogramme" required maxlength="200" placeholder="Programme"><input id="furl" required type="url" placeholder="https:// official call URL"><select id="fcategory"><option value="regional">European regional</option><option value="spain">Canary Islands &amp; Spain</option><option value="africa">EU–Africa cooperation</option></select><select id="fstatus"><option value="research">Research</option><option value="upcoming">Upcoming</option><option value="open">Open</option><option value="closed">Closed</option><option value="archived">Archived</option></select><input id="fregion" placeholder="Country / region"><input id="ftheme" placeholder="Theme"><label>Deadline <input id="fdeadline" type="date"></label><label>Minimum EUR <input id="fmin" type="number" min="0" step=".01"></label><label>Maximum EUR <input id="fmax" type="number" min="0" step=".01"></label><label>Funding rate % <input id="fpercent" type="number" min="0" max="100" step=".01"></label><label>Verified on <input id="fverified" type="date"></label></div><p><textarea id="fsummary" placeholder="Call summary" style="width:100%;min-height:80px"></textarea></p><p><textarea id="feligibility" placeholder="Applicant eligibility notes" style="width:100%;min-height:70px"></textarea></p><p><textarea id="fpartners" placeholder="Partner / consortium requirements" style="width:100%;min-height:70px"></textarea></p><p><textarea id="fnotes" placeholder="Internal research notes" style="width:100%;min-height:70px"></textarea></p><button type="submit">Save call</button> <button type="button" id="cancelcall">Cancel</button><p id="formstatus" role="status"></p></form></div></section><section id="programmes" class="funding-view" hidden><div class="panel"><h2>Programme Library</h2><p>Reference guidance for major EU funding programmes and their objectives.</p><nav class="tabs" aria-label="Funding categories"><button data-tab="regional" aria-selected="true">European regional</button><button data-tab="spain" aria-selected="false">Canary Islands & Spain</button><button data-tab="africa" aria-selected="false">EU–Africa cooperation</button></nav><section class="panel"><h2 id="heading">European regional funding</h2><p id="intro"></p><div class="filters"><input id="query" placeholder="Search programmes, sectors or regions" aria-label="Search programmes"><select id="theme" aria-label="Theme"><option value="">All themes</option><option>Regional development</option><option>Innovation</option><option>Climate & energy</option><option>Employment & skills</option><option>Cooperation</option><option>Rural development</option></select></div><p id="count" class="small" role="status"></p><div id="results" class="grid"></div></section></div></section><section id="scanner-admin" class="funding-view" hidden><div class="panel"><h2>Scanner</h2><p>Official sources, collection methods and connection status. Automated scanning is not yet active.</p><section class="panel"><h2>Import official EU funding opportunities</h2><p>Scan the European Commission Funding &amp; Tenders source. Imported records remain unverified research leads until staff review.</p><button type="button" id="eu-import-run" disabled>Scan official EU funding calls</button><p id="eu-import-status" role="status">Checking staff access…</p><p id="eu-import-last"></p></section><section class="panel" id="eligibility-panel"><h2>EU opportunity eligibility screening</h2><p>Staff-only preliminary screening of recorded funding calls. This does not establish client-specific eligibility or confirm official terms.</p><button type="button" id="eu-eligibility-run" disabled>Run eligibility screening</button><p id="eu-eligibility-status" role="status">Checking staff session…</p><div id="eu-eligibility-results" class="grid" aria-live="polite"></div><h3>Saved assessments</h3><button type="button" id="eu-saved-refresh">Refresh saved assessments</button><p id="eu-saved-status" role="status"></p><div id="eu-saved-list"></div></section><section class="panel" id="sources"><h2>Official EU funding source coverage</h2><p>Private staff source registry for EU-wide, national, regional and cross-border programmes. Source registration does not mean automatic scanning is active.</p><p id="source-status" role="status">Checking source registry…</p><div id="source-list" class="grid"></div></section></div></section></div></div></main><script>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><title>EU Funding Intelligence | Blue Ocean Ventures</title><style>body{margin:0;font:16px/1.6 system-ui,Arial;background:#f5f8fc;color:#243850}*{box-sizing:border-box}header{background:#102d55;color:white;padding:20px 5%}header a{color:white;float:right}main{max-width:1150px;margin:32px auto;padding:0 20px}h1{margin-bottom:4px}p{color:#61738a}.tabs{display:flex;gap:9px;flex-wrap:wrap;margin:25px 0}.tabs button{border:1px solid #ccd9e9;background:white;color:#102d55;border-radius:8px;padding:13px 17px;cursor:pointer;font-weight:700}.tabs button[aria-selected=true]{background:#1767c9;color:white}.panel{background:white;border:1px solid #dce6f0;border-radius:13px;padding:22px;margin:16px 0}.filters{display:flex;gap:12px;flex-wrap:wrap}.filters input,.filters select{font:inherit;padding:11px;border:1px solid #cbd8e6;border-radius:8px;min-width:210px}.filters input{flex:2}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:14px}.card{border:1px solid #dce6f0;border-radius:12px;padding:19px;background:#fff}.card h3{margin:0 0 8px}.tag{display:inline-block;background:#edf3fa;color:#1459ad;border-radius:20px;padding:3px 10px;font-size:12px;margin:3px}a{color:#1767c9}.card a{font-weight:700}.small{font-size:13px}</style><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><style>#eu-map{height:430px;border-radius:12px;background:#e8f1f8}.funding-pin{background:#1767c9;color:#fff;border:2px solid white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:bold;box-shadow:0 2px 8px #1235}</style><style>.workspace-nav{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0}.workspace-nav a{padding:9px 14px;border:1px solid #d7e4f0;border-radius:9px;background:#fff;text-decoration:none;font-size:14px;font-weight:700}.secondary-area{background:#fff;border:1px solid #dce6f0;border-radius:13px;margin:18px 0}.secondary-area>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:15px;padding:22px;color:#102d55}.secondary-area>summary::-webkit-details-marker{display:none}.secondary-area>summary strong{font-size:19px}.secondary-area>summary small{display:block;color:#65768b;font-size:13px;margin-top:5px}.secondary-content{padding:0 18px 16px}.secondary-content>.panel{margin:0;border:0;padding:12px 4px}.secondary-area[open]>summary{border-bottom:1px solid #e3eaf3}#opportunity-map{scroll-margin-top:20px}#live{scroll-margin-top:20px}@media(max-width:650px){.workspace-nav a{font-size:12px;padding:8px 10px}}</style><style>.funding-layout{display:grid;grid-template-columns:224px minmax(0,1fr);gap:20px;align-items:start;margin-top:20px}.funding-sidebar{position:sticky;top:16px;background:#102d55;color:#fff;border-radius:13px;padding:20px 12px;min-height:390px}.sidebar-heading{font-size:11px;letter-spacing:.1em;color:#b6cee8;font-weight:800;padding:5px 10px 15px}.funding-side-nav{display:grid;gap:6px}.funding-side-nav button{border:0;border-radius:9px;padding:13px 12px;text-align:left;background:transparent;color:#dce8f6;font:700 14px system-ui;cursor:pointer}.funding-side-nav button:hover,.funding-side-nav button[aria-current="page"]{background:#1767c9;color:white}.sidebar-footer{border-top:1px solid #456080;margin-top:22px;padding:17px 10px;display:grid;gap:12px}.sidebar-footer a{font-size:12px;color:#e0efff}.funding-main{min-width:0}.funding-main .panel{margin-top:0}.funding-view[hidden]{display:none!important}#eu-map{height:500px}.funding-main .filters select{min-width:170px}.funding-main .grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}@media(max-width:750px){.funding-layout{grid-template-columns:1fr}.funding-sidebar{position:static;min-height:0;padding:13px}.sidebar-heading{padding:5px 8px 8px}.funding-side-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.funding-side-nav button{padding:10px}.sidebar-footer{margin-top:8px;padding:10px 8px;display:flex;gap:16px;flex-wrap:wrap}#eu-map{height:380px}}</style></head><body><header><strong>BLUE OCEAN VENTURES · FUNDING INTELLIGENCE</strong><a href="/knowledge-hub.html">← Knowledge Hub</a></header><main><h1>EU Funding Opportunities</h1><p>Private intelligence workspace for funding available to entrepreneurs, SMEs, family businesses, farmers and project promoters. Explore recorded opportunities on the map, then consult programme guidance or scanner sources when needed. Records are not verified grants unless explicitly confirmed.</p><section class="panel" style="border-left:5px solid #1767c9"><h2>Looking for funding for a project?</h2><p><strong>Use the same project intake and document upload for UN and EU funding.</strong> In the Knowledge Hub, enter project details, upload supporting documents to the private Staff Vault, and complete the existing assessment. This explorer is an internal research register, not a separate project application.</p><a href="/knowledge-hub.html#phase7" style="font-weight:700">Open project assessment &amp; document upload →</a></section><div class="funding-layout"><aside class="funding-sidebar" id="funding-sidebar" aria-label="EU funding navigation"><div class="sidebar-heading">FUNDING INTELLIGENCE</div><nav class="funding-side-nav" aria-label="Funding sections"><button type="button" data-funding-view="opportunity-map" aria-current="page">Opportunities &amp; Map</button><button type="button" data-funding-view="live">Grant Register</button><button type="button" data-funding-view="programmes">Programmes</button><button type="button" data-funding-view="scanner-admin">Scanner</button></nav><div class="sidebar-footer"><a href="/knowledge-hub.html#phase7">Project Assessment ↗</a><a href="/knowledge-hub.html">Knowledge Hub ↗</a></div></aside><div class="funding-main" id="funding-main"><div id="opportunity-map" class="funding-view"><section class="panel"><h2>Funding opportunities · interactive EU map</h2><p>Recorded EU funding opportunities for SMEs, entrepreneurs, family businesses, start-ups and individual promoters. Public-sector opportunities remain available as a secondary category. Markers indicate approximate eligible geography, not the funding authority location.</p><div class="filters"><select id="applicant-filter"><option value="private">Private enterprise focus</option><option value="all">All applicant types</option></select><select id="sector-filter"><option value="">All sectors</option><option value="agricultur">Agriculture &amp; farming</option><option value="food">Food processing</option><option value="touris">Tourism &amp; hospitality</option><option value="energy">Renewable energy</option><option value="rural">Rural development</option><option value="innovation">Innovation &amp; start-ups</option></select></div><p id="map-state" role="status">Checking staff access…</p><div id="eu-map" aria-label="EU funding opportunity map"></div><p id="map-notes" class="small"></p></section></div><section class="funding-view" id="live" hidden><style>
+#gr-app{--navy:#102d55;--blue:#1767c9;--blue-soft:#e8f1fc;--ink:#1d2f45;--muted:#62748a;--line:#dfe7f1;--surface:#fff;--urgent:#c62828;--urgent-bg:#fdecec;--soon:#9a5b00;--soon-bg:#fff4dd;--ok:#1b6e3c;--ok-bg:#e7f6ec;color:var(--ink)}
+#gr-app *{box-sizing:border-box}
+.gr-hero{background:linear-gradient(120deg,#0c2447 0%,#123a70 55%,#1767c9 100%);color:#fff;border-radius:16px;padding:26px 28px;display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;position:relative;overflow:hidden}
+.gr-hero:after{content:"";position:absolute;right:-60px;top:-80px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,#ffffff22,transparent 70%)}
+.gr-hero h2{margin:0;font-size:26px;letter-spacing:-.01em;color:#fff}
+.gr-hero p{margin:6px 0 0;color:#cfe0f5;max-width:640px;font-size:14px}
+.gr-hero .gr-scan{font-size:13px;color:#cfe0f5;text-align:right}
+.gr-hero .gr-scan strong{display:block;color:#fff;font-size:15px}
+.gr-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:16px 0}
+.gr-kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;cursor:default}
+.gr-kpi[data-action]{cursor:pointer}.gr-kpi[data-action]:hover{border-color:var(--blue);box-shadow:0 4px 14px #1767c91a}
+.gr-kpi .v{font-size:28px;font-weight:800;color:var(--navy);line-height:1.15;font-variant-numeric:tabular-nums}
+.gr-kpi .l{font-size:13px;color:var(--muted);margin-top:4px;font-weight:600}
+.gr-filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;box-shadow:0 2px 10px #102d550d}
+.gr-filters input,.gr-filters select{font:inherit;font-size:14px;padding:9px 11px;border:1px solid #cbd8e6;border-radius:9px;background:#fff;color:var(--ink)}
+.gr-filters input{flex:1 1 220px;min-width:180px}
+.gr-chips{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 0}
+.gr-chip{border:1px solid #cbd8e6;background:#fff;color:var(--navy);border-radius:999px;padding:6px 12px;font:600 13px system-ui;cursor:pointer}
+.gr-chip:hover{border-color:var(--blue)}
+.gr-chip[aria-pressed=true]{background:var(--navy);border-color:var(--navy);color:#fff}
+.gr-chip .n{opacity:.7;font-weight:500;margin-left:4px;font-variant-numeric:tabular-nums}
+.gr-active{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;font-size:13px;color:var(--muted);align-items:center}
+.gr-active button{border:0;background:var(--blue-soft);color:var(--blue);border-radius:999px;padding:4px 10px;font:600 12px system-ui;cursor:pointer}
+.gr-layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:14px;margin:16px 0}
+.gr-panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.gr-panel h3{margin:0 0 2px;font-size:16px;color:var(--navy)}
+.gr-panel .sub{margin:0 0 12px;font-size:13px;color:var(--muted)}
+#gr-map{height:400px;border-radius:12px;background:#eef3f8}
+.gr-mapnote{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:10px;font-size:13px;color:var(--muted)}
+.gr-mapnote button{border:1px solid #cbd8e6;background:#fff;border-radius:9px;padding:7px 11px;font:600 13px system-ui;color:var(--navy);cursor:pointer}
+.gr-pin{background:var(--blue);color:#fff;border:2px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 12px system-ui;box-shadow:0 2px 8px #102d5555}
+.gr-pin.sel{background:var(--navy)}
+.gr-charts{display:grid;gap:14px}
+.gr-bars{display:grid;gap:8px}
+.gr-bar{display:grid;grid-template-columns:150px 1fr 42px;align-items:center;gap:10px;font-size:13px;cursor:pointer;border-radius:8px;padding:3px 4px}
+.gr-bar:hover{background:#f3f7fc}
+.gr-bar .t{display:block;height:12px;background:#eef3f8;border-radius:4px;overflow:hidden}
+.gr-bar .f{display:block;height:100%;background:var(--blue);border-radius:0 4px 4px 0}
+.gr-bar.sel .f{background:var(--navy)}
+.gr-bar .num{text-align:right;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.gr-bar .lab{color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#gr-months svg{display:block;width:100%;height:auto;overflow:visible}
+#gr-months .col{fill:var(--blue);cursor:pointer}
+#gr-months .col.sel{fill:var(--navy)}
+#gr-months .hit{fill:transparent;cursor:pointer}
+#gr-months .hit:hover+.col,#gr-months .col:hover{opacity:.82}
+#gr-months text{font:11px system-ui;fill:var(--muted)}.gr-card p.org{margin:0}
+#gr-months .grid{stroke:#e8eef5;stroke-width:1}
+.gr-tip{position:fixed;pointer-events:none;background:#0c2447;color:#fff;font:13px/1.35 system-ui;padding:8px 10px;border-radius:8px;box-shadow:0 6px 18px #0004;z-index:2000;opacity:0;transition:opacity .08s;max-width:240px}
+.gr-tip b{display:block}
+.gr-listhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:22px 0 10px;flex-wrap:wrap}
+.gr-listhead h3{margin:0;color:var(--navy);font-size:19px}
+.gr-listhead span{color:var(--muted);font-size:14px}
+.gr-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.gr-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px;transition:box-shadow .15s,border-color .15s;border-top:4px solid var(--blue)}
+.gr-card:hover{box-shadow:0 8px 24px #102d5514;border-color:#c8d7ea}
+.gr-card.kind-cascade{border-top-color:#3aa0a8}
+.gr-card .top{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:12px}
+.gr-kind{font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-size:11px}
+.gr-due{border-radius:999px;padding:3px 10px;font-weight:700;font-size:12px;white-space:nowrap}
+.gr-due.urgent{background:var(--urgent-bg);color:var(--urgent)}
+.gr-due.soon{background:var(--soon-bg);color:var(--soon)}
+.gr-due.ok{background:var(--ok-bg);color:var(--ok)}
+.gr-due.none{background:#eef3f8;color:var(--muted)}
+.gr-card h4{margin:0;font-size:16px;line-height:1.35}
+.gr-card h4 a{color:var(--navy);text-decoration:none}
+.gr-card h4 a:hover{color:var(--blue);text-decoration:underline}
+.gr-org{font-size:13px;color:var(--muted);margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.gr-tags{display:flex;flex-wrap:wrap;gap:5px}
+.gr-tag{background:var(--blue-soft);color:#14549f;border-radius:999px;padding:3px 9px;font-size:12px;font-weight:600}
+.gr-tag.geo{background:#eef3f8;color:var(--ink)}
+.gr-card .foot{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;border-top:1px solid #edf2f7;padding-top:10px}
+.gr-budget .v{font-weight:800;color:var(--navy);font-size:17px;font-variant-numeric:tabular-nums}
+.gr-budget .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.gr-card .foot a{font-weight:700;font-size:13px;color:var(--blue);white-space:nowrap}
+.gr-card details{font-size:13px;color:#43566c}
+.gr-card details summary{cursor:pointer;color:var(--blue);font-weight:600}
+.gr-more{display:block;margin:18px auto 0;border:1px solid var(--blue);background:#fff;color:var(--blue);border-radius:10px;padding:11px 22px;font:700 14px system-ui;cursor:pointer}
+.gr-empty{background:var(--surface);border:1px dashed #cbd8e6;border-radius:14px;padding:30px;text-align:center;color:var(--muted)}
+.gr-state{padding:24px;text-align:center;color:var(--muted)}
+details.gr-manage{margin-top:22px;background:#fff;border:1px solid var(--line,#dfe7f1);border-radius:14px}
+details.gr-manage>summary{cursor:pointer;padding:16px 18px;font-weight:700;color:#102d55}
+details.gr-manage>div{padding:0 18px 18px}
+@media(max-width:1000px){.gr-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.gr-layout{grid-template-columns:1fr}}
+@media(max-width:600px){.gr-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.gr-bar{grid-template-columns:110px 1fr 36px}.gr-hero{padding:20px}.gr-filters{position:static}}
+</style>
+<div id="gr-app">
+ <div class="gr-hero">
+  <div><h2>Grant Register</h2><p>Open and forthcoming EU funding opportunities collected from the official EU Funding &amp; Tenders Portal. Records are research leads: always check eligibility on the official call page.</p></div>
+  <div class="gr-scan" id="gr-scan">Loading…</div>
+ </div>
+ <div id="gr-body"><div class="gr-state" id="gr-state">Loading funding opportunities…</div></div>
+</div>
+<div class="gr-tip" id="gr-tip" role="tooltip"></div>
+<script type="module">
+const URL="https://tzpbdfbedwmawmpygwpx.supabase.co",KEY="sb_publishable_I82ausx72XBOYcWxWe83zQ_A5DGjqM4";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const AUD={sme:"SMEs & entrepreneurs",students:"Students & internships",research:"Research & universities",public:"Public bodies",ngo:"NGOs & associations",individuals:"Individuals & creatives",none:"Not yet classified"};
+const COUNTRY={AT:["Austria",47.6,14.1],BE:["Belgium",50.6,4.6],BG:["Bulgaria",42.7,25.3],HR:["Croatia",45.3,15.9],CY:["Cyprus",35.0,33.2],CZ:["Czechia",49.8,15.5],DK:["Denmark",56.0,9.6],EE:["Estonia",58.7,25.5],FI:["Finland",62.5,26.0],FR:["France",46.6,2.4],DE:["Germany",51.1,10.4],GR:["Greece",39.3,22.3],HU:["Hungary",47.2,19.4],IE:["Ireland",53.2,-8.1],IT:["Italy",42.8,12.6],LV:["Latvia",56.9,24.9],LT:["Lithuania",55.3,23.9],LU:["Luxembourg",49.8,6.1],MT:["Malta",35.9,14.4],NL:["Netherlands",52.2,5.5],PL:["Poland",52.1,19.4],PT:["Portugal",39.6,-8.0],RO:["Romania",45.9,24.9],SK:["Slovakia",48.7,19.7],SI:["Slovenia",46.1,14.8],ES:["Spain",40.3,-3.7],SE:["Sweden",62.0,15.0],NO:["Norway",61.0,9.0],IS:["Iceland",64.9,-18.6],UA:["Ukraine",49.0,31.4],RS:["Serbia",44.0,20.9],AL:["Albania",41.1,20.0],MK:["North Macedonia",41.6,21.7],ME:["Montenegro",42.7,19.3],BA:["Bosnia and Herzegovina",44.2,17.8],MD:["Moldova",47.2,28.5],TR:["Türkiye",39.0,35.2],GE:["Georgia",42.2,43.4],AM:["Armenia",40.2,45.0]};
+const MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const today=new Date();today.setHours(0,0,0,0);
+const todayISO=today.toISOString().slice(0,10);
+const st={q:"",aud:"",kind:"",win:"",country:"",month:"",sort:"deadline",shown:24};
+let all=[],map=null,markers=null;
+
+const fmtEUR=n=>{if(n==null||!isFinite(n))return"";if(n>=1e9)return"€"+(n/1e9).toFixed(1).replace(/\.0$/,"")+"bn";if(n>=1e6)return"€"+(n/1e6).toFixed(1).replace(/\.0$/,"")+"M";if(n>=1e4)return"€"+Math.round(n/1e3)+"k";return"€"+Math.round(n).toLocaleString("en-GB")};
+const daysTo=d=>d?Math.round((new Date(d+"T00:00:00")-today)/864e5):null;
+const tagsOf=r=>(r.audience_tags&&r.audience_tags.length)?r.audience_tags:["none"];
+const countriesOf=r=>(r.country_codes||[]).filter(c=>COUNTRY[c]);
+
+function tip(e,html){const t=$("gr-tip");if(!html){t.style.opacity=0;return}t.innerHTML=html;const x=Math.min(e.clientX+14,innerWidth-t.offsetWidth-8),y=Math.max(8,e.clientY-t.offsetHeight-12);t.style.left=x+"px";t.style.top=y+"px";t.style.opacity=1}
+
+async function loadAll(db){
+ const cols="id,title,programme,organiser,parent_topic,official_url,deadline,total_budget_eur,audience_tags,country_codes,country_region,call_kind,eu_status,discovered_at,summary,status,source_key";
+ const out=[];for(let from=0;from<5000;from+=1000){const {data,error}=await db.from("bov_eu_funding_calls").select(cols).neq("status","archived").order("deadline",{ascending:true,nullsFirst:false}).range(from,from+999);if(error)throw error;out.push(...(data||[]));if(!data||data.length<1000)break}
+ return out.filter(r=>!r.deadline||r.deadline>=todayISO);
+}
+
+// Everything except the given key — used so each control's counts reflect the other filters.
+function filtered(except=""){
+ const q=st.q.toLowerCase();
+ return all.filter(r=>{
+  if(except!=="aud"&&st.aud&&!tagsOf(r).includes(st.aud))return false;
+  if(except!=="kind"&&st.kind&&(r.call_kind||"manual")!==st.kind)return false;
+  if(except!=="win"&&st.win){const d=daysTo(r.deadline);if(d==null||d>Number(st.win))return false}
+  if(except!=="country"&&st.country){if(st.country==="EU"?countriesOf(r).length:!countriesOf(r).includes(st.country))return false}
+  if(except!=="month"&&st.month&&(!r.deadline||r.deadline.slice(0,7)!==st.month))return false;
+  if(q&&![r.title,r.programme,r.organiser,r.parent_topic,r.summary,r.country_region].join(" ").toLowerCase().includes(q))return false;
+  return true});
+}
+
+function skeleton(){
+ $("gr-body").innerHTML=`
+ <div class="gr-kpis" id="gr-kpis"></div>
+ <div class="gr-filters" role="search">
+  <input id="gr-q" type="search" placeholder="Search calls, organisers, topics…" aria-label="Search calls">
+  <select id="gr-kind" aria-label="Call type"><option value="">All call types</option><option value="topic">EU calls (direct)</option><option value="cascade">Project calls (cascade funding)</option><option value="manual">Recorded by staff</option></select>
+  <select id="gr-win" aria-label="Deadline window"><option value="">Any deadline</option><option value="14">Closing within 14 days</option><option value="30">Closing within 30 days</option><option value="90">Closing within 90 days</option></select>
+  <select id="gr-sort" aria-label="Sort"><option value="deadline">Sort: deadline soonest</option><option value="budget">Sort: largest budget</option><option value="new">Sort: newest found</option></select>
+ </div>
+ <div class="gr-chips" id="gr-chips" aria-label="Audience"></div>
+ <div class="gr-active" id="gr-active"></div>
+ <div class="gr-layout">
+  <section class="gr-panel"><h3>Where the opportunities are</h3><p class="sub">Calls that name specific countries are pinned. Most EU calls are open across all member states.</p><div id="gr-map" aria-label="Map of country-specific funding calls"></div>
+   <div class="gr-mapnote"><span id="gr-eunote"></span><button type="button" id="gr-eubtn">Show EU-wide calls</button></div></section>
+  <div class="gr-charts">
+   <section class="gr-panel"><h3>Who can apply</h3><p class="sub">Open calls by audience · click a bar to filter. A call can serve several audiences.</p><div class="gr-bars" id="gr-bars"></div></section>
+   <section class="gr-panel"><h3>Deadlines ahead</h3><p class="sub">Open calls by closing month · click a month to filter</p><div id="gr-months"></div></section>
+  </div>
+ </div>
+ <div class="gr-listhead"><h3 id="gr-count"></h3><span id="gr-countsub"></span></div>
+ <div class="gr-cards" id="gr-cards"></div>
+ <button type="button" class="gr-more" id="gr-more" hidden>Show more</button>`;
+ $("gr-q").oninput=e=>{st.q=e.target.value.trim();st.shown=24;render()};
+ for(const k of ["kind","win","sort"])$("gr-"+k).onchange=e=>{st[k]=e.target.value;st.shown=24;render()};
+ $("gr-more").onclick=()=>{st.shown+=24;renderCards(filtered())};
+ $("gr-eubtn").onclick=()=>{st.country=st.country==="EU"?"":"EU";st.shown=24;render()};
+}
+
+function renderKpis(){
+ const open=all.length,soon=all.filter(r=>{const d=daysTo(r.deadline);return d!=null&&d<=30}).length;
+ const budget=all.reduce((s,r)=>s+(Number(r.total_budget_eur)||0),0);
+ const week=all.filter(r=>r.discovered_at&&(Date.now()-new Date(r.discovered_at))<7*864e5).length;
+ const sme=all.filter(r=>tagsOf(r).includes("sme")).length;
+ const k=[["Open opportunities",open.toLocaleString("en-GB"),"reset"],["Closing within 30 days",soon.toLocaleString("en-GB"),"win30"],["Published call budgets",fmtEUR(budget)||"—",""],["Found this week",week.toLocaleString("en-GB"),"new"],["Open to SMEs & entrepreneurs",sme.toLocaleString("en-GB"),"sme"]];
+ $("gr-kpis").innerHTML=k.map(([l,v,a])=>`<div class="gr-kpi"${a?` data-action="${a}" role="button" tabindex="0"`:""}><div class="v">${esc(v)}</div><div class="l">${esc(l)}</div></div>`).join("");
+ $("gr-kpis").querySelectorAll("[data-action]").forEach(el=>{const go=()=>{const a=el.dataset.action;if(a==="reset")Object.assign(st,{q:"",aud:"",kind:"",win:"",country:"",month:""});if(a==="win30")st.win="30";if(a==="sme")st.aud="sme";if(a==="new")st.sort="new";st.shown=24;syncControls();render()};el.onclick=go;el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
+}
+function syncControls(){$("gr-q").value=st.q;$("gr-kind").value=st.kind;$("gr-win").value=st.win;$("gr-sort").value=st.sort}
+
+function renderChips(){
+ const base=filtered("aud"),counts={};for(const r of base)for(const t of tagsOf(r))counts[t]=(counts[t]||0)+1;
+ const keys=["sme","students","research","ngo","public","individuals","none"].filter(k=>counts[k]);
+ $("gr-chips").innerHTML=`<button class="gr-chip" type="button" data-aud="" aria-pressed="${!st.aud}">All audiences<span class="n">${base.length}</span></button>`+keys.map(k=>`<button class="gr-chip" type="button" data-aud="${k}" aria-pressed="${st.aud===k}">${esc(AUD[k])}<span class="n">${counts[k]}</span></button>`).join("");
+ $("gr-chips").querySelectorAll("button").forEach(b=>b.onclick=()=>{st.aud=b.dataset.aud;st.shown=24;render()});
+}
+
+function renderBars(){
+ const base=filtered("aud"),counts={};for(const r of base)for(const t of tagsOf(r))counts[t]=(counts[t]||0)+1;
+ const rows=Object.entries(counts).sort((a,b)=>b[1]-a[1]);const max=Math.max(1,...rows.map(r=>r[1]));
+ $("gr-bars").innerHTML=rows.length?rows.map(([k,n])=>`<div class="gr-bar${st.aud===k?" sel":""}" data-aud="${k}" role="button" tabindex="0" aria-label="${esc(AUD[k])}: ${n} calls"><span class="lab">${esc(AUD[k])}</span><span class="t"><span class="f" style="width:${Math.max(2,n/max*100)}%"></span></span><span class="num">${n}</span></div>`).join(""):'<p class="sub">No calls match.</p>';
+ $("gr-bars").querySelectorAll(".gr-bar").forEach(el=>{const k=el.dataset.aud,n=counts[k];el.onclick=()=>{st.aud=st.aud===k?"":k;st.shown=24;render()};el.onkeydown=e=>{if(e.key==="Enter"){el.click()}};el.onmousemove=e=>tip(e,`<b>${esc(AUD[k])}</b>${n} open call${n===1?"":"s"} (${Math.round(n/base.length*100)}% of shown)`);el.onmouseleave=e=>tip(e)});
+}
+
+function renderMonths(){
+ const base=filtered("month"),start=new Date(today.getFullYear(),today.getMonth(),1),buckets=[];
+ for(let i=0;i<12;i++){const d=new Date(start.getFullYear(),start.getMonth()+i,1);buckets.push({key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`,label:MONTHS[d.getMonth()],year:d.getFullYear(),n:0})}
+ const idx=Object.fromEntries(buckets.map((b,i)=>[b.key,i]));let later=0,none=0;
+ for(const r of base){if(!r.deadline){none++;continue}const i=idx[r.deadline.slice(0,7)];if(i==null)later++;else buckets[i].n++}
+ const W=360,H=170,pl=26,pb=26,pt=14,cw=(W-pl)/12,max=Math.max(1,...buckets.map(b=>b.n)),step=max<=5?1:Math.ceil(max/4/5)*5||1,top=Math.ceil(max/step)*step;
+ let g="";for(let v=0;v<=top;v+=step){const y=pt+(H-pt-pb)*(1-v/top);g+=`<line class="grid" x1="${pl}" x2="${W}" y1="${y}" y2="${y}"/><text x="${pl-6}" y="${y+4}" text-anchor="end">${v}</text>`}
+ const bars=buckets.map((b,i)=>{const h=(H-pt-pb)*(b.n/top),x=pl+i*cw+cw*0.18,w=cw*0.64,y=H-pb-h;const r=Math.min(4,w/2,h);
+  const path=h>0?`M${x},${H-pb}V${y+r}Q${x},${y} ${x+r},${y}H${x+w-r}Q${x+w},${y} ${x+w},${y+r}V${H-pb}Z`:"";
+  return `<rect class="hit" data-k="${b.key}" x="${pl+i*cw}" y="${pt}" width="${cw}" height="${H-pt}"/>${path?`<path class="col${st.month===b.key?" sel":""}" d="${path}" pointer-events="none"/>`:""}<text x="${x+w/2}" y="${H-8}" text-anchor="middle">${b.label.slice(0,1)}</text>${b.label==="Jan"||i===0?`<text x="${x+w/2}" y="${H+6}" text-anchor="middle">’${String(b.year).slice(2)}</text>`:""}`}).join("");
+ $("gr-months").innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Open calls by closing month">${g}${bars}</svg><p class="sub" style="margin:6px 0 0">${later?`${later} close later than 12 months · `:""}${none?`${none} with no fixed deadline`:""}</p>`;
+ $("gr-months").querySelectorAll(".hit").forEach(el=>{const b=buckets[idx[el.dataset.k]];el.onclick=()=>{st.month=st.month===b.key?"":b.key;st.shown=24;render()};el.onmousemove=e=>tip(e,`<b>${b.label} ${b.year}</b>${b.n} call${b.n===1?"":"s"} closing`);el.onmouseleave=e=>tip(e)});
+}
+
+async function ensureLeaflet(){
+ if(window.L)return;
+ await new Promise((ok,bad)=>{const s=[...document.scripts].find(x=>x.src.includes("leaflet@1.9.4/dist/leaflet.js"));if(s){if(window.L)return ok();s.addEventListener("load",ok);s.addEventListener("error",bad);setTimeout(()=>window.L?ok():null,1500);return}const n=document.createElement("script");n.src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";n.onload=ok;n.onerror=bad;document.head.append(n)});
+}
+async function renderMap(){
+ const base=filtered("country"),counts={};let eu=0;
+ for(const r of base){const cs=countriesOf(r);if(!cs.length)eu++;for(const c of cs)counts[c]=(counts[c]||0)+1}
+ $("gr-eunote").innerHTML=`<strong style="color:#102d55">${eu.toLocaleString("en-GB")}</strong> EU-wide call${eu===1?"":"s"} open to applicants across member states`;
+ $("gr-eubtn").textContent=st.country==="EU"?"Clear EU-wide filter":"Show EU-wide calls";
+ try{await ensureLeaflet()}catch{$("gr-map").innerHTML='<p class="gr-state">Map could not load.</p>';return}
+ if(!map){map=L.map("gr-map",{scrollWheelZoom:false,zoomControl:true,attributionControl:true}).setView([50.5,13],4);
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",{attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',subdomains:"abcd",maxZoom:10}).addTo(map);
+  markers=L.layerGroup().addTo(map)}
+ markers.clearLayers();const max=Math.max(1,...Object.values(counts));
+ for(const [c,n] of Object.entries(counts)){const [name,lat,lng]=COUNTRY[c],size=Math.round(26+22*Math.sqrt(n/max));
+  const m=L.marker([lat,lng],{icon:L.divIcon({className:"",html:`<div class="gr-pin${st.country===c?" sel":""}" style="width:${size}px;height:${size}px">${n}</div>`,iconSize:[size,size],iconAnchor:[size/2,size/2]}),title:`${name}: ${n} calls`,keyboard:true});
+  m.on("click",()=>{st.country=st.country===c?"":c;st.shown=24;render()});m.bindTooltip(`<b>${esc(name)}</b><br>${n} country-specific call${n===1?"":"s"}`,{direction:"top",offset:[0,-size/2]});markers.addLayer(m)}
+ setTimeout(()=>map.invalidateSize(),60);
+}
+
+function dueChip(d){const n=daysTo(d);if(n==null)return'<span class="gr-due none">No fixed deadline</span>';const date=new Date(d+"T00:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
+ if(n<=14)return`<span class="gr-due urgent" title="Deadline ${date}">⏱ ${n===0?"Closes today":n===1?"Closes tomorrow":"Closes in "+n+" days"}</span>`;
+ if(n<=30)return`<span class="gr-due soon" title="Deadline ${date}">Closes in ${n} days</span>`;
+ return`<span class="gr-due ok" title="Deadline ${date}">Closes ${date}</span>`}
+
+function renderCards(list){
+ const s=st.sort==="budget"?[...list].sort((a,b)=>(Number(b.total_budget_eur)||0)-(Number(a.total_budget_eur)||0)):st.sort==="new"?[...list].sort((a,b)=>String(b.discovered_at||"").localeCompare(String(a.discovered_at||""))):[...list].sort((a,b)=>(a.deadline||"9999").localeCompare(b.deadline||"9999"));
+ const page=s.slice(0,st.shown);
+ $("gr-count").textContent=`${list.length.toLocaleString("en-GB")} opportunit${list.length===1?"y":"ies"}`;
+ $("gr-countsub").textContent=list.length?`Showing ${page.length} · ${st.sort==="budget"?"largest budget first":st.sort==="new"?"newest first":"soonest deadline first"}`:"";
+ $("gr-cards").innerHTML=page.length?page.map(r=>{const kind=r.call_kind==="cascade"?"Project call · cascade funding":r.call_kind==="topic"?"EU call":"Recorded by staff";
+  const geo=countriesOf(r).map(c=>`<span class="gr-tag geo">📍 ${esc(COUNTRY[c][0])}</span>`).join("")||(r.source_key==="eu-ft"?'<span class="gr-tag geo">🇪🇺 EU-wide</span>':(r.country_region?`<span class="gr-tag geo">${esc(r.country_region)}</span>`:""));
+  const org=r.organiser||r.parent_topic||r.programme;
+  return `<article class="gr-card kind-${esc(r.call_kind||"manual")}"><div class="top"><span class="gr-kind">${kind}${r.eu_status==="forthcoming"?" · Forthcoming":""}</span>${dueChip(r.deadline)}</div>
+  <h4><a href="${esc(r.official_url)}" target="_blank" rel="noopener">${esc(r.title)}</a></h4>
+  ${org?`<p class="org" title="${esc(org)}"><span class="gr-org">${esc(org)}</span></p>`:""}
+  <div class="gr-tags">${tagsOf(r).filter(t=>t!=="none").map(t=>`<span class="gr-tag">${esc(AUD[t])}</span>`).join("")}${geo}</div>
+  ${r.summary?`<details><summary>Summary</summary><p>${esc(r.summary.slice(0,700))}${r.summary.length>700?"…":""}</p></details>`:""}
+  <div class="foot"><div class="gr-budget">${r.total_budget_eur?`<div class="v">${fmtEUR(Number(r.total_budget_eur))}</div><div class="l">Total call budget</div>`:`<div class="l">Budget not published</div>`}</div><a href="${esc(r.official_url)}" target="_blank" rel="noopener">View official call ↗</a></div></article>`}).join(""):`<div class="gr-empty">No opportunities match these filters. <a href="#" id="gr-clear">Clear all filters</a></div>`;
+ const c=$("gr-clear");if(c)c.onclick=e=>{e.preventDefault();Object.assign(st,{q:"",aud:"",kind:"",win:"",country:"",month:""});syncControls();render()};
+ $("gr-more").hidden=s.length<=st.shown;
+}
+
+function renderActive(){
+ const parts=[];if(st.aud)parts.push(["aud",AUD[st.aud]]);if(st.country)parts.push(["country",st.country==="EU"?"EU-wide calls":COUNTRY[st.country][0]]);if(st.month){const [y,m]=st.month.split("-");parts.push(["month",`Closing ${MONTHS[Number(m)-1]} ${y}`])}
+ if(st.win)parts.push(["win",`Within ${st.win} days`]);if(st.kind)parts.push(["kind",$("gr-kind").selectedOptions[0].text]);if(st.q)parts.push(["q",`“${st.q}”`]);
+ $("gr-active").innerHTML=parts.length?"Filtered by: "+parts.map(([k,l])=>`<button type="button" data-k="${k}" aria-label="Remove filter ${esc(l)}">${esc(l)} ✕</button>`).join("")+` <button type="button" data-k="all">Clear all</button>`:"";
+ $("gr-active").querySelectorAll("button").forEach(b=>b.onclick=()=>{if(b.dataset.k==="all")Object.assign(st,{q:"",aud:"",kind:"",win:"",country:"",month:""});else st[b.dataset.k]="";st.shown=24;syncControls();render()});
+}
+
+function render(){renderChips();renderActive();renderBars();renderMonths();renderMap();renderCards(filtered())}
+
+async function init(){
+ try{
+  const {createClient}=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+  const db=createClient(URL,KEY);
+  const {data:{user}}=await db.auth.getUser();
+  if(!user){$("gr-state").innerHTML='Sign in to the <a href="/knowledge-hub.html">Knowledge Hub</a> to view the Grant Register.';$("gr-scan").textContent="";return}
+  const [rows,scan]=await Promise.all([loadAll(db),db.from("bov_eu_scan_runs").select("finished_at,status,inserted_count").eq("status","success").order("started_at",{ascending:false}).limit(1).maybeSingle()]);
+  all=rows;
+  const s=scan?.data;$("gr-scan").innerHTML=s?`<strong>Last scan</strong>${esc(new Date(s.finished_at).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}))} · ${s.inserted_count} new`:"No completed scan yet";
+  skeleton();renderKpis();render();
+  // The map needs a resize when this view becomes visible.
+  const fix=()=>setTimeout(()=>{if(map&&!$("live").hidden)map.invalidateSize()},150);
+  document.querySelectorAll('[data-funding-view="live"]').forEach(b=>b.addEventListener("click",fix));addEventListener("hashchange",fix);
+ }catch(e){$("gr-state").textContent="Grant Register unavailable: "+(e?.message||String(e))}
+}
+init();
+</script>
+<details class="gr-manage"><summary>Manage &amp; edit records</summary><div><p class="small">Add opportunities manually or edit recorded calls. These are funding-source records, not client projects; use the Knowledge Hub for project submissions.</p><p id="authstate" role="status">Checking staff access…</p><div id="staffarea" hidden><div class="filters"><input id="callsearch" placeholder="Search recorded calls" aria-label="Search recorded calls"><select id="callstatus"><option value="">All statuses</option><option>research</option><option>open</option><option>upcoming</option><option>closed</option><option>archived</option></select><button id="newcall" type="button">Record EU opportunity</button></div><p class="small" id="callcount"></p><div id="callcards" class="grid"></div><form id="callform" class="panel" hidden><h3 id="formtitle">Add funding call</h3><input type="hidden" id="callid"><div class="filters"><input id="ftitle" required maxlength="250" placeholder="Official call title"><input id="fprogramme" required maxlength="200" placeholder="Programme"><input id="furl" required type="url" placeholder="https:// official call URL"><select id="fcategory"><option value="regional">European regional</option><option value="spain">Canary Islands &amp; Spain</option><option value="africa">EU–Africa cooperation</option></select><select id="fstatus"><option value="research">Research</option><option value="upcoming">Upcoming</option><option value="open">Open</option><option value="closed">Closed</option><option value="archived">Archived</option></select><input id="fregion" placeholder="Country / region"><input id="ftheme" placeholder="Theme"><label>Deadline <input id="fdeadline" type="date"></label><label>Minimum EUR <input id="fmin" type="number" min="0" step=".01"></label><label>Maximum EUR <input id="fmax" type="number" min="0" step=".01"></label><label>Funding rate % <input id="fpercent" type="number" min="0" max="100" step=".01"></label><label>Verified on <input id="fverified" type="date"></label></div><p><textarea id="fsummary" placeholder="Call summary" style="width:100%;min-height:80px"></textarea></p><p><textarea id="feligibility" placeholder="Applicant eligibility notes" style="width:100%;min-height:70px"></textarea></p><p><textarea id="fpartners" placeholder="Partner / consortium requirements" style="width:100%;min-height:70px"></textarea></p><p><textarea id="fnotes" placeholder="Internal research notes" style="width:100%;min-height:70px"></textarea></p><button type="submit">Save call</button> <button type="button" id="cancelcall">Cancel</button><p id="formstatus" role="status"></p></form></div></div></details></section><section id="programmes" class="funding-view" hidden><div class="panel"><h2>Programme Library</h2><p>Reference guidance for major EU funding programmes and their objectives.</p><nav class="tabs" aria-label="Funding categories"><button data-tab="regional" aria-selected="true">European regional</button><button data-tab="spain" aria-selected="false">Canary Islands & Spain</button><button data-tab="africa" aria-selected="false">EU–Africa cooperation</button></nav><section class="panel"><h2 id="heading">European regional funding</h2><p id="intro"></p><div class="filters"><input id="query" placeholder="Search programmes, sectors or regions" aria-label="Search programmes"><select id="theme" aria-label="Theme"><option value="">All themes</option><option>Regional development</option><option>Innovation</option><option>Climate & energy</option><option>Employment & skills</option><option>Cooperation</option><option>Rural development</option></select></div><p id="count" class="small" role="status"></p><div id="results" class="grid"></div></section></div></section><section id="scanner-admin" class="funding-view" hidden><div class="panel"><h2>Scanner</h2><p>Official sources, collection methods and connection status. Automated scanning is not yet active.</p><section class="panel"><h2>Import official EU funding opportunities</h2><p>Scan the European Commission Funding &amp; Tenders source. Imported records remain unverified research leads until staff review.</p><button type="button" id="eu-import-run" disabled>Scan official EU funding calls</button><p id="eu-import-status" role="status">Checking staff access…</p><p id="eu-import-last"></p></section><section class="panel" id="eligibility-panel"><h2>EU opportunity eligibility screening</h2><p>Staff-only preliminary screening of recorded funding calls. This does not establish client-specific eligibility or confirm official terms.</p><button type="button" id="eu-eligibility-run" disabled>Run eligibility screening</button><p id="eu-eligibility-status" role="status">Checking staff session…</p><div id="eu-eligibility-results" class="grid" aria-live="polite"></div><h3>Saved assessments</h3><button type="button" id="eu-saved-refresh">Refresh saved assessments</button><p id="eu-saved-status" role="status"></p><div id="eu-saved-list"></div></section><section class="panel" id="sources"><h2>Official EU funding source coverage</h2><p>Private staff source registry for EU-wide, national, regional and cross-border programmes. Source registration does not mean automatic scanning is active.</p><p id="source-status" role="status">Checking source registry…</p><div id="source-list" class="grid"></div></section></div></section></div></div></main><script>
 const groups={regional:{title:"European regional funding",intro:"EU-wide regional investment, cohesion and territorial cooperation programmes.",items:[
 ["European Regional Development Fund (ERDF)","Regional development","Regional investment, SME competitiveness, innovation and low-carbon transition.","https://ec.europa.eu/regional_policy/funding/erdf_en"],
 ["European Social Fund Plus (ESF+)","Employment & skills","Employment, education, skills and social inclusion programmes.","https://european-social-fund-plus.ec.europa.eu/"],
