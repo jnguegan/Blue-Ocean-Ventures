@@ -42,9 +42,9 @@ Deno.serve(async req=>{
  try{
   const query={bool:{must:[{terms:{type:["1","2","8"]}},{terms:{status:["31094501","31094502","31094503"]}}]}};
   const form=new FormData();form.append("query",new Blob([JSON.stringify(query)],{type:"application/json"}),"query.json");form.append("languages",new Blob([JSON.stringify(["en"])],{type:"application/json"}),"languages.json");form.append("displayLanguage","en");
-  const response=await fetch(API,{method:"POST",body:form,signal:AbortSignal.timeout(25000)});
-  if(!response.ok){const diagnostic=(await response.text()).slice(0,600);throw Error("EU API returned HTTP "+response.status+(diagnostic?": "+diagnostic:""));}
-  const payload=await response.json(),results=rowsFrom(payload);fetched=results.length;
+  const response=await fetch(API,{method:"POST",body:form,headers:{"Accept":"application/json","User-Agent":"Mozilla/5.0 (compatible; BlueOceanVenturesFundingScanner/1.0)","Referer":"https://ec.europa.eu/info/funding-tenders/opportunities/portal/"},signal:AbortSignal.timeout(45000)});
+  if(!response.ok){let diagnostic="";try{diagnostic=(await response.text()).slice(0,600)}catch(e){diagnostic="response body unreadable"}throw Error("EU API returned HTTP "+response.status+(diagnostic?": "+diagnostic:""));}
+  let payload;try{payload=await response.json()}catch(e){throw Error("EU API response body could not be read or parsed: "+(e instanceof Error?e.message:String(e)))}const results=rowsFrom(payload);fetched=results.length;
   if(!results.length)throw Error("EU API returned no recognisable result rows; check response schema before import");
   const now=new Date().toISOString(),today=now.slice(0,10);
   for(const raw of results){
