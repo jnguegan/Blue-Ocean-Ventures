@@ -26,7 +26,7 @@
 .gr-panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
 .gr-panel h3{margin:0 0 2px;font-size:16px;color:var(--navy)}
 .gr-panel .sub{margin:0 0 12px;font-size:13px;color:var(--muted)}
-#gr-map{height:400px;border-radius:12px;background:#eef3f8}
+#gr-map .gr-tiles{filter:grayscale(.85) brightness(1.06) contrast(.9) sepia(.08) hue-rotate(170deg) saturate(1.6)}#gr-map{height:440px;border-radius:12px;background:#eef3f8}
 .gr-mapnote{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:10px;font-size:13px;color:var(--muted)}
 .gr-mapnote button{border:1px solid #cbd8e6;background:#fff;border-radius:9px;padding:7px 11px;font:600 13px system-ui;color:var(--navy);cursor:pointer}
 .gr-pin{background:var(--blue);color:#fff;border:2px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 12px system-ui;box-shadow:0 2px 8px #102d5555}
@@ -98,7 +98,7 @@ const URL="https://tzpbdfbedwmawmpygwpx.supabase.co",KEY="sb_publishable_I82ausx
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const AUD={sme:"SMEs & entrepreneurs",students:"Students & internships",research:"Research & universities",public:"Public bodies",ngo:"NGOs & associations",individuals:"Individuals & creatives",none:"Not yet classified"};
-const COUNTRY={AT:["Austria",47.6,14.1],BE:["Belgium",50.6,4.6],BG:["Bulgaria",42.7,25.3],HR:["Croatia",45.3,15.9],CY:["Cyprus",35.0,33.2],CZ:["Czechia",49.8,15.5],DK:["Denmark",56.0,9.6],EE:["Estonia",58.7,25.5],FI:["Finland",62.5,26.0],FR:["France",46.6,2.4],DE:["Germany",51.1,10.4],GR:["Greece",39.3,22.3],HU:["Hungary",47.2,19.4],IE:["Ireland",53.2,-8.1],IT:["Italy",42.8,12.6],LV:["Latvia",56.9,24.9],LT:["Lithuania",55.3,23.9],LU:["Luxembourg",49.8,6.1],MT:["Malta",35.9,14.4],NL:["Netherlands",52.2,5.5],PL:["Poland",52.1,19.4],PT:["Portugal",39.6,-8.0],RO:["Romania",45.9,24.9],SK:["Slovakia",48.7,19.7],SI:["Slovenia",46.1,14.8],ES:["Spain",40.3,-3.7],SE:["Sweden",62.0,15.0],NO:["Norway",61.0,9.0],IS:["Iceland",64.9,-18.6],UA:["Ukraine",49.0,31.4],RS:["Serbia",44.0,20.9],AL:["Albania",41.1,20.0],MK:["North Macedonia",41.6,21.7],ME:["Montenegro",42.7,19.3],BA:["Bosnia and Herzegovina",44.2,17.8],MD:["Moldova",47.2,28.5],TR:["Türkiye",39.0,35.2],GE:["Georgia",42.2,43.4],AM:["Armenia",40.2,45.0]};
+const COUNTRY={AT:["Austria",47.6,14.1],BE:["Belgium",50.6,4.6],BG:["Bulgaria",42.7,25.3],HR:["Croatia",45.3,15.9],CY:["Cyprus",35.0,33.2],CZ:["Czechia",49.8,15.5],DK:["Denmark",56.0,9.6],EE:["Estonia",58.7,25.5],FI:["Finland",62.5,26.0],FR:["France",46.6,2.4],DE:["Germany",51.1,10.4],GR:["Greece",39.3,22.3],HU:["Hungary",47.2,19.4],IE:["Ireland",53.2,-8.1],IT:["Italy",42.8,12.6],LV:["Latvia",56.9,24.9],LT:["Lithuania",55.3,23.9],LU:["Luxembourg",49.8,6.1],MT:["Malta",35.9,14.4],NL:["Netherlands",52.2,5.5],PL:["Poland",52.1,19.4],PT:["Portugal",39.6,-8.0],RO:["Romania",45.9,24.9],SK:["Slovakia",48.7,19.7],SI:["Slovenia",46.1,14.8],ES:["Spain",40.3,-3.7],SE:["Sweden",62.0,15.0],NO:["Norway",61.0,9.0],IS:["Iceland",64.9,-18.6],UA:["Ukraine",49.0,31.4],RS:["Serbia",44.0,20.9],AL:["Albania",41.1,20.0],MK:["North Macedonia",41.6,21.7],ME:["Montenegro",42.7,19.3],BA:["Bosnia and Herzegovina",44.2,17.8],MD:["Moldova",47.2,28.5],TR:["Türkiye",39.0,35.2],GE:["Georgia",42.2,43.4],AM:["Armenia",40.2,45.0],BJ:["Benin", 9.3, 2.3],SN:["Senegal", 14.5, -14.5],GH:["Ghana", 7.9, -1.0],NG:["Nigeria", 9.1, 8.7],KE:["Kenya", 0.0, 37.9],ET:["Ethiopia", 9.1, 40.5],TZ:["Tanzania", -6.4, 34.9],UG:["Uganda", 1.4, 32.3],RW:["Rwanda", -1.9, 29.9],CM:["Cameroon", 7.4, 12.4],CI:["Côte d'Ivoire", 7.5, -5.5],ML:["Mali", 17.6, -4.0],BF:["Burkina Faso", 12.2, -1.6],NE:["Niger", 17.6, 8.1],TD:["Chad", 15.5, 18.7],MA:["Morocco", 31.8, -7.1],DZ:["Algeria", 28.0, 1.7],TN:["Tunisia", 33.9, 9.5],EG:["Egypt", 26.8, 30.8],LY:["Libya", 26.3, 17.2],ZA:["South Africa", -30.6, 22.9],MZ:["Mozambique", -18.7, 35.5],ZM:["Zambia", -13.1, 27.8],ZW:["Zimbabwe", -19.0, 29.2],MW:["Malawi", -13.3, 34.3],MG:["Madagascar", -18.8, 46.9],CD:["DR Congo", -4.0, 21.8],CG:["Congo", -0.2, 15.8],GA:["Gabon", -0.8, 11.6],TG:["Togo", 8.6, 0.8],GN:["Guinea", 9.9, -9.7],SL:["Sierra Leone", 8.5, -11.8],LR:["Liberia", 6.4, -9.4],GM:["Gambia", 13.4, -15.3],MR:["Mauritania", 21.0, -10.9],SO:["Somalia", 5.2, 46.2],SD:["Sudan", 12.9, 30.2],SS:["South Sudan", 6.9, 31.3],AO:["Angola", -11.2, 17.9],NA:["Namibia", -22.9, 18.5],BW:["Botswana", -22.3, 24.7],CV:["Cabo Verde", 16.0, -24.0],LB:["Lebanon", 33.9, 35.9],JO:["Jordan", 30.6, 36.2],PS:["Palestine", 31.9, 35.2],IL:["Israel", 31.0, 34.9],SY:["Syria", 34.8, 39.0],IQ:["Iraq", 33.2, 43.7],XK:["Kosovo", 42.6, 20.9],CH:["Switzerland", 46.8, 8.2],GB:["United Kingdom", 54.0, -2.0]};
 const MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const today=new Date();today.setHours(0,0,0,0);
 const todayISO=today.toISOString().slice(0,10);
@@ -143,7 +143,7 @@ function skeleton(){
  <div class="gr-chips" id="gr-chips" aria-label="Audience"></div>
  <div class="gr-active" id="gr-active"></div>
  <div class="gr-layout">
-  <section class="gr-panel"><h3>Where the opportunities are</h3><p class="sub">Calls that name specific countries are pinned. Most EU calls are open across all member states.</p><div id="gr-map" aria-label="Map of country-specific funding calls"></div>
+  <section class="gr-panel"><h3>Where the opportunities are</h3><p class="sub">Calls that target specific countries (in Europe, Africa and the neighbourhood) are pinned. Most EU calls are open across all member states.</p><div id="gr-map" aria-label="Map of country-specific funding calls"></div>
    <div class="gr-mapnote"><span id="gr-eunote"></span><button type="button" id="gr-eubtn">Show EU-wide calls</button></div></section>
   <div class="gr-charts">
    <section class="gr-panel"><h3>Who can apply</h3><p class="sub">Open calls by audience · click a bar to filter. A call can serve several audiences.</p><div class="gr-bars" id="gr-bars"></div></section>
@@ -161,7 +161,7 @@ function skeleton(){
 
 function renderKpis(){
  const open=all.length,soon=all.filter(r=>{const d=daysTo(r.deadline);return d!=null&&d<=30}).length;
- const budget=all.reduce((s,r)=>s+(Number(r.total_budget_eur)||0),0);
+ const budget=all.reduce((s,r)=>s+(Number(r.total_budget_eur)>=1000?Number(r.total_budget_eur):0),0);
  const week=all.filter(r=>r.discovered_at&&(Date.now()-new Date(r.discovered_at))<7*864e5).length;
  const sme=all.filter(r=>tagsOf(r).includes("sme")).length;
  const k=[["Open opportunities",open.toLocaleString("en-GB"),"reset"],["Closing within 30 days",soon.toLocaleString("en-GB"),"win30"],["Published call budgets",fmtEUR(budget)||"—",""],["Found this week",week.toLocaleString("en-GB"),"new"],["Open to SMEs & entrepreneurs",sme.toLocaleString("en-GB"),"sme"]];
@@ -208,8 +208,8 @@ async function renderMap(){
  $("gr-eunote").innerHTML=`<strong style="color:#102d55">${eu.toLocaleString("en-GB")}</strong> EU-wide call${eu===1?"":"s"} open to applicants across member states`;
  $("gr-eubtn").textContent=st.country==="EU"?"Clear EU-wide filter":"Show EU-wide calls";
  try{await ensureLeaflet()}catch{$("gr-map").innerHTML='<p class="gr-state">Map could not load.</p>';return}
- if(!map){map=L.map("gr-map",{scrollWheelZoom:false,zoomControl:true,attributionControl:true}).setView([50.5,13],4);
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",{attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',subdomains:"abcd",maxZoom:10}).addTo(map);
+ if(!map){map=L.map("gr-map",{scrollWheelZoom:false,zoomControl:true,attributionControl:true}).setView([34,14],3);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',maxZoom:10,className:"gr-tiles"}).addTo(map);
   markers=L.layerGroup().addTo(map)}
  markers.clearLayers();const max=Math.max(1,...Object.values(counts));
  for(const [c,n] of Object.entries(counts)){const [name,lat,lng]=COUNTRY[c],size=Math.round(26+22*Math.sqrt(n/max));
@@ -224,19 +224,19 @@ function dueChip(d){const n=daysTo(d);if(n==null)return'<span class="gr-due none
  return`<span class="gr-due ok" title="Deadline ${date}">Closes ${date}</span>`}
 
 function renderCards(list){
- const s=st.sort==="budget"?[...list].sort((a,b)=>(Number(b.total_budget_eur)||0)-(Number(a.total_budget_eur)||0)):st.sort==="new"?[...list].sort((a,b)=>String(b.discovered_at||"").localeCompare(String(a.discovered_at||""))):[...list].sort((a,b)=>(a.deadline||"9999").localeCompare(b.deadline||"9999"));
+ const s=st.sort==="budget"?[...list].sort((a,b)=>((Number(b.total_budget_eur)>=1000?Number(b.total_budget_eur):0)-(Number(a.total_budget_eur)>=1000?Number(a.total_budget_eur):0))):st.sort==="new"?[...list].sort((a,b)=>String(b.discovered_at||"").localeCompare(String(a.discovered_at||""))):[...list].sort((a,b)=>(a.deadline||"9999").localeCompare(b.deadline||"9999"));
  const page=s.slice(0,st.shown);
  $("gr-count").textContent=`${list.length.toLocaleString("en-GB")} opportunit${list.length===1?"y":"ies"}`;
  $("gr-countsub").textContent=list.length?`Showing ${page.length} · ${st.sort==="budget"?"largest budget first":st.sort==="new"?"newest first":"soonest deadline first"}`:"";
  $("gr-cards").innerHTML=page.length?page.map(r=>{const kind=r.call_kind==="cascade"?"Project call · cascade funding":r.call_kind==="topic"?"EU call":"Recorded by staff";
   const geo=countriesOf(r).map(c=>`<span class="gr-tag geo">📍 ${esc(COUNTRY[c][0])}</span>`).join("")||(r.source_key==="eu-ft"?'<span class="gr-tag geo">🇪🇺 EU-wide</span>':(r.country_region?`<span class="gr-tag geo">${esc(r.country_region)}</span>`:""));
-  const org=r.organiser||r.parent_topic||r.programme;
+  const org=[r.organiser,r.parent_topic,r.programme].find(x=>x&&x.trim().toLowerCase()!==String(r.title).trim().toLowerCase());const bud=Number(r.total_budget_eur)>=1000?Number(r.total_budget_eur):null;
   return `<article class="gr-card kind-${esc(r.call_kind||"manual")}"><div class="top"><span class="gr-kind">${kind}${r.eu_status==="forthcoming"?" · Forthcoming":""}</span>${dueChip(r.deadline)}</div>
   <h4><a href="${esc(r.official_url)}" target="_blank" rel="noopener">${esc(r.title)}</a></h4>
   ${org?`<p class="org" title="${esc(org)}"><span class="gr-org">${esc(org)}</span></p>`:""}
   <div class="gr-tags">${tagsOf(r).filter(t=>t!=="none").map(t=>`<span class="gr-tag">${esc(AUD[t])}</span>`).join("")}${geo}</div>
   ${r.summary?`<details><summary>Summary</summary><p>${esc(r.summary.slice(0,700))}${r.summary.length>700?"…":""}</p></details>`:""}
-  <div class="foot"><div class="gr-budget">${r.total_budget_eur?`<div class="v">${fmtEUR(Number(r.total_budget_eur))}</div><div class="l">Total call budget</div>`:`<div class="l">Budget not published</div>`}</div><a href="${esc(r.official_url)}" target="_blank" rel="noopener">View official call ↗</a></div></article>`}).join(""):`<div class="gr-empty">No opportunities match these filters. <a href="#" id="gr-clear">Clear all filters</a></div>`;
+  <div class="foot"><div class="gr-budget">${bud?`<div class="v">${fmtEUR(bud)}</div><div class="l">Total call budget</div>`:`<div class="l">Budget not published</div>`}</div><a href="${esc(r.official_url)}" target="_blank" rel="noopener">View official call ↗</a></div></article>`}).join(""):`<div class="gr-empty">No opportunities match these filters. <a href="#" id="gr-clear">Clear all filters</a></div>`;
  const c=$("gr-clear");if(c)c.onclick=e=>{e.preventDefault();Object.assign(st,{q:"",aud:"",kind:"",win:"",country:"",month:""});syncControls();render()};
  $("gr-more").hidden=s.length<=st.shown;
 }
