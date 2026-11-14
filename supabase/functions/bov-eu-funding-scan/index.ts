@@ -2,6 +2,7 @@
 // Deploy with Verify JWT OFF. Staff JWT is verified in-function; scheduled callers may use EU_SCAN_SECRET.
 // Only imports official European Commission grants, not tenders or fabricated regional calls.
 //
+// v2.1: multipart body sent as fixed-size bytes; GET fallback; detailed network error causes.
 // v2 changes:
 //  - Small pages (PAGE_SIZE) fetched one after another, instead of one huge 100-row reply
 //    (fixes "error reading a body from connection").
@@ -82,40 +83,79 @@ function classify(text: string) {
     : "unreviewed";
 }
 
-// One page from the EU API, with one retry on network failure.
-async function fetchPage(pageNumber: number): Promise<any[]> {
+// type 1,2,8 = grant topics / cascade; status 31094501 = forthcoming, 31094502 = open
+const WANTED_TYPES = new Set(["1", "2", "8"]);
+const WANTED_STATUS = new Set(["31094501", "31094502"]);
+
+// Build the multipart body ourselves as fixed-size bytes (sent with Content-Length),
+// instead of FormData, which Deno may stream in chunks — some servers drop such uploads.
+function multipartBody(parts: Record<string, unknown>) {
+  const boundary = "----BOVBoundary" + crypto.randomUUID().replace(/-/g, "");
+  let text = "";
+  for (const [name, value] of Object.entries(parts)) {
+    text += `--${boundary}\r\nContent-Disposition: form-data; name="${name}"; filename="${name}.json"\r\nContent-Type: application/json\r\n\r\n${JSON.stringify(value)}\r\n`;
+  }
+  text += `--${boundary}--\r\n`;
+  return { body: new TextEncoder().encode(text), contentType: `multipart/form-data; boundary=${boundary}` };
+}
+
+function errText(e: unknown): string {
+  const msg = e instanceof Error ? e.message : String(e);
+  const cause = (e as any)?.cause;
+  return cause ? `${msg} (cause: ${cause instanceof Error ? cause.message : String(cause)})` : msg;
+}
+
+// One page from the EU API. Tries POST with filters (twice), then a plain GET with local filtering.
+async function fetchPage(pageNumber: number): Promise<{ rows: any[]; rawCount: number; method: string }> {
   const url = `${API_BASE}?apiKey=SEDIA&text=***&pageSize=${PAGE_SIZE}&pageNumber=${pageNumber}`;
-  // type 1,2,8 = grant topics / cascade; status 31094501 = forthcoming, 31094502 = open
-  const query = { bool: { must: [{ terms: { type: ["1", "2", "8"] } }, { terms: { status: ["31094501", "31094502"] } }] } };
-  let lastErr: unknown;
+  const query = { bool: { must: [{ terms: { type: [...WANTED_TYPES] } }, { terms: { status: [...WANTED_STATUS] } }] } };
+  const baseHeaders = { "Accept": "application/json", "Accept-Encoding": "identity", "User-Agent": "Mozilla/5.0 (compatible; BlueOceanVenturesFundingScanner/1.2)" };
+  const errors: string[] = [];
+
+  // 1) POST with server-side filters
   for (let attempt = 1; attempt <= 2; attempt++) {
     try {
-      const form = new FormData();
-      form.append("query", new Blob([JSON.stringify(query)], { type: "application/json" }), "query.json");
-      form.append("languages", new Blob([JSON.stringify(["en"])], { type: "application/json" }), "languages.json");
+      const { body, contentType } = multipartBody({ query, languages: ["en"] });
       const response = await fetch(url, {
         method: "POST",
-        body: form,
-        headers: { "Accept": "application/json", "User-Agent": "Mozilla/5.0 (compatible; BlueOceanVenturesFundingScanner/1.1)" },
+        body,
+        headers: { ...baseHeaders, "Content-Type": contentType },
         signal: AbortSignal.timeout(PAGE_TIMEOUT_MS),
       });
-      if (!response.ok) {
-        let body = "";
-        try { body = (await response.text()).slice(0, 600); } catch { body = "response body unreadable"; }
-        // HTTP errors are not retried: they won't fix themselves.
-        throw Object.assign(Error(`EU API page ${pageNumber} returned HTTP ${response.status}${body ? ": " + body : ""}`), { noRetry: true });
-      }
-      const text = await response.text();
-      try { return rowsFrom(JSON.parse(text)); }
-      catch { throw Object.assign(Error(`EU API page ${pageNumber} was not valid JSON: ${text.slice(0, 300)}`), { noRetry: true }); }
+      const rows = await readRows(response, pageNumber);
+      return { rows, rawCount: rows.length, method: "POST" };
     } catch (e) {
-      lastErr = e;
-      if ((e as any)?.noRetry) break;
+      if ((e as any)?.noRetry) throw e;
+      errors.push(`POST#${attempt}: ${errText(e)}`);
       if (attempt < 2) await new Promise((r) => setTimeout(r, 1500));
     }
   }
-  const msg = lastErr instanceof Error ? lastErr.message : String(lastErr);
-  throw Error(msg.startsWith("EU API") ? msg : `EU API page ${pageNumber} network error: ${msg}`);
+
+  // 2) Fallback: GET without a body, filter type/status locally
+  try {
+    const response = await fetch(url, { method: "GET", headers: baseHeaders, signal: AbortSignal.timeout(PAGE_TIMEOUT_MS) });
+    const rows = await readRows(response, pageNumber);
+    const keep = rows.filter((r) => {
+      const t = fieldAll(r, "type"), s = fieldAll(r, "status");
+      return (!t.length || t.some((v) => WANTED_TYPES.has(v))) && (!s.length || s.some((v) => WANTED_STATUS.has(v)));
+    });
+    return { rows: keep, rawCount: rows.length, method: "GET" };
+  } catch (e) {
+    if ((e as any)?.noRetry) throw e;
+    errors.push(`GET: ${errText(e)}`);
+  }
+  throw Error(`EU API page ${pageNumber} network error: ${errors.join(" | ")}`);
+}
+
+async function readRows(response: Response, pageNumber: number): Promise<any[]> {
+  if (!response.ok) {
+    let body = "";
+    try { body = (await response.text()).slice(0, 600); } catch { body = "response body unreadable"; }
+    throw Object.assign(Error(`EU API page ${pageNumber} returned HTTP ${response.status}${body ? ": " + body : ""}`), { noRetry: true });
+  }
+  const text = await response.text();
+  try { return rowsFrom(JSON.parse(text)); }
+  catch { throw Object.assign(Error(`EU API page ${pageNumber} was not valid JSON: ${text.slice(0, 300)}`), { noRetry: true }); }
 }
 
 const allowedOrigins = new Set(["https://blueoceanventures.co", "https://www.blueoceanventures.co"]);
@@ -157,6 +197,7 @@ Deno.serve(async (req) => {
   let fetched = 0, inserted = 0, updated = 0, skipped = 0, pages = 0;
   let sampleKeys: { top: string[]; metadata: string[] } | null = null;
   let partialError: string | null = null;
+  let method = "";
 
   try {
     const now = new Date().toISOString(), today = now.slice(0, 10);
@@ -164,16 +205,17 @@ Deno.serve(async (req) => {
     for (let page = 1; page <= MAX_PAGES; page++) {
       if (Date.now() - startedAt > TIME_BUDGET_MS) { partialError = `Stopped after page ${page - 1}: time budget reached`; break; }
 
-      let results: any[];
+      let results: any[], rawCount = 0;
       try {
-        results = await fetchPage(page);
+        const got = await fetchPage(page);
+        results = got.rows; rawCount = got.rawCount; method = got.method;
       } catch (e) {
         if (page === 1) throw e; // nothing fetched at all: real failure
         partialError = e instanceof Error ? e.message : String(e); // keep what we already imported
         break;
       }
       pages++;
-      if (!results.length) {
+      if (!rawCount) {
         if (page === 1) throw Error("EU API returned no recognisable result rows; check response schema before import");
         break;
       }
@@ -221,7 +263,7 @@ Deno.serve(async (req) => {
           if (error) throw error; inserted++;
         }
       }
-      if (results.length < PAGE_SIZE) break; // last page
+      if (rawCount < PAGE_SIZE) break; // last page
     }
 
     const finished = new Date().toISOString();
@@ -231,10 +273,10 @@ Deno.serve(async (req) => {
     }).eq("id", run.id);
     await db.from("bov_eu_funding_sources").update({ last_scanned_at: finished, scan_status: "success", last_error: partialError }).eq("source_key", "eu-ft");
 
-    return reply({ ok: true, pages, fetched, inserted, updated, skipped, partialError, sampleKeys,
+    return reply({ ok: true, method, pages, fetched, inserted, updated, skipped, partialError, sampleKeys,
       source: "EU Funding & Tenders official API", note: "Imported records require eligibility and deadline verification" });
   } catch (e) {
-    const message = e instanceof Error ? e.message : (typeof e === "object" && e && "message" in e) ? String((e as any).message) : String(e);
+    const message = e instanceof Error ? errText(e) : (typeof e === "object" && e && "message" in e) ? String((e as any).message) : String(e);
     await db.from("bov_eu_scan_runs").update({ finished_at: new Date().toISOString(), status: "error", fetched_count: fetched,
       inserted_count: inserted, updated_count: updated, error_message: message.slice(0, 1500) }).eq("id", run.id);
     await db.from("bov_eu_funding_sources").update({ scan_status: "error", last_error: message.slice(0, 1000) }).eq("source_key", "eu-ft");
