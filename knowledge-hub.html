@@ -8,7 +8,7 @@
 
 /* Compact project-document library */
 #projectDocuments #docList{padding:3px 0}#projectDocuments #docBrowseLibrary{margin-top:5px}.doc-folder{border:1px solid #dce6f0;border-radius:9px;margin:8px 0;background:#fff}.doc-folder>summary{padding:12px 14px;cursor:pointer;font-weight:650;color:#183b63}.doc-folder[open]>summary{border-bottom:1px solid #e5eaf0}.doc-folder-files{padding:2px 12px}.doc-file-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #edf1f6}.doc-file-row:last-child{border:0}.doc-file-info{min-width:0;overflow-wrap:anywhere}.doc-file-info p{margin:3px 0}.doc-file-actions{flex-shrink:0}@media(max-width:700px){.doc-file-row{display:block}.doc-file-actions{margin-top:6px}}
-</style></head><body><header><strong>BLUE OCEAN · KNOWLEDGE HUB</strong><a href="/workbench.html#projects" style="color:#fff;font-weight:650;text-decoration:underline">Open Workbench ↗</a></header><main><h1>Institutional Knowledge Hub</h1><p>Internal research, funding intelligence and verified reference records. Staff access only.</p><section id="setup" class="panel"><h2>Secure connection required</h2><p>This page does not expose Knowledge Hub records publicly. An administrator must deploy the staff-only Supabase migration and configure the project's publishable key before the Hub can be used.</p><p id="notice">Not configured yet.</p></section><section id="login" class="panel hidden"><h2>Staff sign in</h2><div class="row"><input id="email" type="email" placeholder="Staff email" autocomplete="username"><input id="password" type="password" placeholder="Password" autocomplete="current-password"><button id="signin">Sign in</button></div><p id="authmsg"></p></section><section id="app" class="hidden"><div class="row"><strong id="who"></strong><button id="signout">Sign out</button></div><div class="panel" style="margin:14px 0;padding:16px"><strong>One project · multiple funding sources</strong><p style="margin:5px 0 9px">Start with Detailed Project Assessment below: enter the project, upload supporting documents to the private Staff Vault, and assess eligibility. Research UN and EU funding against the same project. The EU funding-call register is internal research, not a separate client application.</p><a href="#phase7" style="font-weight:700">Start project assessment &amp; document upload →</a> &nbsp; · &nbsp; <a href="/eu-funding-intelligence.html" style="font-weight:700">Browse EU funding intelligence →</a></div><div class="hub-layout" id="hubLayout"><aside class="hub-sidebar" id="hubSidebar" aria-label="Knowledge Hub sections"><h2>KNOWLEDGE HUB</h2><nav id="hubNav" aria-label="Workspace navigation"></nav></aside><div class="hub-content"><button type="button" class="hub-mobile-toggle" id="hubMobileToggle" aria-expanded="false" aria-controls="hubSidebar">☰ Sections</button><p class="hub-workspace-title" id="hubWorkspaceTitle"></p><div id="hubWorkspace"><section class="panel" id="phase7"><h2>Phase 7 · Detailed Project Assessment</h2><p class="muted">Internal consultant screening. All findings are provisional until supporting evidence and administrator review.</p><div class="row"><input id="aName" placeholder="Project name *" style="flex:2"><input id="aOrg" placeholder="Applicant organisation *" style="flex:1"></div><section class="panel" id="projectDocuments" style="background:#f5f9ff;margin:16px 0 20px"><h3>Project Documents · Staff Vault</h3><p class="muted">Private staff-only PDF, DOCX and image storage (10 MB maximum per file). Select several project briefs, supporting documents or photos together. Project name and applicant organisation are entered once above. Uploaded files are not automatically analysed.</p><div class="row"><input id="docFile" type="file" multiple accept=".pdf,.docx,.jpg,.jpeg,.png,.webp,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png,image/webp"><button id="docUpload">Upload to private vault</button><button id="docRefresh">Refresh documents</button></div><p id="docStatus" class="muted"></p><div id="docList"></div><button id="docBrowseLibrary" type="button" class="btn alt">Open Project Document Library</button></section><div class="row"><select id="aType"><option value="">Applicant legal type *</option><option>Non-Governmental Organisation (NGO) / Civil Society Organisation (CSO)</option><option>Foundation</option><option>Government body</option><option>University / Research</option><option>Private company</option><option>Individual</option><option>Other</option></select></div><div class="row project-areas-row"><input id="aCountry" placeholder="Project country *"><div class="project-areas-wrap"><strong>Project areas (select all that apply)</strong><div id="aThemeChoices" class="project-areas-grid"><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Education" style="width:auto">Education</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Community development" style="width:auto">Community development</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Vocational training" style="width:auto">Vocational training</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Agriculture and food security" style="width:auto">Agriculture and food security</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Sport and youth development" style="width:auto">Sport and youth development</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Water and sanitation" style="width:auto">Water and sanitation</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Health and wellbeing" style="width:auto">Health and wellbeing</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Industry and manufacturing" style="width:auto">Industry and manufacturing</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Climate and environment" style="width:auto">Climate and environment</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Renewable energy" style="width:auto">Renewable energy</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Infrastructure and housing" style="width:auto">Infrastructure and housing</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Women and gender equality" style="width:auto">Women and gender equality</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Entrepreneurship and employment" style="width:auto">Entrepreneurship and employment</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Humanitarian assistance" style="width:auto">Humanitarian assistance</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Digital innovation" style="width:auto">Digital innovation</label></div><input id="aTheme" type="hidden"><p id="aThemeCount" class="muted">0 areas selected</p></div><select id="aSdg"><option value="">Primary SDG (optional)</option></select></div><div class="row"><input id="aBudget" type="number" min="0" placeholder="Total project budget"><input id="aRequest" type="number" min="0" placeholder="Funding requested"><select id="aCurrency"><option>EUR</option><option>USD</option><option>GBP</option></select><input id="aDuration" type="number" min="1" placeholder="Duration in months"></div><div class="row"><select id="aOpportunity"><option value="">Select verified funding programme (optional)</option></select><input id="aEvidence" type="url" placeholder="Official eligibility evidence URL"></div><textarea id="aDescription" rows="3" placeholder="Project objectives, beneficiaries and activities" style="width:100%;font:inherit;padding:12px;border:1px solid #ccd8e7;border-radius:8px"></textarea><textarea id="aDocuments" rows="2" placeholder="Available documents, registration, budget, audited accounts..." style="width:100%;font:inherit;padding:12px;border:1px solid #ccd8e7;border-radius:8px"></textarea><div class="row"><button id="aFind">Find Matching Funding Programmes</button><button id="aScreen">Screen eligibility</button><button id="aSave">Save assessment</button><button id="aSaveReports" type="button">Save both reports to Workbench</button><button id="aPrint" type="button">Print current screening</button></div><p class="muted" id="saveBuildVersion">Save control version 2026-11-13h · Navigation disabled; click diagnostic active.</p><p id="aSaveReportsStatus" role="status" aria-live="polite" style="display:none;padding:12px;border:1px solid #c6d7eb;border-radius:8px;background:#f4f8fd;color:#17365c;font-weight:600"></p><p id="aStatus" class="muted"></p><div class="panel" style="padding:14px;margin:12px 0"><strong>Saved Workbench assessments</strong><p class="muted">Select a saved project and print its latest stored report without completing the assessment form again.</p><div class="row"><select id="aSavedPrintProject" aria-label="Select saved project to print"><option value="">Select saved project</option></select><button id="aPrintSaved" type="button">Print saved report</button></div><p id="aSavedPrintStatus" class="muted"></p></div><div class="row"><select id="aProjectLink" aria-label="Existing Workbench project"><option value="">Create new Workbench project</option></select></div><div style="margin-top:28px;padding-top:18px;border-top:1px solid #dce6f0"><p class="muted">Open Workbench to manage saved projects and reports.</p><a id="viewSavedProjects" href="/workbench.html#projects">View saved projects in Workbench ↗</a></div><div id="aResults"></div></section><section class="panel" id="projectDocLibrary"><h2>Project Document Library</h2><p class="muted">Private staff-only project files. Select a project folder to see its documents. This is separate from the institutional Research Library.</p><div class="row"><input id="docLibrarySearch" placeholder="Search project, organisation, country or file name" aria-label="Search project documents"><button id="docLibraryRefresh" type="button">Refresh library</button></div><p id="docLibraryStatus" class="muted"></p><div id="docLibraryFolders"></div></section><section class="panel" id="ecosocScreen"><h2>ECOSOC · NGO Consultative Status Eligibility Check</h2><p class="muted">Internal preliminary screening against UN ECOSOC consultative status criteria. Not a UN determination or an accreditation. Select Yes only where supporting evidence exists.</p><div class="row"><input id="ecoName" placeholder="NGO / organisation name *"><input id="ecoCountry" placeholder="Country of legal registration"><input id="ecoFounded" type="date" aria-label="Legal registration date"></div><div class="eco-check" id="ecoQuestions"></div><h3>Document readiness</h3><p class="muted">Mark documents verified only after checking their contents. Staff Vault matches are shown for reference, not treated as automatic proof.</p><div class="eco-check" id="ecoDocuments"></div><div class="row" style="margin-top:14px"><button id="ecoRun">Run ECOSOC eligibility check</button><button id="ecoPrint" type="button">Print eligibility report</button><button id="ecoSave" type="button">Save screening</button></div><p id="ecoStatus" role="status" class="muted"></p><div id="ecoResult"></div><div class="eco-links"><a href="https://ecosoc.un.org/sites/default/files/2026-03/Application%20Questionnaire%20-%20Reference%20Only%20-%20English%20%286Mar26%29.pdf" target="_blank" rel="noopener noreferrer">UN application questionnaire ↗</a><a href="https://ecosoc.un.org/sites/default/files/documents/2023/resolution-1996-31.pdf" target="_blank" rel="noopener noreferrer">ECOSOC resolution 1996/31 ↗</a><a href="https://esango.un.org/civilsociety/displayConsultativeStatusSearch.do?method=redefine" target="_blank" rel="noopener noreferrer">Check existing ECOSOC status ↗</a></div></section><section class="panel" id="phase6"><h2>Funding Intelligence Operations</h2><p class="muted">Staff-only records. Only administrators can save. No opportunities are presumed open until independently verified.</p><div class="row"><button id="p6refresh">Refresh operations</button><select id="p6view"><option value="bov_hub_opportunities">Funding opportunities</option><option value="bov_hub_assessments">Project assessments</option><option value="bov_hub_contact_activity">Contact activity & follow-ups</option></select></div><p id="p6status" class="muted">Run the Phase 6 SQL migration to activate.</p><div id="p6results"></div><h3>New record (administrator)</h3><div class="row"><input id="p6title" placeholder="Opportunity title / project name / organisation"><input id="p6agency" placeholder="Agency / project country / contact name"><input id="p6url" placeholder="Official source URL (opportunities)"></div><div class="row"><input id="p6deadline" type="date" aria-label="Deadline or follow-up date"><input id="p6notes" placeholder="Notes / eligibility evidence / activity summary"><button id="p6save">Save record</button></div></section><section class="panel" id="matcherPanel"><h2>Project-to-institution matching</h2><p class="muted">Internal preliminary screening only. Thematic relevance is not eligibility or an open funding offer. No client data is stored by this tool.</p><div class="row"><input id="matchTheme" placeholder="Project theme, e.g. education, agriculture, climate"><input id="matchCountry" placeholder="Country (optional)"><select id="matchSdg"><option value="">Any SDG</option></select><button id="runMatch">Find relevant references</button></div><p id="matchCount" class="muted"></p><div id="matchResults"></div></section><div class="panel"><h2>Browse libraries</h2><div class="grid" id="categories"></div></div><div class="panel"><div class="row"><input id="query" placeholder="Search institution, programme, country, source…"><select id="category"><option value="">All libraries</option></select><select id="sdg"><option value="">All SDGs</option></select><button id="search">Search</button></div><p id="count" class="muted"></p><div id="results"></div></div><section class="panel hidden" id="detailPanel"><h2>Reference details</h2><div id="detail"></div></section></div></div></div></section></main><script>
+</style></head><body><header><strong>BLUE OCEAN · KNOWLEDGE HUB</strong><a href="/workbench.html#projects" style="color:#fff;font-weight:650;text-decoration:underline">Open Workbench ↗</a></header><main><h1>Institutional Knowledge Hub</h1><p>Internal research, funding intelligence and verified reference records. Staff access only.</p><section id="setup" class="panel"><h2>Secure connection required</h2><p>This page does not expose Knowledge Hub records publicly. An administrator must deploy the staff-only Supabase migration and configure the project's publishable key before the Hub can be used.</p><p id="notice">Not configured yet.</p></section><section id="login" class="panel hidden"><h2>Staff sign in</h2><div class="row"><input id="email" type="email" placeholder="Staff email" autocomplete="username"><input id="password" type="password" placeholder="Password" autocomplete="current-password"><button id="signin">Sign in</button></div><p id="authmsg"></p></section><section id="app" class="hidden"><div class="row"><strong id="who"></strong><button id="signout">Sign out</button></div><div class="panel" style="margin:14px 0;padding:16px"><strong>One project · multiple funding sources</strong><p style="margin:5px 0 9px">Start with Detailed Project Assessment below: enter the project, upload supporting documents to the private Staff Vault, and assess eligibility. Research UN and EU funding against the same project. The EU funding-call register is internal research, not a separate client application.</p><a href="#phase7" style="font-weight:700">Start project assessment &amp; document upload →</a> &nbsp; · &nbsp; <a href="/eu-funding-intelligence.html" style="font-weight:700">Browse EU funding intelligence →</a></div><div class="hub-layout" id="hubLayout"><aside class="hub-sidebar" id="hubSidebar" aria-label="Knowledge Hub sections"><h2>KNOWLEDGE HUB</h2><nav id="hubNav" aria-label="Workspace navigation"></nav></aside><div class="hub-content"><button type="button" class="hub-mobile-toggle" id="hubMobileToggle" aria-expanded="false" aria-controls="hubSidebar">☰ Sections</button><p class="hub-workspace-title" id="hubWorkspaceTitle"></p><div id="hubWorkspace"><section class="panel" id="phase7"><h2>Phase 7 · Detailed Project Assessment</h2><p class="muted">Internal consultant screening. All findings are provisional until supporting evidence and administrator review.</p><div class="row"><input id="aName" placeholder="Project name *" style="flex:2"><input id="aOrg" placeholder="Applicant organisation *" style="flex:1"></div><section class="panel" id="projectDocuments" style="background:#f5f9ff;margin:16px 0 20px"><h3>Project Documents · Staff Vault</h3><p class="muted">Private staff-only PDF, DOCX and image storage (10 MB maximum per file). Select several project briefs, supporting documents or photos together. Project name and applicant organisation are entered once above. The text of PDF and Word files is read and used by Find Matching Funding Programmes; image files are stored but not read.</p><div class="row"><input id="docFile" type="file" multiple accept=".pdf,.docx,.jpg,.jpeg,.png,.webp,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png,image/webp"><button id="docUpload">Upload to private vault</button><button id="docRefresh">Refresh documents</button></div><p id="docStatus" class="muted"></p><div id="docList"></div><button id="docBrowseLibrary" type="button" class="btn alt">Open Project Document Library</button></section><div class="row"><select id="aType"><option value="">Applicant legal type *</option><option>Non-Governmental Organisation (NGO) / Civil Society Organisation (CSO)</option><option>Foundation</option><option>Government body</option><option>University / Research</option><option>Private company</option><option>Individual</option><option>Other</option></select></div><div class="row project-areas-row"><input id="aCountry" placeholder="Project country *"><div class="project-areas-wrap"><strong>Project areas (select all that apply)</strong><div id="aThemeChoices" class="project-areas-grid"><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Education" style="width:auto">Education</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Community development" style="width:auto">Community development</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Vocational training" style="width:auto">Vocational training</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Agriculture and food security" style="width:auto">Agriculture and food security</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Sport and youth development" style="width:auto">Sport and youth development</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Water and sanitation" style="width:auto">Water and sanitation</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Health and wellbeing" style="width:auto">Health and wellbeing</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Industry and manufacturing" style="width:auto">Industry and manufacturing</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Climate and environment" style="width:auto">Climate and environment</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Renewable energy" style="width:auto">Renewable energy</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Infrastructure and housing" style="width:auto">Infrastructure and housing</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Women and gender equality" style="width:auto">Women and gender equality</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Entrepreneurship and employment" style="width:auto">Entrepreneurship and employment</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Humanitarian assistance" style="width:auto">Humanitarian assistance</label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" value="Digital innovation" style="width:auto">Digital innovation</label></div><input id="aTheme" type="hidden"><p id="aThemeCount" class="muted">0 areas selected</p></div><select id="aSdg"><option value="">Primary SDG (optional)</option></select></div><div class="row"><input id="aBudget" type="number" min="0" placeholder="Total project budget"><input id="aRequest" type="number" min="0" placeholder="Funding requested"><select id="aCurrency"><option>EUR</option><option>USD</option><option>GBP</option></select><input id="aDuration" type="number" min="1" placeholder="Duration in months"></div><div class="row"><select id="aOpportunity"><option value="">Select verified funding programme (optional)</option></select><input id="aEvidence" type="url" placeholder="Official eligibility evidence URL"></div><textarea id="aDescription" rows="3" placeholder="Project objectives, beneficiaries and activities" style="width:100%;font:inherit;padding:12px;border:1px solid #ccd8e7;border-radius:8px"></textarea><textarea id="aDocuments" rows="2" placeholder="Available documents, registration, budget, audited accounts..." style="width:100%;font:inherit;padding:12px;border:1px solid #ccd8e7;border-radius:8px"></textarea><div class="row"><button id="aFind">Find Matching Funding Programmes</button><button id="aScreen">Screen eligibility</button><button id="aSave">Save assessment</button><button id="aSaveReports" type="button">Save both reports to Workbench</button><button id="aPrint" type="button">Print current screening</button></div><p class="muted" id="saveBuildVersion">Save control version 2026-11-13h · Navigation disabled; click diagnostic active.</p><p id="aSaveReportsStatus" role="status" aria-live="polite" style="display:none;padding:12px;border:1px solid #c6d7eb;border-radius:8px;background:#f4f8fd;color:#17365c;font-weight:600"></p><p id="aStatus" class="muted"></p><div class="panel" style="padding:14px;margin:12px 0"><strong>Saved Workbench assessments</strong><p class="muted">Select a saved project and print its latest stored report without completing the assessment form again.</p><div class="row"><select id="aSavedPrintProject" aria-label="Select saved project to print"><option value="">Select saved project</option></select><button id="aPrintSaved" type="button">Print saved report</button></div><p id="aSavedPrintStatus" class="muted"></p></div><div class="row"><select id="aProjectLink" aria-label="Existing Workbench project"><option value="">Create new Workbench project</option></select></div><div style="margin-top:28px;padding-top:18px;border-top:1px solid #dce6f0"><p class="muted">Open Workbench to manage saved projects and reports.</p><a id="viewSavedProjects" href="/workbench.html#projects">View saved projects in Workbench ↗</a></div><div id="aResults"></div></section><section class="panel" id="projectDocLibrary"><h2>Project Document Library</h2><p class="muted">Private staff-only project files. Select a project folder to see its documents. This is separate from the institutional Research Library.</p><div class="row"><input id="docLibrarySearch" placeholder="Search project, organisation, country or file name" aria-label="Search project documents"><button id="docLibraryRefresh" type="button">Refresh library</button></div><p id="docLibraryStatus" class="muted"></p><div id="docLibraryFolders"></div></section><section class="panel" id="ecosocScreen"><h2>ECOSOC · NGO Consultative Status Eligibility Check</h2><p class="muted">Internal preliminary screening against UN ECOSOC consultative status criteria. Not a UN determination or an accreditation. Select Yes only where supporting evidence exists.</p><div class="row"><input id="ecoName" placeholder="NGO / organisation name *"><input id="ecoCountry" placeholder="Country of legal registration"><input id="ecoFounded" type="date" aria-label="Legal registration date"></div><div class="eco-check" id="ecoQuestions"></div><h3>Document readiness</h3><p class="muted">Mark documents verified only after checking their contents. Staff Vault matches are shown for reference, not treated as automatic proof.</p><div class="eco-check" id="ecoDocuments"></div><div class="row" style="margin-top:14px"><button id="ecoRun">Run ECOSOC eligibility check</button><button id="ecoPrint" type="button">Print eligibility report</button><button id="ecoSave" type="button">Save screening</button></div><p id="ecoStatus" role="status" class="muted"></p><div id="ecoResult"></div><div class="eco-links"><a href="https://ecosoc.un.org/sites/default/files/2026-03/Application%20Questionnaire%20-%20Reference%20Only%20-%20English%20%286Mar26%29.pdf" target="_blank" rel="noopener noreferrer">UN application questionnaire ↗</a><a href="https://ecosoc.un.org/sites/default/files/documents/2023/resolution-1996-31.pdf" target="_blank" rel="noopener noreferrer">ECOSOC resolution 1996/31 ↗</a><a href="https://esango.un.org/civilsociety/displayConsultativeStatusSearch.do?method=redefine" target="_blank" rel="noopener noreferrer">Check existing ECOSOC status ↗</a></div></section><section class="panel" id="phase6"><h2>Funding Intelligence Operations</h2><p class="muted">Staff-only records. Only administrators can save. No opportunities are presumed open until independently verified.</p><div class="row"><button id="p6refresh">Refresh operations</button><select id="p6view"><option value="bov_hub_opportunities">Funding opportunities</option><option value="bov_hub_assessments">Project assessments</option><option value="bov_hub_contact_activity">Contact activity & follow-ups</option></select></div><p id="p6status" class="muted">Run the Phase 6 SQL migration to activate.</p><div id="p6results"></div><h3>New record (administrator)</h3><div class="row"><input id="p6title" placeholder="Opportunity title / project name / organisation"><input id="p6agency" placeholder="Agency / project country / contact name"><input id="p6url" placeholder="Official source URL (opportunities)"></div><div class="row"><input id="p6deadline" type="date" aria-label="Deadline or follow-up date"><input id="p6notes" placeholder="Notes / eligibility evidence / activity summary"><button id="p6save">Save record</button></div></section><section class="panel" id="matcherPanel"><h2>Project-to-institution matching</h2><p class="muted">Internal preliminary screening only. Thematic relevance is not eligibility or an open funding offer. No client data is stored by this tool.</p><div class="row"><input id="matchTheme" placeholder="Project theme, e.g. education, agriculture, climate"><input id="matchCountry" placeholder="Country (optional)"><select id="matchSdg"><option value="">Any SDG</option></select><button id="runMatch">Find relevant references</button></div><p id="matchCount" class="muted"></p><div id="matchResults"></div></section><div class="panel"><h2>Browse libraries</h2><div class="grid" id="categories"></div></div><div class="panel"><div class="row"><input id="query" placeholder="Search institution, programme, country, source…"><select id="category"><option value="">All libraries</option></select><select id="sdg"><option value="">All SDGs</option></select><button id="search">Search</button></div><p id="count" class="muted"></p><div id="results"></div></div><section class="panel hidden" id="detailPanel"><h2>Reference details</h2><div id="detail"></div></section></div></div></div></section></main><script>
 (function(){
  var button=document.getElementById('aSaveReports');
  var status=document.getElementById('aSaveReportsStatus');
@@ -131,58 +131,294 @@ const aSpecialContext={
  'UN Women':{pattern:/women|girls|gender equality|female/i,label:'women’s empowerment or gender equality'},
  'UNOPS':{pattern:/construct|infrastructure|procurement|project management|engineering/i,label:'infrastructure implementation or procurement'}
 };
-function aFindMatches(){
- const x=aForm(),out=$('aResults');out.replaceChildren();
- if(!x.country||!x.theme||!x.applicant_type){$('aStatus').textContent='Enter country, project areas and applicant legal type.';return}
- const selected=[...document.querySelectorAll('#aThemeChoices input:checked')].map(c=>c.value);
- const areas=selected.length?selected:x.theme.split(',').map(t=>t.trim()).filter(Boolean);
- const records=aOpportunities||[],evidence=[x.project_description,x.project_name,x.theme].filter(Boolean).join(' ');
- const themeAliases={
-  'Agriculture and food security':['Industry and manufacturing','Vocational training'],
-  'Vocational training':['Industry and manufacturing','Entrepreneurship and employment'],
-  'Infrastructure and housing':['Industry and manufacturing']
- };
- function pct(n){return Math.max(0,Math.min(100,Math.round(n)))}
- function bar(n){const track=el('div');track.style.cssText='height:11px;background:#e5eaf2;border-radius:8px;overflow:hidden;margin:9px 0';const fill=el('div');fill.style.cssText='height:100%;width:'+n+'%;background:'+(n>=70?'#19856d':n>=35?'#d39c32':'#8b9eb5');track.append(fill);return track}
- function source(card,url){if(url&&/^https:\/\//.test(url)){const l=el('a','Official source');l.href=url;l.target='_blank';l.rel='noopener noreferrer';card.append(l)}}
- function choose(card,p){const btn=el('button','Select for detailed screening');btn.style.marginLeft='12px';btn.onclick=()=>{$('aOpportunity').value=p.id;$('aEvidence').value=p.source_url||'';$('aStatus').textContent='Selected for further screening; funding not confirmed.';$('aOpportunity').scrollIntoView({behavior:'smooth',block:'center'})};card.append(btn)}
- const ranked=Object.entries(aAgencyMandates).map(([agency,mandate])=>{
+// ===== Document-aware matching v2 =====
+// Reads the text of the project's PDF and Word files (in the browser), stores it,
+// and combines it with the ticked areas, description, country and legal type.
+// Advisory relevance only: never an eligibility or funding decision.
+const A_PDFJS='https://cdn.jsdelivr.net/npm/pdfjs-dist@6.2.108/legacy/build/pdf.min.mjs';
+const A_PDFJS_WORKER='https://cdn.jsdelivr.net/npm/pdfjs-dist@6.2.108/legacy/build/pdf.worker.min.mjs';
+const A_JSZIP='https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+const A_TEXT_LIMIT=300000;
+let aPdfLib=null,aZipLib=null,aLastMatching=null;
+const aDocTextCache=new Map();
+async function aLoadPdf(){if(!aPdfLib){const lib=await import(A_PDFJS);lib.GlobalWorkerOptions.workerSrc=A_PDFJS_WORKER;aPdfLib=lib}return aPdfLib}
+function aLoadZip(){
+ if(window.JSZip)return Promise.resolve(window.JSZip);
+ if(!aZipLib)aZipLib=new Promise((ok,fail)=>{const s=document.createElement('script');s.src=A_JSZIP;s.onload=()=>window.JSZip?ok(window.JSZip):fail(Error('Word reader unavailable'));s.onerror=()=>{aZipLib=null;fail(Error('Word reader could not be loaded'))};document.head.append(s)});
+ return aZipLib;
+}
+// Returns extracted text, or null when the format is not readable (images).
+async function aExtractText(blob,mime,name){
+ const ext=(name||'').toLowerCase().split('.').pop();
+ if(mime==='application/pdf'||ext==='pdf'){
+  const lib=await aLoadPdf();
+  const pdf=await lib.getDocument({data:new Uint8Array(await blob.arrayBuffer()),isEvalSupported:false}).promise;
+  const parts=[];let size=0;
+  for(let i=1;i<=pdf.numPages&&size<A_TEXT_LIMIT;i++){
+   const content=await (await pdf.getPage(i)).getTextContent();
+   const t=content.items.map(it=>(it.str||'')+(it.hasEOL?'\n':' ')).join('');parts.push(t);size+=t.length;
+  }
+  try{await pdf.destroy()}catch(e){}
+  return parts.join('\n').slice(0,A_TEXT_LIMIT);
+ }
+ if(ext==='docx'||/wordprocessingml/.test(mime||'')){
+  const Zip=await aLoadZip(),zip=await Zip.loadAsync(await blob.arrayBuffer());
+  const W='http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+  const parts=Object.keys(zip.files).filter(f=>/^word\/(document|header\d*|footer\d*|footnotes|endnotes)\.xml$/.test(f)).sort((a,b)=>a==='word/document.xml'?-1:b==='word/document.xml'?1:a.localeCompare(b));
+  let out='';
+  for(const f of parts){
+   const xml=new DOMParser().parseFromString(await zip.file(f).async('string'),'application/xml');
+   for(const p of xml.getElementsByTagNameNS(W,'p')){
+    let line='';for(const n of p.getElementsByTagNameNS(W,'*')){if(n.localName==='t')line+=n.textContent;else if(n.localName==='tab')line+=' ';else if(n.localName==='br')line+='\n'}
+    out+=line+'\n';if(out.length>A_TEXT_LIMIT)break;
+   }
+  }
+  return out.slice(0,A_TEXT_LIMIT);
+ }
+ return null;
+}
+function aTextStatus(text){return text===null?'unsupported':text.replace(/\s+/g,'').length<150?'empty':'read'}
+async function aStoreDocText(id,text,status){
+ const {error}=await db.rpc('bov_set_document_text',{p_id:id,p_text:text||'',p_status:status});
+ return !error;
+}
+function aLikeEscape(v){return v.replace(/[\\%_]/g,m=>'\\'+m)}
+// Loads the project's documents, reading any that have not been read yet.
+async function aProjectDocuments(x,progress){
+ const cols='id,project_name,organisation_name,file_name,storage_path,mime_type';
+ let stored=true,r=await db.from('bov_hub_project_documents').select(cols+',extracted_text,extraction_status').ilike('project_name',aLikeEscape(x.project_name)).limit(200);
+ if(r.error){stored=false;r=await db.from('bov_hub_project_documents').select(cols).ilike('project_name',aLikeEscape(x.project_name)).limit(200)}
+ if(r.error)throw Error('Project documents unavailable: '+r.error.message);
+ const org=x.organisation_name.trim().toLocaleLowerCase();
+ const rows=(r.data||[]).filter(d=>!org||d.organisation_name?.trim().toLocaleLowerCase()===org);
+ const docs=[];
+ for(const [i,d] of rows.entries()){
+  const cached=aDocTextCache.get(d.id);
+  let text=d.extracted_text??cached?.text??null,status=d.extraction_status||cached?.status||null,error='';
+  if(!status){
+   progress?.('Reading document '+(i+1)+' of '+rows.length+': '+d.file_name+'…');
+   try{
+    if(!/pdf|wordprocessingml/.test(d.mime_type||'')&&!/\.(pdf|docx)$/i.test(d.file_name)){text=null;status='unsupported'}
+    else{const {data:blob,error:dlErr}=await db.storage.from(DOC_BUCKET).download(d.storage_path);if(dlErr)throw dlErr;text=await aExtractText(blob,d.mime_type,d.file_name);status=aTextStatus(text)}
+   }catch(e){text=null;status='failed';error=e.message||String(e)}
+   aDocTextCache.set(d.id,{text,status});
+   if(stored&&status!=='failed')stored=await aStoreDocText(d.id,text,status);
+  }
+  docs.push({id:d.id,file_name:d.file_name,status,text:text||'',error});
+ }
+ return {docs,stored};
+}
+
+// Area vocabulary (English, German, French, Spanish). Stems match word starts.
+const aAreaTerms={
+ 'Education':['educat','school','teacher','pupil','students?(?![\\p{L}])','literacy','curricul','classroom','scholarship','kindergarten','preschool','bildung','schule','lehrer','école','enseign','élève','scolai','escuela','docente','alumn','alfabeti','educación'],
+ 'Community development':['communit','local development','social inclusion','social cohesion','grassroots','rural development','gemeinde','gemeinschaft','communaut','développement local','comunidad','comunitari','desarrollo local','inclusión social'],
+ 'Vocational training':['vocational','apprentic','skills? training','technical training','tvet','upskill','reskill','berufsausbild','ausbildung','weiterbildung','formation professionnelle','apprentissage','formación profesional','capacitación','aprendiz'],
+ 'Agriculture and food security':['agricultur','agri-','agro','farm','crops?(?![\\p{L}])','livestock','harvest','irrigat','food security','horticult','smallholder','vineyard','orchard','rustic land','landwirtschaft','agricole','sécurité alimentaire','cultivo','ganader','cosecha','seguridad alimentaria','finca','viñedo','agrícola','agrari'],
+ 'Sport and youth development':['sport','football','soccer','athlet','youth','young people','adolescen','recreation','jugend','jeunes','jeunesse','deport','juventud','jóvenes','fútbol'],
+ 'Water and sanitation':['water','sanitation','wash(?![\\p{L}])','hygiene','borehole','latrine','toilet','wastewater','drinking','wasser','abwasser','eau potable','assainissement','agua','saneamiento','potable'],
+ 'Health and wellbeing':['health','medical','clinic','hospital','disease','nutrition','wellbeing','well-being','maternal','vaccin','gesundheit','klinik','krankenhaus','santé','médic','hôpital','salud','sanitari'],
+ 'Industry and manufacturing':['industr','manufactur','factory','factories','processing plant','agro-processing','food processing','production line','value chain','fabri','usine','procesamiento','cadena de valor'],
+ 'Climate and environment':['climat','environment','biodivers','ecosystem','conservation','reforest','carbon','emissions?(?![\\p{L}])','resilien','sustainab','pollution','klima','umwelt','nachhaltig','environnement','durable','clima','medio ambiente','medioambient','sostenib'],
+ 'Renewable energy':['renewable','solar','photovolta','wind power','wind energy','wind turbine','biogas','biomass','hydropower','mini-?grid','off-grid','clean energy','energy efficien','erneuerbar','renouvelable','solaire','renovable','fotovolta','eólic'],
+ 'Infrastructure and housing':['infrastruct','construct','housing','shelter','renovat','refurbish','roads?(?![\\p{L}])','bridges?(?![\\p{L}])','infrastruktur','wohnung','logement','bâtiment','vivienda','construcción','edific','rehabilita'],
+ 'Women and gender equality':['wom[ae]n','girls?(?![\\p{L}])','gender','female','gbv','frauen','mädchen','gleichstell','femmes?(?![\\p{L}])','filles?(?![\\p{L}])','égalité','mujer','niñas','género'],
+ 'Entrepreneurship and employment':['entrepreneur','start-?ups?(?![\\p{L}])','small business','smes?(?![\\p{L}])','msmes?(?![\\p{L}])','self-employ','job creation','jobs?(?![\\p{L}])','employ','livelihood','income generat','microfinanc','cooperative','unternehm','gründ','beschäftigung','entreprene','emploi','empleo','emprend','microcr'],
+ 'Humanitarian assistance':['humanitar','refugee','displac','emergency relief','disaster','conflict-affected','asylum','migrant','floods?(?![\\p{L}])','drought','earthquake','humanitär','flüchtl','katastroph','réfugi','refugiad','desplazad','emergencia'],
+ 'Digital innovation':['digital','software','apps?(?![\\p{L}])','online platform','ict(?![\\p{L}])','technolog','internet','connectivity','e-learning','artificial intelligence','innovat','numérique','tecnolog','informátic','innovación']
+};
+const aAreaRx=Object.fromEntries(Object.entries(aAreaTerms).map(([a,t])=>[a,new RegExp('(?<![\\p{L}\\p{N}])(?:'+t.join('|')+')','giu')]));
+const aTypeTerms={
+ 'Non-Governmental Organisation (NGO) / Civil Society Organisation (CSO)':['ngos?','non-governmental','non-profit','nonprofit','not-for-profit','charit(?:y|able)','civil society','ong','verein','e\\.v\\.','asociaci[oó]n','sin [aá]nimo de lucro','sans but lucratif','gemeinnützig'],
+ 'Foundation':['foundation','stiftung','fondation','fundaci[oó]n'],
+ 'Government body':['ministry','ministerio','minist[eè]re','municipality','ayuntamiento','cabildo','government agency','public authority','local authority','gobierno'],
+ 'University / Research':['universit(?:y|ies|é|ät|ad)','research (?:institute|centre|center)','instituto de investigación'],
+ 'Private company':['ltd','limited company','gmbh','plc','sociedad limitada','s\\.l\\.u?','s\\.a\\.r\\.l','private company','company number']
+};
+const aTypeRx=Object.fromEntries(Object.entries(aTypeTerms).map(([a,t])=>[a,new RegExp('(?<![\\p{L}\\p{N}])(?:'+t.join('|')+')(?![\\p{L}])','giu')]));
+// Words used to recognise each legal type inside a programme's eligible-applicant list.
+const aTypeKeys={
+ 'Non-Governmental Organisation (NGO) / Civil Society Organisation (CSO)':['ngo','cso','civil society','non-governmental','non governmental','non-profit','nonprofit','not-for-profit','charit','association'],
+ 'Foundation':['foundation'],
+ 'Government body':['government','public bod','public author','municipal','ministr','local author'],
+ 'University / Research':['universit','research','academ','higher education'],
+ 'Private company':['private','compan','business','enterprise','sme','firm'],
+ 'Individual':['individual','person','consultant','expert'],
+ 'Other':[]
+};
+function aApplicantKeys(type){return aTypeKeys[type]||(/ngo|cso/i.test(type||'')?aTypeKeys['Non-Governmental Organisation (NGO) / Civil Society Organisation (CSO)']:[(type||'').toLowerCase()].filter(Boolean))}
+function aApplicantMatches(list,type){const keys=aApplicantKeys(type);return (list||[]).some(t=>keys.some(k=>String(t).toLowerCase().includes(k)))}
+function aCount(rx,text){rx.lastIndex=0;const terms=new Map();let m,hits=0;
+ while((m=rx.exec(text))&&hits<5000){hits++;const tail=/^[\p{L}\p{N}]*/u.exec(text.slice(m.index+m[0].length,m.index+m[0].length+30))[0];const w=(m[0]+tail).toLocaleLowerCase();terms.set(w,(terms.get(w)||0)+1)}
+ return {hits,terms};
+}
+function aScanAreas(text){const out={};for(const [area,rx] of Object.entries(aAreaRx)){const r=aCount(rx,text);if(r.hits)out[area]=r}return out}
+// Builds the evidence picture from the description and every readable document.
+function aAnalyseEvidence(x,docs){
+ const sources=[{name:'Project description',kind:'form',text:[x.project_name,x.project_description,x.documents_available].filter(Boolean).join('\n')}];
+ for(const d of docs)if(d.status==='read')sources.push({name:d.file_name,kind:'document',text:d.text});
+ const areas={};
+ for(const s of sources){
+  const found=aScanAreas(s.text.normalize('NFC'));
+  for(const [area,r] of Object.entries(found)){
+   const a=areas[area]||(areas[area]={hits:0,terms:new Map(),files:new Set()});
+   a.hits+=r.hits;for(const [t,n] of r.terms)a.terms.set(t,(a.terms.get(t)||0)+n);a.files.add(s.name);
+  }
+ }
+ for(const a of Object.values(areas)){
+  a.distinct=a.terms.size;
+  a.strength=Math.min(1,0.5*Math.min(a.distinct,4)/4+0.5*Math.min(a.hits,20)/20);
+  a.evidenced=(a.hits>=3&&a.distinct>=2)||a.hits>=6;
+  a.top=[...a.terms.entries()].sort((p,q)=>q[1]-p[1]).slice(0,5).map(([t,n])=>t+' ×'+n);
+  a.files=[...a.files];
+ }
+ const docText=sources.filter(s=>s.kind==='document').map(s=>s.text).join('\n');
+ const corpus=sources.map(s=>s.text).join('\n');
+ const checks=[];
+ const readDocs=docs.filter(d=>d.status==='read');
+ if(readDocs.length&&x.country){
+  const c=x.country.trim();
+  if(c.length>2&&!docText.toLocaleLowerCase().includes(c.toLocaleLowerCase()))checks.push('The project country "'+c+'" does not appear in the documents read. Confirm the location is correct.');
+ }
+ if(readDocs.length){
+  const typeHits=Object.entries(aTypeRx).map(([t,rx])=>[t,aCount(rx,docText).hits]).sort((p,q)=>q[1]-p[1]);
+  const [bestType,bestHits]=typeHits[0];
+  if(bestHits>=3&&x.applicant_type&&bestType!==x.applicant_type&&!aApplicantKeys(x.applicant_type).some(k=>aApplicantKeys(bestType).includes(k)))
+   checks.push('The documents mostly describe the applicant as "'+bestType+'" ('+bestHits+' mentions), but the legal type selected is "'+x.applicant_type+'". Check the legal type.');
+ }
+ for(const d of docs){
+  if(d.status==='empty')checks.push(d.file_name+': almost no text found. It may be a scanned document; please upload a text-based PDF or Word version.');
+  if(d.status==='failed')checks.push(d.file_name+': could not be read ('+(d.error||'unknown error')+').');
+ }
+ return {sources:sources.map(s=>({name:s.name,kind:s.kind,chars:s.text.length})),areas,corpus,docCount:docs.length,readCount:readDocs.length,
+  imageCount:docs.filter(d=>d.status==='unsupported').length,checks};
+}
+// Report 1: 45 ticked themes + 25 core mandate + 20 evidence + 10 extra evidenced areas.
+function aAgencyScores(areas,ev){
+ const n=areas.length||1;
+ return Object.entries(aAgencyMandates).map(([agency,mandate])=>{
   const core=aCoreMandates[agency]||[];
   const direct=areas.filter(t=>mandate.areas.includes(t)),primary=areas.filter(t=>core.includes(t));
-  const special=aSpecialContext[agency],hasContext=special?special.pattern.test(evidence):true;
-  // Relevance report only: 60% broad thematic overlap, 40% core-mandate overlap.
-  // Related agricultural transformation is surfaced as a research avenue, not a confirmed match.
-  const score=pct(60*direct.length/areas.length+40*primary.length/areas.length);
+  const support=direct.length?direct.reduce((s,a)=>s+(ev.areas[a]?.strength||0),0)/direct.length:0;
+  const extra=mandate.areas.filter(a=>!areas.includes(a)&&ev.areas[a]?.evidenced);
+  const parts={themes:45*direct.length/n,core:25*primary.length/n,evidence:20*support*direct.length/n,extra:Math.min(10,5*extra.length)};
+  const special=aSpecialContext[agency],hasContext=special?special.pattern.test(ev.corpus):true;
   const notes=[],related=[];
-  if(!hasContext)notes.push('Core beneficiary context not established: '+special.label);
+  let score=parts.themes+parts.core+parts.evidence+parts.extra;
+  if(!hasContext){score*=0.6;notes.push('Core beneficiary context not found in the description or documents ('+special.label+'); score reduced by 40%')}
   if(agency==='UNOPS')notes.push('Project implementation is distinct from grant funding');
   if(agency==='UNIDO'&&areas.includes('Agriculture and food security')){
    related.push('Agriculture and food security → agro-processing / food manufacturing');
    notes.push('Conditional route only: confirm that the project actually includes processing, manufacturing or agricultural value-chain development. Agricultural production alone is not an industrial mandate match.');
   }
-  if(agency==='UNIDO'&&/agro.processing|food processing|agricultural transformation|value.chain|food manufactur/i.test(evidence)){
-   notes.push('Project text mentions possible industrial transformation; validate activities before treating this as direct alignment.');
-  }
-  if(agency==='UNIDO'&&areas.includes('Infrastructure and housing')){
-   related.push('Infrastructure and housing → industrial facilities only');
-   notes.push('Ordinary school, housing or sports construction is not automatically UNIDO-relevant.');
-  }
-  return {agency,mandate,direct,primary,score,notes,related,hasContext}
+  if(agency==='UNIDO'&&/agro.processing|food processing|agricultural transformation|value.chain|food manufactur/i.test(ev.corpus))notes.push('Project text or documents mention possible industrial transformation; validate activities before treating this as direct alignment.');
+  if(agency==='UNIDO'&&areas.includes('Infrastructure and housing')){related.push('Infrastructure and housing → industrial facilities only');notes.push('Ordinary school, housing or sports construction is not automatically UNIDO-relevant.')}
+  const unsupported=direct.filter(a=>!ev.areas[a]?.evidenced);
+  if(ev.readCount&&unsupported.length)notes.push('Ticked but not clearly supported by the documents: '+unsupported.join(', '));
+  const r=v=>Math.round(v);
+  return {agency,mandate,name:mandate.name,direct,primary,core:primary,extra,score:Math.max(0,Math.min(100,r(score))),breakdown:{themes:r(parts.themes),core:r(parts.core),evidence:r(parts.evidence),extra:r(parts.extra),context_found:hasContext},notes,related,hasContext};
  }).sort((a,b)=>b.score-a.score||(b.related.length?1:0)-(a.related.length?1:0)||a.agency.localeCompare(b.agency));
- const header=el('div');header.append(el('h3','Report 1 — Institutional relevance'),el('p','Based only on selected project themes and mapped agency mandates. 60% thematic alignment + 40% core mandate alignment. This report does not depend on whether funding is currently available. Conditional related pathways are shown separately and never inflate the direct score without confirmed project activities. Percentages are indicative relevance scores, not eligibility or funding probabilities.','muted'),el('p','Selected areas: '+areas.join(' · '),'muted'));out.append(header);
- for(const m of ranked){const card=el('div',null,'item');card.append(el('strong',m.agency+' · '+m.mandate.name),el('p',m.score+'% institutional relevance','muted'),bar(m.score),el('p','Thematic alignment: '+(m.direct.join(' · ')||'none')+' · Core mandate: '+(m.primary.join(' · ')||'none'),'muted'));if(m.related.length)card.append(el('p','Conditional / related pathways (not counted in the direct relevance score): '+m.related.join(' · '),'muted'));if(m.notes.length)card.append(el('p','Research considerations: '+m.notes.join('; '),'muted'));const ref=records.find(p=>p.agency===m.agency&&p.title==='Institutional partnership and programme pathways')||records.find(p=>p.agency===m.agency);if(ref)source(card,ref.source_url);out.append(card)}
- const divider=el('hr');divider.style.margin='30px 0';out.append(divider,el('h3','Report 2 — Funding availability'),el('p','This report checks recorded funding mechanisms and verified open calls separately from institutional relevance. An unverified record means availability is unknown, NOT that the agency has no funding. Programme-specific geography, applicant rules and deadlines must be verified.','muted'));
- const pathways=records.filter(p=>p.title!=='Institutional partnership and programme pathways');
- const active=pathways.filter(p=>aEvidenceComplete(p));
- const available=pathways.filter(p=>!aEvidenceComplete(p));
+}
+// Report 2: ranks each recorded pathway by fit (themes 40, agency 30, country 15, applicant 15).
+function aPathwayFits(x,areas,ranked){
+ const agencyScore=Object.fromEntries(ranked.map(m=>[m.agency,m.score]));
+ const country=(x.country||'').trim().toLocaleLowerCase();
+ return aOpportunities.filter(p=>p.title!=='Institutional partnership and programme pathways').map(p=>{
+  const flags=[],fits=[];
+  const pAreas=Object.keys(aScanAreas([p.title,p.theme,p.eligibility].filter(Boolean).join(' ')));
+  const overlap=areas.filter(a=>pAreas.includes(a));
+  let theme;
+  if(overlap.length){theme=40*Math.min(1,overlap.length/Math.min(areas.length||1,pAreas.length));fits.push('Themes: '+overlap.join(', '))}
+  else if(pAreas.length){theme=0;flags.push('Programme themes do not overlap with the project areas')}
+  else{theme=16;flags.push('Programme themes not documented')}
+  const agency=30*(agencyScore[p.agency]||0)/100;
+  const pc=(p.country||'').trim().toLocaleLowerCase();let place;
+  if(!pc){place=8;flags.push('Country coverage not documented')}
+  else if(/global|worldwide|international|multi-country|all countries|any country/.test(pc)){place=12;fits.push('Coverage: '+p.country)}
+  else if(country&&(pc.includes(country)||country.includes(pc))){place=15;fits.push('Country: '+p.country)}
+  else{place=0;flags.push('Recorded for '+p.country+', not '+(x.country||'the project country'))}
+  let applicant;
+  if(!p.applicant_types?.length){applicant=7;flags.push('Eligible applicants not documented')}
+  else if(aApplicantMatches(p.applicant_types,x.applicant_type)){applicant=15;fits.push('Applicant type listed')}
+  else{applicant=0;flags.push('Eligible applicants listed: '+p.applicant_types.join(', ')+'. Your legal type is not among them')}
+  const fit=Math.round(theme+agency+place+applicant);
+  return {p,fit,fits,flags,verified_open:aEvidenceComplete(p)};
+ }).sort((a,b)=>(b.verified_open-a.verified_open)||b.fit-a.fit||a.p.title.localeCompare(b.p.title));
+}
+function aMatchSignature(x){return JSON.stringify([x.project_name,x.organisation_name,x.country,x.applicant_type,x.theme,x.project_description,x.documents_available])}
+async function aComputeMatching(x,progress){
+ const selected=[...document.querySelectorAll('#aThemeChoices input:checked')].map(c=>c.value);
+ const areas=selected.length?selected:x.theme.split(',').map(t=>t.trim()).filter(Boolean);
+ let docs=[],stored=true,docError='';
+ try{({docs,stored}=await aProjectDocuments(x,progress))}catch(e){docError=e.message}
+ const ev=aAnalyseEvidence(x,docs);
+ if(docError)ev.checks.unshift(docError+'. Matching used the form only.');
+ const ranked=aAgencyScores(areas,ev),pathways=aPathwayFits(x,areas,ranked);
+ const suggested=Object.entries(ev.areas).filter(([a,v])=>v.evidenced&&!areas.includes(a)).sort((p,q)=>q[1].hits-p[1].hits).map(([a])=>a);
+ return aLastMatching={signature:aMatchSignature(x),x,areas,docs,stored,ev,ranked,pathways,suggested,at:new Date().toISOString()};
+}
+async function aFindMatches(){
+ const x=aForm(),out=$('aResults'),btn=$('aFind');
+ if(!x.country||!x.theme||!x.applicant_type){$('aStatus').textContent='Enter country, project areas and applicant legal type.';return}
+ if(!x.project_name||!x.organisation_name){$('aStatus').textContent='Enter the project name and applicant organisation so the project documents can be found.';return}
+ out.replaceChildren();btn.disabled=true;$('aStatus').textContent='Looking for project documents…';
+ let m;
+ try{m=await aComputeMatching(x,t=>$('aStatus').textContent=t)}
+ catch(e){$('aStatus').textContent='Matching failed: '+e.message;return}
+ finally{btn.disabled=false}
+ aRenderMatching(m);
+}
+function aRenderMatching(m){
+ const {areas,ev,ranked,pathways,suggested,docs,stored}=m,out=$('aResults');out.replaceChildren();
+ function bar(n){const track=el('div');track.style.cssText='height:11px;background:#e5eaf2;border-radius:8px;overflow:hidden;margin:9px 0';const fill=el('div');fill.style.cssText='height:100%;width:'+n+'%;background:'+(n>=70?'#19856d':n>=35?'#d39c32':'#8b9eb5');track.append(fill);return track}
+ function source(card,url){if(url&&/^https:\/\//.test(url)){const l=el('a','Official source');l.href=url;l.target='_blank';l.rel='noopener noreferrer';card.append(l)}}
+ function choose(card,p){const b=el('button','Select for detailed screening');b.style.marginLeft='12px';b.onclick=()=>{$('aOpportunity').value=p.id;$('aEvidence').value=p.source_url||'';$('aStatus').textContent='Selected for further screening; funding not confirmed.';$('aOpportunity').scrollIntoView({behavior:'smooth',block:'center'})};card.append(b)}
+ // Evidence panel
+ const panel=el('div',null,'item');panel.style.background='#f4f8fd';
+ panel.append(el('h3','Project evidence used for matching'));
+ const docLine=!docs.length?'No documents found in the Staff Vault for this project name and organisation. Matching uses the form and description only. Upload the project documents for evidence-based matching.'
+  :ev.readCount+' of '+docs.length+' document(s) read: '+docs.map(d=>d.file_name+' ('+({read:'read',empty:'no text',unsupported:'image, not read',failed:'failed'}[d.status]||d.status)+')').join(' · ');
+ panel.append(el('p',docLine,'muted'));
+ if(docs.length&&!stored)panel.append(el('p','Document text was read for this session only. Run the document-reading SQL step in Supabase so it is stored and not re-read each time.','muted'));
+ const evAreas=Object.entries(ev.areas).filter(([,v])=>v.evidenced).sort((p,q)=>q[1].hits-p[1].hits);
+ if(evAreas.length){panel.append(el('strong','Areas supported by the evidence'));for(const [a,v] of evAreas)panel.append(el('p',(areas.includes(a)?'✓ ':'+ ')+a+': '+v.top.join(', ')+' · in '+v.files.join(', '),'muted'))}
+ else panel.append(el('p','No project area is clearly supported by the description or documents yet.','muted'));
+ if(suggested.length){
+  const row=el('p','Suggested areas found in the evidence but not ticked: '+suggested.join(' · '));
+  const add=el('button','Tick these areas and re-run');add.style.marginLeft='10px';
+  add.onclick=()=>{for(const c of aThemeChecks)if(suggested.includes(c.value))c.checked=true;aSyncThemes();aFindMatches()};
+  row.append(add);panel.append(row);
+ }
+ if(ev.checks.length){panel.append(el('strong','Consistency checks'));for(const c of ev.checks)panel.append(el('p','⚠ '+c,'muted'))}
+ out.append(panel);
+ // Report 1
+ const header=el('div');header.append(el('h3','Report 1 — Institutional relevance'),el('p','Score out of 100: up to 45 for ticked project areas within the agency mandate, 25 for its core mandate, 20 for how strongly the description and documents support those areas, and 10 for additional mandate areas found in the evidence. Agencies whose core beneficiary group is absent from the evidence are reduced by 40%. Indicative relevance only, not eligibility or funding probability.','muted'),el('p','Ticked areas: '+areas.join(' · '),'muted'));out.append(header);
+ for(const r of ranked){
+  const card=el('div',null,'item'),b=r.breakdown;
+  card.append(el('strong',r.agency+' · '+r.mandate.name),el('p',r.score+'% institutional relevance','muted'),bar(r.score),
+   el('p','Themes '+b.themes+'/45 · Core mandate '+b.core+'/25 · Evidence '+b.evidence+'/20 · Extra evidenced areas '+b.extra+'/10','muted'),
+   el('p','Thematic alignment: '+(r.direct.join(' · ')||'none')+' · Core mandate: '+(r.primary.join(' · ')||'none')+(r.extra.length?' · Also evidenced: '+r.extra.join(' · '):''),'muted'));
+  if(r.related.length)card.append(el('p','Conditional / related pathways (not scored): '+r.related.join(' · '),'muted'));
+  if(r.notes.length)card.append(el('p','Research considerations: '+r.notes.join('; '),'muted'));
+  const ref=aOpportunities.find(p=>p.agency===r.agency&&p.title==='Institutional partnership and programme pathways')||aOpportunities.find(p=>p.agency===r.agency);if(ref)source(card,ref.source_url);
+  out.append(card);
+ }
+ // Report 2
+ const divider=el('hr');divider.style.margin='30px 0';
+ out.append(divider,el('h3','Report 2 — Funding pathways ranked by fit'),el('p','Each recorded pathway is scored out of 100: up to 40 for matching project areas, 30 for the agency\'s relevance above, 15 for country coverage and 15 for applicant legal type. Verified open calls are listed first. An unverified record means availability is unknown, NOT that the agency has no funding.','muted'));
+ const active=pathways.filter(p=>p.verified_open),other=pathways.filter(p=>!p.verified_open);
+ const draw=f=>{const p=f.p,card=el('div',null,'item');card.append(el('strong',p.agency+' · '+p.title),el('p',f.fit+'% fit · '+(f.verified_open?'Verified on '+p.verified_on+' · Deadline '+p.deadline:'Funding availability: NOT VERIFIED · Recorded status: '+p.status+' · Deadline: '+(p.deadline||'not documented')),'muted'),bar(f.fit));
+  if(f.fits.length)card.append(el('p','Fits: '+f.fits.join(' · '),'muted'));if(f.flags.length)card.append(el('p','Check: '+f.flags.join(' · '),'muted'));
+  if(p.agency==='UNIDO')card.append(el('p','UNIDO Technical Cooperation is a relevant route to investigate, particularly for industrial or agricultural transformation. This record does not confirm an open grant or direct funding for this applicant.','muted'));
+  source(card,p.source_url);choose(card,p);out.append(card)};
  out.append(el('h3','A. Verified open calls ('+active.length+')'));
  if(!active.length)out.append(el('p','No fully verified open calls recorded in this database. This does not establish that none exist.','muted'));
- for(const p of active){const card=el('div',null,'item');card.append(el('strong',p.agency+' · '+p.title),el('p','Verified on: '+p.verified_on+' · Deadline: '+p.deadline,'muted'));source(card,p.source_url);choose(card,p);out.append(card)}
- out.append(el('h3','B. Funding pathways requiring verification ('+available.length+')'));
- if(!available.length)out.append(el('p','No additional recorded pathways.','muted'));
- for(const p of available){const card=el('div',null,'item');card.append(el('strong',p.agency+' · '+p.title),el('p','Funding availability: NOT VERIFIED · Recorded status: '+p.status+' · Deadline: '+(p.deadline||'not documented'),'muted'));if(p.agency==='UNIDO')card.append(el('p','UNIDO Technical Cooperation is a relevant route to investigate, particularly for industrial or agricultural transformation. This record does not confirm an open grant or direct funding for this applicant.','muted'));source(card,p.source_url);choose(card,p);out.append(card)}
+ active.forEach(draw);
+ out.append(el('h3','B. Funding pathways requiring verification ('+other.length+')'));
+ if(!other.length)out.append(el('p','No additional recorded pathways.','muted'));
+ other.forEach(draw);
  out.append(el('p','Verification checklist: exact official programme title, country coverage, eligible applicants, funding instrument, budget, application window, deadline and date of source review.','muted'));
- $('aStatus').textContent='Two reports generated: '+ranked.length+' agencies ranked by relevance; '+active.length+' verified open calls and '+available.length+' funding pathways requiring verification. No eligibility decision made.';
+ $('aStatus').textContent='Two reports generated using '+(ev.readCount?ev.readCount+' document(s) and the form':'the form only')+': '+ranked.length+' agencies ranked; '+active.length+' verified open calls and '+other.length+' pathways ranked by fit. No eligibility decision made.';
 }
 
 let aProjects=[],aLastReports=null;
@@ -207,17 +443,17 @@ function aEvidenceComplete(p){
  if(p.deadline&&String(p.deadline).slice(0,10)<today)return false;
  return true;
 }
-function aBuildReports(){
+async function aBuildReports(){
  const x=aForm();if(!x.project_name||!x.organisation_name||!x.country||!x.applicant_type||!x.theme)throw Error('Complete project name, organisation, country, legal type and project areas first.');
- const areas=x.theme.split(',').map(v=>v.trim()).filter(Boolean);
- const relevance=Object.entries(aAgencyMandates).map(([agency,mandate])=>{
-  const direct=areas.filter(t=>mandate.areas.includes(t)),primary=areas.filter(t=>(aCoreMandates[agency]||[]).includes(t));
-  const related=[];if(agency==='UNIDO'&&areas.includes('Agriculture and food security'))related.push('Conditional agro-processing / agricultural value chains (not scored)');
-  if(agency==='UNIDO'&&areas.includes('Infrastructure and housing'))related.push('Conditional industrial facilities only (not scored)');
-  return {agency,name:mandate.name,score:Math.round(60*direct.length/areas.length+40*primary.length/areas.length),direct,core:primary,related}
- }).sort((a,b)=>b.score-a.score);
- const pathways=aOpportunities.filter(p=>p.title!=='Institutional partnership and programme pathways').map(p=>({agency:p.agency,title:p.title,status:p.status,source_url:p.source_url,deadline:p.deadline,verified_on:p.verified_on,verified_open:aEvidenceComplete(p)}));
- return {input:x,relevance:{method:'60% thematic, 40% core mandate; conditional matches not scored',areas,agencies:relevance},funding:{verified_open_calls:pathways.filter(p=>p.verified_open),pathways_requiring_verification:pathways.filter(p=>!p.verified_open),note:'Database snapshot only; absence of verified calls does not mean no funding exists.'}};
+ let m=aLastMatching;
+ if(!m||m.signature!==aMatchSignature(x))m=await aComputeMatching(x,t=>saveFeedback(t));
+ const pathways=m.pathways.map(f=>({agency:f.p.agency,title:f.p.title,status:f.p.status,source_url:f.p.source_url,deadline:f.p.deadline,verified_on:f.p.verified_on,verified_open:f.verified_open,fit:f.fit,fits:f.fits,flags:f.flags}));
+ const supported=Object.entries(m.ev.areas).filter(([,v])=>v.evidenced).map(([area,v])=>({area,mentions:v.hits,top_terms:v.top,found_in:v.files}));
+ return {input:x,
+  relevance:{method:'v2: 45 ticked areas in mandate, 25 core mandate, 20 evidence strength from description and documents, 10 additional evidenced mandate areas; reduced 40% when core beneficiary context is absent',areas:m.areas,
+   evidence:{documents:m.docs.map(d=>({file_name:d.file_name,status:d.status})),documents_read:m.ev.readCount,supported_areas:supported,suggested_areas:m.suggested,checks:m.ev.checks},
+   agencies:m.ranked.map(r=>({agency:r.agency,name:r.name,score:r.score,breakdown:r.breakdown,direct:r.direct,core:r.core,extra:r.extra,related:r.related,notes:r.notes}))},
+  funding:{verified_open_calls:pathways.filter(p=>p.verified_open),pathways_requiring_verification:pathways.filter(p=>!p.verified_open),note:'Database snapshot ranked by fit (themes 40, agency relevance 30, country 15, applicant type 15); absence of verified calls does not mean no funding exists.'}};
 }
 // Save diagnostics: never navigate automatically, and always show a visible outcome.
 const saveButton=$('aSaveReports'),saveStatus=$('aSaveReportsStatus');
@@ -246,7 +482,7 @@ saveButton.addEventListener('click',async event=>{
   if(sessionError)throw Error('Session check: '+sessionError.message);
   if(!sessionData?.user)throw Error('Your login session has expired. Sign in again.');
   saveFeedback('Administrator session confirmed. Validating the project fields…');
-  const reports=aBuildReports();let id=$('aProjectLink').value;
+  const reports=await aBuildReports();let id=$('aProjectLink').value;
   if(id){
    const p=aProjects.find(v=>v.id===id);
    if(!p||p.project_name!==reports.input.project_name||p.organisation_name!==reports.input.organisation_name)throw Error('Selected project differs from the project name or organisation. Select the correct project or create a new one.');
@@ -294,7 +530,7 @@ function aScreen(){const x=aForm(),p=aOpportunities.find(y=>y.id===x.opportunity
 if(!p){add('Programme','unknown','No specific programme selected');}else{
 const terms=x.theme.toLowerCase().split(/[^a-z0-9]+/).filter(w=>w.length>3);const context=[p.theme,p.title,p.eligibility].join(' ').toLowerCase();add('Thematic alignment',terms.some(t=>context.includes(t))?'possible':'unknown','Keyword overlap is not proof of mandate fit');
 add('Country eligibility',!p.country?'unknown':p.country.trim().toLowerCase()===x.country.toLowerCase()?'possible':'unknown',p.country?'Published programme country: '+p.country:'Country coverage not documented');
-add('Applicant eligibility',!p.applicant_types?.length?'unknown':p.applicant_types.some(t=>t.toLowerCase()===x.applicant_type.toLowerCase())?'possible':'unknown','Applicant type must be checked against official programme conditions');
+add('Applicant eligibility',!p.applicant_types?.length?'unknown':aApplicantMatches(p.applicant_types,x.applicant_type)?'possible':'unknown','Applicant type must be checked against official programme conditions');
 const same=p.currency===x.currency;const within=same&&x.requested_funding!=null&&(p.funding_min==null||x.requested_funding>=p.funding_min)&&(p.funding_max==null||x.requested_funding<=p.funding_max);add('Funding amount',!same||x.requested_funding==null||p.funding_min==null&&p.funding_max==null?'unknown':within?'possible':'no',same?'Compared against recorded limits':'Currencies differ; conversion not performed');
 const current=new Date().toISOString().slice(0,10);add('Call availability',p.status==='open'&&p.verified_on&&(!p.deadline||p.deadline>=current)?'possible':p.deadline&&p.deadline<current?'no':'unknown','Recorded status '+p.status+'; independently reconfirm before applying');
 }
@@ -309,11 +545,16 @@ function aPrintSavedDocument(win,project,report){
  body.append(el('p','Report version '+report.version+' · '+new Date(report.created_at).toLocaleString()));
  const table=(headings,rows)=>{const t=doc.createElement('table'),tr=doc.createElement('tr');for(const h of headings)tr.append(el('th',h));t.append(tr);for(const cells of rows){const row=doc.createElement('tr');for(const c of cells)row.append(el('td',String(c??'—')));t.append(row)}body.append(t)};
  body.append(el('h2','Report 1 — Institutional relevance'));
- table(['Agency','Relevance','Matching project areas'],(report.relevance_report?.agencies||[]).map(a=>[a.agency,a.score+'%',a.direct?.join(', ')||'No direct match recorded']));
+ const evp=report.relevance_report?.evidence;
+ if(evp){body.append(el('p','Documents read: '+(evp.documents_read||0)+' of '+(evp.documents||[]).length+(evp.documents?.length?' ('+evp.documents.map(d=>d.file_name+': '+d.status).join(', ')+')':'')));
+  if(evp.supported_areas?.length)table(['Area supported by evidence','Mentions','Key terms','Found in'],evp.supported_areas.map(v=>[v.area,v.mentions,(v.top_terms||[]).join(', '),(v.found_in||[]).join(', ')]));
+  if(evp.suggested_areas?.length)body.append(el('p','Suggested areas not ticked: '+evp.suggested_areas.join(', ')));
+  for(const c of evp.checks||[])body.append(el('p','Check: '+c,'note'))}
+ table(['Agency','Relevance','Matching project areas'],(report.relevance_report?.agencies||[]).map(a=>[a.agency,a.score+'%',(a.direct?.join(', ')||'No direct match recorded')+(a.breakdown?' (themes '+a.breakdown.themes+', core '+a.breakdown.core+', evidence '+a.breakdown.evidence+', extra '+a.breakdown.extra+')':'')]));
  body.append(el('h2','Report 2 — Funding intelligence'));
  const f=report.funding_report||{},calls=f.verified_open_calls||[],pending=f.pathways_requiring_verification||[];
  body.append(el('p',calls.length+' verified open calls · '+pending.length+' pathways requiring verification'));
- table(['Agency','Programme / pathway','Verification'],[...calls.map(x=>[x.agency,x.title,'Verified open at assessment']),...pending.map(x=>[x.agency,x.title,'Requires verification'])]);
+ table(['Agency','Programme / pathway','Fit','Verification'],[...calls.map(x=>[x.agency,x.title,x.fit!=null?x.fit+'%':'—','Verified open at assessment']),...pending.map(x=>[x.agency,x.title,x.fit!=null?x.fit+'%':'—','Requires verification'+(x.flags?.length?' · '+x.flags.join('; '):'')])]);
  body.append(el('p','Internal research only. Relevance is not eligibility approval or a funding probability.','note'));
  win.focus();win.print();
 }
@@ -419,8 +660,9 @@ $('docUpload').onclick=async()=>{
    const ext=file.name.toLowerCase().split('.').pop(),path=user.id+'/'+crypto.randomUUID()+'.'+ext;
    try{
     const {error:upErr}=await db.storage.from(DOC_BUCKET).upload(path,file,{contentType:file.type,upsert:false});if(upErr)throw upErr;
-    const {error:metaErr}=await db.from('bov_hub_project_documents').insert({project_name:project,organisation_name:org,file_name:file.name,storage_path:path,mime_type:file.type,file_size:file.size,uploaded_by:user.id});
+    const {data:meta,error:metaErr}=await db.from('bov_hub_project_documents').insert({project_name:project,organisation_name:org,file_name:file.name,storage_path:path,mime_type:file.type,file_size:file.size,uploaded_by:user.id}).select('id').single();
     if(metaErr){await db.storage.from(DOC_BUCKET).remove([path]);throw metaErr}
+    try{$('docStatus').textContent='Reading text of '+file.name+' for matching…';const text=await aExtractText(file,file.type,file.name),status=aTextStatus(text);aDocTextCache.set(meta.id,{text,status});await aStoreDocText(meta.id,text,status)}catch(e){console.warn('Document text not read now; it will be read during matching.',e)}
     completed++;
    }catch(e){failures.push(file.name+': '+e.message)}
   }
