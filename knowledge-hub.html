@@ -345,7 +345,134 @@ function aPathwayFits(x,areas,ranked){
   return {p,fit,fits,flags,verified_open:aEvidenceComplete(p)};
  }).sort((a,b)=>(b.verified_open-a.verified_open)||b.fit-a.fit||a.p.title.localeCompare(b.p.title));
 }
-function aMatchSignature(x){return JSON.stringify([x.project_name,x.organisation_name,x.country,x.applicant_type,x.theme,x.project_description,x.documents_available])}
+// ===== EU side of the unified matching =====
+// Reads the 47 EU programmes and the live EU calls (nightly scan) and scores them
+// with the same project evidence used for the UN agencies.
+const A_EU27=['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE'];
+const A_EEA=['IS','LI','NO'];
+const A_ASSOCIATED=['AL','BA','ME','MK','RS','XK','TR','UA','MD','GE','AM','IL','TN','MA','EG','FO','CH','GB','NZ','CA','KR','JP'];
+let aCountryCodes=null;
+function aCountryCode(name){
+ const v=(name||'').trim();if(!v)return '';
+ if(/^[A-Za-z]{2}$/.test(v))return v.toUpperCase();
+ if(!aCountryCodes){
+  aCountryCodes=new Map();
+  const letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  for(const lang of ['en','es','fr','de','pt','it']){let dn;try{dn=new Intl.DisplayNames([lang],{type:'region'})}catch(e){continue}
+   for(const a of letters)for(const b of letters){const c=a+b;let n;try{n=dn.of(c)}catch(e){continue}if(n&&n!==c)aCountryCodes.set(n.toLocaleLowerCase(),c)}}
+  for(const [k,c] of Object.entries({'uk':'GB','united kingdom':'GB','england':'GB','scotland':'GB','wales':'GB','northern ireland':'GB','isle of man':'IM','usa':'US','us':'US','united states of america':'US','canary islands':'ES','tenerife':'ES','gran canaria':'ES','islas canarias':'ES','kosovo':'XK','ivory coast':'CI','côte d’ivoire':'CI',"cote d'ivoire":'CI','drc':'CD','dr congo':'CD','congo-brazzaville':'CG','czech republic':'CZ','holland':'NL'}))aCountryCodes.set(k,c);
+ }
+ const key=v.toLocaleLowerCase();
+ if(aCountryCodes.has(key))return aCountryCodes.get(key);
+ for(const [n,c] of aCountryCodes)if(key.includes(n)&&n.length>3)return c;
+ return '';
+}
+function aCountryLabel(code){try{return new Intl.DisplayNames(['en'],{type:'region'}).of(code)||code}catch(e){return code}}
+const aEuApplicant={'Non-Governmental Organisation (NGO) / Civil Society Organisation (CSO)':'ngo','Foundation':'ngo','Government body':'public','University / Research':'research','Private company':'sme','Individual':'individuals'};
+function aEuApplicantCode(type){return aEuApplicant[type]||(/ngo|cso/i.test(type||'')?'ngo':'')}
+const aEuApplicantNames={ngo:'NGOs / non-profits',public:'public bodies',research:'universities / research',sme:'companies / SMEs',students:'students',individuals:'individuals'};
+let aEuCache=null;
+async function aLoadEU(progress){
+ if(aEuCache&&Date.now()-aEuCache.at<10*60*1000)return aEuCache;
+ progress?.('Loading EU programmes and open EU calls…');
+ const progRes=await db.from('bov_funding_programmes').select('code,no,name,category,management_mode,on_eu_portal,applicant_types,themes,consortium,min_partners,min_countries,typical_grant_min,typical_grant_max,funding_rate_min,funding_rate_max,geography,notes').order('no');
+ const programmes=progRes.error?[]:(progRes.data||[]);
+ const today=new Date().toISOString().slice(0,10);
+ const base='id,title,programme,category,theme,summary,eligibility_notes,partner_requirements,official_url,status,eu_status,deadline,opening_date,funding_min_eur,funding_max_eur,total_budget_eur,cofinancing_percent,call_kind,parent_topic,organiser,audience_tags,country_codes,country_region';
+ const req='bov_call_requirements(programme_code,applicant_types,eligible_countries,themes,grant_min,grant_max,funding_rate_min,funding_rate_max,consortium_required,min_partners,min_countries,deadline,source)';
+ const page=async(cols,from)=>db.from('bov_eu_funding_calls').select(cols).not('status','in','(archived,closed)').or('deadline.is.null,deadline.gte.'+today).order('deadline',{ascending:true,nullsFirst:false}).range(from,from+999);
+ let calls=[],cols=base+','+req,error=null;
+ for(let from=0;from<6000;from+=1000){
+  let r=await page(cols,from);
+  if(r.error&&cols!==base){cols=base;r=await page(cols,from)}
+  if(r.error){error=r.error.message;break}
+  calls=calls.concat(r.data||[]);if((r.data||[]).length<1000)break;
+ }
+ const progByCode=new Map(programmes.map(p=>[p.code,p]));
+ for(const p of programmes)p._areas=Object.keys(aScanAreas([p.name,...(p.themes||[])].join(' ; ')));
+ for(const c of calls){
+  const r=Array.isArray(c.bov_call_requirements)?c.bov_call_requirements[0]:c.bov_call_requirements;c.req=r||null;
+  c.prog=(r&&progByCode.get(r.programme_code))||programmes.find(p=>c.programme&&(c.programme.toLowerCase().includes(p.name.toLowerCase())||p.name.toLowerCase().includes(c.programme.toLowerCase())))||null;
+  const head=[c.title,c.theme,c.parent_topic,...(r?.themes||[])].filter(Boolean).join(' ; ');
+  const body=[c.summary,c.eligibility_notes].filter(Boolean).join(' ');
+  const hb=aScanAreas(head),bb=aScanAreas(body);
+  c._areas=Object.keys(aAreaRx).filter(a=>hb[a]||(bb[a]?.hits>=2));
+  if(!c._areas.length&&c.prog)c._areas=c.prog._areas.slice();
+ }
+ return aEuCache={at:Date.now(),programmes,calls,error:progRes.error?.message||error};
+}
+function aEuGeography(code,prog,call){
+ const intl=prog?.category==='international'||/worldwide|third countr|partner countr|africa|global|non-eu/i.test(prog?.geography||'')||call?.category==='africa';
+ if(!code)return {pts:6,note:'Project country not recognised; check geographic eligibility',state:'unknown'};
+ const listed=[...(call?.req?.eligible_countries||[]),...(call?.country_codes||[])].map(v=>String(v).toUpperCase());
+ if(listed.length){return listed.includes(code)?{pts:15,fit:'Country eligible: '+aCountryLabel(code),state:'ok'}:{pts:0,note:'Call targets '+listed.slice(0,6).join(', ')+(listed.length>6?'…':'')+', not '+aCountryLabel(code),state:'no'}}
+ if(A_EU27.includes(code)||A_EEA.includes(code))return {pts:15,fit:aCountryLabel(code)+' is an EU/EEA country',state:'ok'};
+ if(intl)return {pts:13,fit:'International programme: '+aCountryLabel(code)+' can be covered',state:'ok'};
+ if(A_ASSOCIATED.includes(code))return {pts:9,note:aCountryLabel(code)+' is associated to some EU programmes; check this call',state:'check'};
+ return {pts:3,note:'Normally for EU Member States and associated countries; applicants from '+aCountryLabel(code)+' can usually only join as partners',state:'limited'};
+}
+function aEuApplicantFit(type,list){
+ const code=aEuApplicantCode(type),l=(list||[]).map(v=>String(v).toLowerCase());
+ if(!l.length)return {pts:8,note:'Eligible applicant types not documented'};
+ if(code&&l.includes(code))return {pts:20,fit:'Open to '+(aEuApplicantNames[code]||code)};
+ return {pts:0,note:'Open to '+l.map(v=>aEuApplicantNames[v]||v).join(', ')+'; your legal type is not listed'};
+}
+function aEuThemeFit(areas,ev,callAreas){
+ const ticked=areas.filter(a=>callAreas.includes(a)),extra=callAreas.filter(a=>!areas.includes(a)&&ev.areas[a]?.evidenced);
+ if(!callAreas.length)return {pts:10,support:0,overlap:[],extra:[],note:'Themes not clear from the call text'};
+ const ratio=Math.min(1,(ticked.length+0.5*extra.length)/Math.min(areas.length||1,callAreas.length));
+ const sup=ticked.length?ticked.reduce((s,a)=>s+(ev.areas[a]?.strength||0),0)/ticked.length:0;
+ return {pts:40*ratio,support:sup,overlap:ticked,extra};
+}
+// EU programmes on the same institutional relevance scale as UN agencies:
+// 45 ticked areas in programme themes, 25 applicant type, 20 evidence, 10 extra evidenced areas.
+function aEuProgrammeScores(x,areas,ev){
+ const n=areas.length||1,code=aCountryCode(x.country);
+ return (aEuCache?.programmes||[]).map(p=>{
+  const direct=areas.filter(a=>p._areas.includes(a)),extra=p._areas.filter(a=>!areas.includes(a)&&ev.areas[a]?.evidenced);
+  const support=direct.length?direct.reduce((s,a)=>s+(ev.areas[a]?.strength||0),0)/direct.length:0;
+  const app=aEuApplicantFit(x.applicant_type,p.applicant_types);
+  const parts={themes:45*direct.length/n,core:25*app.pts/20,evidence:20*support*direct.length/n,extra:Math.min(10,5*extra.length)};
+  let score=parts.themes+parts.core+parts.evidence+parts.extra;const notes=[];
+  const geo=aEuGeography(code,p,null);
+  if(geo.state==='limited'){score*=0.6;notes.push(geo.note+'; score reduced by 40%')}else if(geo.note)notes.push(geo.note);
+  if(app.note)notes.push(app.note);
+  if(p.management_mode==='shared')notes.push('Managed nationally/regionally: calls are published by national or regional authorities');
+  if(p.management_mode==='financial_instrument')notes.push('Loans and guarantees through banks, not grants');
+  if(p.consortium==='required')notes.push('Consortium required'+(p.min_partners?' (at least '+p.min_partners+' partners'+(p.min_countries?' from '+p.min_countries+' countries':'')+')':''));
+  if(p.notes)notes.push(p.notes);
+  const r=v=>Math.round(v);
+  return {source:'EU',agency:p.code,name:p.name,direct,primary:[],core:[],extra,score:Math.max(0,Math.min(100,r(score))),breakdown:{themes:r(parts.themes),core:r(parts.core),evidence:r(parts.evidence),extra:r(parts.extra),core_label:'applicant type'},notes,related:[],mandate:{name:p.name}};
+ });
+}
+// EU calls on the same fit scale as UN pathways: themes 40 (+ evidence 10), applicant 20, country 15, budget 10, deadline 5.
+function aEuCallFits(x,areas,ev){
+ const code=aCountryCode(x.country),today=new Date();
+ return (aEuCache?.calls||[]).map(c=>{
+  const fits=[],flags=[];
+  const th=aEuThemeFit(areas,ev,c._areas);
+  if(th.overlap.length)fits.push('Themes: '+th.overlap.join(', '));if(th.extra.length)fits.push('Also in your documents: '+th.extra.join(', '));
+  if(th.note)flags.push(th.note);else if(!th.overlap.length&&!th.extra.length)flags.push('Call themes do not overlap with the project areas');
+  const app=aEuApplicantFit(x.applicant_type,c.req?.applicant_types?.length?c.req.applicant_types:(c.audience_tags?.length?c.audience_tags:c.prog?.applicant_types));
+  if(app.fit)fits.push(app.fit);if(app.note)flags.push(app.note);
+  const geo=aEuGeography(code,c.prog,c);if(geo.fit)fits.push(geo.fit);if(geo.note)flags.push(geo.note);
+  const gmin=c.req?.grant_min??c.funding_min_eur??c.prog?.typical_grant_min,gmax=c.req?.grant_max??c.funding_max_eur??c.prog?.typical_grant_max;
+  let budget=5;
+  if(x.requested_funding!=null&&x.currency==='EUR'&&(gmin!=null||gmax!=null)){
+   if(gmax!=null&&x.requested_funding>gmax){budget=2;flags.push('Request above the usual maximum (€'+Math.round(gmax).toLocaleString('en')+')')}
+   else if(gmin!=null&&x.requested_funding<gmin){budget=4;flags.push('Request below the usual minimum (€'+Math.round(gmin).toLocaleString('en')+')')}
+   else{budget=10;fits.push('Request within the usual grant range')}
+  }
+  const dl=c.deadline||c.req?.deadline;let time=3;
+  if(dl){const days=Math.round((new Date(dl)-today)/864e5);if(days<0)return null;if(days<21){time=1;flags.push('Deadline in '+days+' day(s)')}else time=5}
+  if(c.req?.consortium_required||c.prog?.consortium==='required'){const mp=c.req?.min_partners??c.prog?.min_partners,mc=c.req?.min_countries??c.prog?.min_countries;flags.push('Consortium required'+(mp?' (at least '+mp+' partners'+(mc?' from '+mc+' countries':'')+')':''))}
+  if(c.call_kind==='cascade')fits.push('Cascade call run by '+(c.organiser||'an EU-funded project')+': usually simpler applications');
+  const fit=Math.max(0,Math.min(100,Math.round(th.pts+10*th.support*(th.overlap.length?1:0)+app.pts+geo.pts+budget+time)));
+  const open=c.eu_status==='open'||c.status==='open';
+  return {source:'EU',fit,fits,flags,open,c,title:c.title,agency:c.prog?.code||c.programme||'EU',deadline:dl,url:c.official_url,status:c.eu_status||c.status};
+ }).filter(Boolean).sort((a,b)=>b.fit-a.fit||String(a.deadline||'9').localeCompare(String(b.deadline||'9')));
+}
+function aMatchSignature(x){return JSON.stringify([x.project_name,x.organisation_name,x.country,x.applicant_type,x.theme,x.project_description,x.documents_available,x.requested_funding,x.currency])}
 async function aComputeMatching(x,progress){
  const selected=[...document.querySelectorAll('#aThemeChoices input:checked')].map(c=>c.value);
  const areas=selected.length?selected:x.theme.split(',').map(t=>t.trim()).filter(Boolean);
@@ -354,8 +481,17 @@ async function aComputeMatching(x,progress){
  const ev=aAnalyseEvidence(x,docs);
  if(docError)ev.checks.unshift(docError+'. Matching used the form only.');
  const ranked=aAgencyScores(areas,ev),pathways=aPathwayFits(x,areas,ranked);
+ for(const r of ranked)r.source='UN';
+ let euError='';try{await aLoadEU(progress);euError=aEuCache.error||''}catch(e){euError=e.message}
+ if(euError)ev.checks.unshift('EU funding data could not be fully loaded ('+euError+'). EU results may be incomplete.');
+ const euProgrammes=aEuCache?aEuProgrammeScores(x,areas,ev):[],euCalls=aEuCache?aEuCallFits(x,areas,ev):[];
+ const relevance=[...ranked,...euProgrammes].sort((a,b)=>b.score-a.score||a.source.localeCompare(b.source)||a.agency.localeCompare(b.agency));
+ const opportunities=[
+  ...pathways.map(f=>({source:'UN',fit:f.fit,fits:f.fits,flags:f.flags,open:f.verified_open,title:f.p.title,agency:f.p.agency,deadline:f.p.deadline,url:f.p.source_url,status:f.verified_open?'verified open':f.p.status,p:f.p})),
+  ...euCalls
+ ].sort((a,b)=>b.fit-a.fit||String(a.deadline||'9').localeCompare(String(b.deadline||'9')));
  const suggested=Object.entries(ev.areas).filter(([a,v])=>v.evidenced&&!areas.includes(a)).sort((p,q)=>q[1].hits-p[1].hits).map(([a])=>a);
- return aLastMatching={signature:aMatchSignature(x),x,areas,docs,stored,ev,ranked,pathways,suggested,at:new Date().toISOString()};
+ return aLastMatching={signature:aMatchSignature(x),x,areas,docs,stored,ev,ranked,pathways,euProgrammes,euCalls,relevance,opportunities,suggested,at:new Date().toISOString()};
 }
 async function aFindMatches(){
  const x=aForm(),out=$('aResults'),btn=$('aFind');
@@ -391,34 +527,45 @@ function aRenderMatching(m){
  }
  if(ev.checks.length){panel.append(el('strong','Consistency checks'));for(const c of ev.checks)panel.append(el('p','⚠ '+c,'muted'))}
  out.append(panel);
+ const tag=src=>{const t=el('span',src==='UN'?'UN':'EU');t.style.cssText='display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px;margin-right:8px;color:#fff;background:'+(src==='UN'?'#1d6fb8':'#2c3e9e');return t};
  // Report 1
- const header=el('div');header.append(el('h3','Report 1 — Institutional relevance'),el('p','Score out of 100: up to 45 for ticked project areas within the agency mandate, 25 for its core mandate, 20 for how strongly the description and documents support those areas, and 10 for additional mandate areas found in the evidence. Agencies whose core beneficiary group is absent from the evidence are reduced by 40%. Indicative relevance only, not eligibility or funding probability.','muted'),el('p','Ticked areas: '+areas.join(' · '),'muted'));out.append(header);
- for(const r of ranked){
-  const card=el('div',null,'item'),b=r.breakdown;
-  card.append(el('strong',r.agency+' · '+r.mandate.name),el('p',r.score+'% institutional relevance','muted'),bar(r.score),
-   el('p','Themes '+b.themes+'/45 · Core mandate '+b.core+'/25 · Evidence '+b.evidence+'/20 · Extra evidenced areas '+b.extra+'/10','muted'),
-   el('p','Thematic alignment: '+(r.direct.join(' · ')||'none')+' · Core mandate: '+(r.primary.join(' · ')||'none')+(r.extra.length?' · Also evidenced: '+r.extra.join(' · '):''),'muted'));
+ const relevance=m.relevance||ranked;
+ out.append(el('h3','Report 1 — Institutional relevance (UN agencies and EU programmes)'),el('p','One ranking for UN agencies and the 47 EU programmes, each scored out of 100: up to 45 for ticked project areas within the mandate or programme themes, 25 for the agency\'s core mandate (UN) or for your legal type being an eligible applicant (EU), 20 for how strongly the description and documents support those areas, and 10 for additional areas found in the evidence. UN agencies whose core beneficiary group is absent, and EU programmes that are mainly closed to the project country, are reduced by 40%. Indicative relevance only, not eligibility or funding probability.','muted'),el('p','Ticked areas: '+areas.join(' · '),'muted'));
+ const drawRel=r=>{
+  const card=el('div',null,'item'),b=r.breakdown,title=el('strong');title.append(tag(r.source),document.createTextNode(r.agency+' · '+r.mandate.name));
+  card.append(title,el('p',r.score+'% institutional relevance','muted'),bar(r.score),
+   el('p','Themes '+b.themes+'/45 · '+(r.source==='EU'?'Applicant type ':'Core mandate ')+b.core+'/25 · Evidence '+b.evidence+'/20 · Extra evidenced areas '+b.extra+'/10','muted'),
+   el('p','Thematic alignment: '+(r.direct.join(' · ')||'none')+(r.source==='UN'?' · Core mandate: '+(r.primary.join(' · ')||'none'):'')+(r.extra.length?' · Also evidenced: '+r.extra.join(' · '):''),'muted'));
   if(r.related.length)card.append(el('p','Conditional / related pathways (not scored): '+r.related.join(' · '),'muted'));
   if(r.notes.length)card.append(el('p','Research considerations: '+r.notes.join('; '),'muted'));
-  const ref=aOpportunities.find(p=>p.agency===r.agency&&p.title==='Institutional partnership and programme pathways')||aOpportunities.find(p=>p.agency===r.agency);if(ref)source(card,ref.source_url);
-  out.append(card);
- }
+  if(r.source==='UN'){const ref=aOpportunities.find(p=>p.agency===r.agency&&p.title==='Institutional partnership and programme pathways')||aOpportunities.find(p=>p.agency===r.agency);if(ref)source(card,ref.source_url)}
+  else{const l=el('a','See in EU Programme Directory');l.href='/eu-funding-intelligence.html#directory';l.target='_blank';l.rel='noopener';card.append(l)}
+  return card;
+ };
+ const relBox=el('div');out.append(relBox);
+ const showRel=(list,n)=>{relBox.replaceChildren();list.slice(0,n).forEach(r=>relBox.append(drawRel(r)));if(list.length>n){const b=el('button','Show all '+list.length+' agencies and programmes');b.type='button';b.className='btn alt';b.onclick=()=>showRel(list,list.length);relBox.append(b)}};
+ showRel(relevance,20);
  // Report 2
+ const opps=m.opportunities||[];
  const divider=el('hr');divider.style.margin='30px 0';
- out.append(divider,el('h3','Report 2 — Funding pathways ranked by fit'),el('p','Each recorded pathway is scored out of 100: up to 40 for matching project areas, 30 for the agency\'s relevance above, 15 for country coverage and 15 for applicant legal type. Verified open calls are listed first. An unverified record means availability is unknown, NOT that the agency has no funding.','muted'));
- const active=pathways.filter(p=>p.verified_open),other=pathways.filter(p=>!p.verified_open);
- const draw=f=>{const p=f.p,card=el('div',null,'item');card.append(el('strong',p.agency+' · '+p.title),el('p',f.fit+'% fit · '+(f.verified_open?'Verified on '+p.verified_on+' · Deadline '+p.deadline:'Funding availability: NOT VERIFIED · Recorded status: '+p.status+' · Deadline: '+(p.deadline||'not documented')),'muted'),bar(f.fit));
+ out.append(divider,el('h3','Report 2 — Funding opportunities ranked by fit (UN and EU)'),el('p','UN pathways and live EU calls from the nightly scan of the official EU Funding & Tenders Portal, in one list. Each is scored out of 100 for project areas and document evidence, eligible applicant type, country coverage and other practical fit (budget, deadline). Every opportunity must still be checked against the official call documents. An unverified UN record means availability is unknown, NOT that the agency has no funding.','muted'));
+ const drawOpp=f=>{
+  const card=el('div',null,'item'),title=el('strong');title.append(tag(f.source),document.createTextNode(f.agency+' · '+f.title));
+  const line=f.source==='EU'?('EU call · '+(f.status==='open'?'Open':f.status==='forthcoming'?'Forthcoming':f.status)+' · Deadline: '+(f.deadline||'not published'))
+   :(f.open?'Verified on '+f.p.verified_on+' · Deadline '+f.p.deadline:'Funding availability: NOT VERIFIED · Recorded status: '+f.p.status+' · Deadline: '+(f.p.deadline||'not documented'));
+  card.append(title,el('p',f.fit+'% fit · '+line,'muted'),bar(f.fit));
   if(f.fits.length)card.append(el('p','Fits: '+f.fits.join(' · '),'muted'));if(f.flags.length)card.append(el('p','Check: '+f.flags.join(' · '),'muted'));
-  if(p.agency==='UNIDO')card.append(el('p','UNIDO Technical Cooperation is a relevant route to investigate, particularly for industrial or agricultural transformation. This record does not confirm an open grant or direct funding for this applicant.','muted'));
-  source(card,p.source_url);choose(card,p);out.append(card)};
- out.append(el('h3','A. Verified open calls ('+active.length+')'));
- if(!active.length)out.append(el('p','No fully verified open calls recorded in this database. This does not establish that none exist.','muted'));
- active.forEach(draw);
- out.append(el('h3','B. Funding pathways requiring verification ('+other.length+')'));
- if(!other.length)out.append(el('p','No additional recorded pathways.','muted'));
- other.forEach(draw);
+  if(f.source==='UN'&&f.agency==='UNIDO')card.append(el('p','UNIDO Technical Cooperation is a relevant route to investigate, particularly for industrial or agricultural transformation. This record does not confirm an open grant or direct funding for this applicant.','muted'));
+  source(card,f.url);if(f.source==='UN')choose(card,f.p);
+  return card;
+ };
+ const openNow=opps.filter(f=>f.open),later=opps.filter(f=>!f.open);
+ const section=(heading,list,empty)=>{out.append(el('h3',heading+' ('+list.length+')'));const box=el('div');out.append(box);if(!list.length){box.append(el('p',empty,'muted'));return}
+  const show=n=>{box.replaceChildren();list.slice(0,n).forEach(f=>box.append(drawOpp(f)));if(list.length>n){const b=el('button','Show '+(list.length-n)+' more');b.type='button';b.className='btn alt';b.onclick=()=>show(Math.min(list.length,n+25));box.append(b)}};show(15)};
+ section('A. Open now: EU calls open for applications and verified UN calls',openNow,'No open calls recorded for this project in the databases. This does not establish that none exist.');
+ section('B. Forthcoming EU calls and UN pathways requiring verification',later,'No additional recorded opportunities.');
  out.append(el('p','Verification checklist: exact official programme title, country coverage, eligible applicants, funding instrument, budget, application window, deadline and date of source review.','muted'));
- $('aStatus').textContent='Two reports generated using '+(ev.readCount?ev.readCount+' document(s) and the form':'the form only')+': '+ranked.length+' agencies ranked; '+active.length+' verified open calls and '+other.length+' pathways ranked by fit. No eligibility decision made.';
+ $('aStatus').textContent='One matching for UN and EU, using '+(ev.readCount?ev.readCount+' document(s) and the form':'the form only')+': '+relevance.length+' agencies and programmes ranked; '+openNow.length+' open calls and '+later.length+' forthcoming calls or pathways ranked by fit. No eligibility decision made.';
 }
 
 let aProjects=[],aLastReports=null;
@@ -447,13 +594,13 @@ async function aBuildReports(){
  const x=aForm();if(!x.project_name||!x.organisation_name||!x.country||!x.applicant_type||!x.theme)throw Error('Complete project name, organisation, country, legal type and project areas first.');
  let m=aLastMatching;
  if(!m||m.signature!==aMatchSignature(x))m=await aComputeMatching(x,t=>saveFeedback(t));
- const pathways=m.pathways.map(f=>({agency:f.p.agency,title:f.p.title,status:f.p.status,source_url:f.p.source_url,deadline:f.p.deadline,verified_on:f.p.verified_on,verified_open:f.verified_open,fit:f.fit,fits:f.fits,flags:f.flags}));
+ const pathways=(m.opportunities||[]).slice(0,120).map(f=>({source:f.source,agency:f.agency,title:f.title,status:f.status,source_url:f.url,deadline:f.deadline||null,verified_on:f.p?.verified_on||null,verified_open:f.open,fit:f.fit,fits:f.fits,flags:f.flags}));
  const supported=Object.entries(m.ev.areas).filter(([,v])=>v.evidenced).map(([area,v])=>({area,mentions:v.hits,top_terms:v.top,found_in:v.files}));
  return {input:x,
-  relevance:{method:'v2: 45 ticked areas in mandate, 25 core mandate, 20 evidence strength from description and documents, 10 additional evidenced mandate areas; reduced 40% when core beneficiary context is absent',areas:m.areas,
+  relevance:{method:'v3 unified UN + EU: 45 ticked areas in mandate or programme themes, 25 core mandate (UN) or eligible applicant type (EU), 20 evidence strength from description and documents, 10 additional evidenced mandate areas; reduced 40% when core beneficiary context is absent',areas:m.areas,
    evidence:{documents:m.docs.map(d=>({file_name:d.file_name,status:d.status})),documents_read:m.ev.readCount,supported_areas:supported,suggested_areas:m.suggested,checks:m.ev.checks},
-   agencies:m.ranked.map(r=>({agency:r.agency,name:r.name,score:r.score,breakdown:r.breakdown,direct:r.direct,core:r.core,extra:r.extra,related:r.related,notes:r.notes}))},
-  funding:{verified_open_calls:pathways.filter(p=>p.verified_open),pathways_requiring_verification:pathways.filter(p=>!p.verified_open),note:'Database snapshot ranked by fit (themes 40, agency relevance 30, country 15, applicant type 15); absence of verified calls does not mean no funding exists.'}};
+   agencies:(m.relevance||m.ranked).map(r=>({source:r.source||'UN',agency:r.agency,name:r.name,score:r.score,breakdown:r.breakdown,direct:r.direct,core:r.core,extra:r.extra,related:r.related,notes:r.notes}))},
+  funding:{verified_open_calls:pathways.filter(p=>p.verified_open),pathways_requiring_verification:pathways.filter(p=>!p.verified_open),note:'UN pathways and live EU calls in one list ranked by fit (top 120 kept). Verified/open = verified UN call or EU call open on the official portal. Absence of verified calls does not mean no funding exists.'}};
 }
 // Save diagnostics: never navigate automatically, and always show a visible outcome.
 const saveButton=$('aSaveReports'),saveStatus=$('aSaveReportsStatus');
@@ -550,11 +697,11 @@ function aPrintSavedDocument(win,project,report){
   if(evp.supported_areas?.length)table(['Area supported by evidence','Mentions','Key terms','Found in'],evp.supported_areas.map(v=>[v.area,v.mentions,(v.top_terms||[]).join(', '),(v.found_in||[]).join(', ')]));
   if(evp.suggested_areas?.length)body.append(el('p','Suggested areas not ticked: '+evp.suggested_areas.join(', ')));
   for(const c of evp.checks||[])body.append(el('p','Check: '+c,'note'))}
- table(['Agency','Relevance','Matching project areas'],(report.relevance_report?.agencies||[]).map(a=>[a.agency,a.score+'%',(a.direct?.join(', ')||'No direct match recorded')+(a.breakdown?' (themes '+a.breakdown.themes+', core '+a.breakdown.core+', evidence '+a.breakdown.evidence+', extra '+a.breakdown.extra+')':'')]));
+ table(['Agency / programme','Relevance','Matching project areas'],(report.relevance_report?.agencies||[]).map(a=>[(a.source?a.source+' · ':'')+a.agency,a.score+'%',(a.direct?.join(', ')||'No direct match recorded')+(a.breakdown?' (themes '+a.breakdown.themes+', core '+a.breakdown.core+', evidence '+a.breakdown.evidence+', extra '+a.breakdown.extra+')':'')]));
  body.append(el('h2','Report 2 — Funding intelligence'));
  const f=report.funding_report||{},calls=f.verified_open_calls||[],pending=f.pathways_requiring_verification||[];
- body.append(el('p',calls.length+' verified open calls · '+pending.length+' pathways requiring verification'));
- table(['Agency','Programme / pathway','Fit','Verification'],[...calls.map(x=>[x.agency,x.title,x.fit!=null?x.fit+'%':'—','Verified open at assessment']),...pending.map(x=>[x.agency,x.title,x.fit!=null?x.fit+'%':'—','Requires verification'+(x.flags?.length?' · '+x.flags.join('; '):'')])]);
+ body.append(el('p',calls.length+' open calls · '+pending.length+' forthcoming calls or pathways requiring verification'));
+ table(['Source · body','Call / pathway','Fit','Status'],[...calls.map(x=>[(x.source?x.source+' · ':'')+x.agency,x.title,x.fit!=null?x.fit+'%':'—',(x.source==='EU'?'Open on EU portal':'Verified open at assessment')+(x.deadline?' · deadline '+x.deadline:'')]),...pending.map(x=>[(x.source?x.source+' · ':'')+x.agency,x.title,x.fit!=null?x.fit+'%':'—',(x.source==='EU'?'Forthcoming EU call':'Requires verification')+(x.deadline?' · deadline '+x.deadline:'')+(x.flags?.length?' · '+x.flags.join('; '):'')])]);
  body.append(el('p','Internal research only. Relevance is not eligibility approval or a funding probability.','note'));
  win.focus();win.print();
 }
@@ -562,7 +709,7 @@ $('aPrintSaved').onclick=async()=>{
  const id=$('aSavedPrintProject').value,status=$('aSavedPrintStatus');
  if(!id){status.textContent='Select an existing project first.';return}
  const win=window.open('','_blank');if(!win){status.textContent='Allow pop-ups to print saved reports.';return}win.opener=null;win.document.body.textContent='Loading saved report…';
- try{const {data,error}=await db.from('bov_project_reports').select('*').eq('project_id',id).order('version',{ascending:false}).limit(1);if(error)throw error;if(!data?.length)throw Error('This project has no saved assessment reports.');
+ try{const {data,error}=await db.from('bov_project_reports').select('*').eq('project_id',id).order('version',{ascending:false}).order('created_at',{ascending:false}).limit(1);if(error)throw error;if(!data?.length)throw Error('This project has no saved assessment reports.');
  const project=aProjects.find(p=>p.id===id);win.document.body.replaceChildren();aPrintSavedDocument(win,project,data[0]);status.textContent='Opened saved assessment version '+data[0].version+' for printing.';
  }catch(e){status.textContent='Cannot print saved assessment: '+e.message;win.close()}
 };
