@@ -1,4 +1,4 @@
-// Supabase Edge Function: bov-eu-funding-scan  (v3.1: wider country detection incl. Africa & neighbourhood; placeholder budgets ignored)
+// Supabase Edge Function: bov-eu-funding-scan  (v3.2: batch paging via {startPage} and nextPage; v3.1: Africa & neighbourhood countries, placeholder budgets ignored)
 // Deploy with Verify JWT OFF. Staff JWT is verified in-function; scheduled callers may use EU_SCAN_SECRET.
 // Imports open and forthcoming EU Funding & Tenders opportunities: EU topics (types 1, 2) and
 // cascade calls run by EU-funded projects (type 8). Requires blue-ocean-eu-scanner-v3.sql.
@@ -351,19 +351,23 @@ Deno.serve(async (req) => {
   let fetched = 0, inserted = 0, updated = 0, skipped = 0, pages = 0, method = "";
   let partialError: string | null = null;
   let rawSample: any = null;
+  let nextPage: number | null = null;
+  let startPage = 1;
+  try { const b = await req.json(); const n = Number(b?.startPage); if (Number.isInteger(n) && n >= 1 && n <= 500) startPage = n; } catch { /* no body */ }
 
   try {
     const now = new Date().toISOString(), today = now.slice(0, 10);
 
-    for (let page = 1; page <= MAX_PAGES; page++) {
-      if (Date.now() - startedAt > TIME_BUDGET_MS) { partialError = `Stopped after page ${page - 1}: time budget reached`; break; }
+    const lastPage = startPage + MAX_PAGES - 1;
+    for (let page = startPage; page <= lastPage; page++) {
+      if (Date.now() - startedAt > TIME_BUDGET_MS) { nextPage = page; break; } // continue in the next batch
 
       let results: any[], rawCount = 0;
       try {
         const got = await fetchPage(page);
         results = got.rows; rawCount = got.rawCount; method = got.method;
       } catch (e) {
-        if (page === 1) throw e;
+        if (page === startPage) throw e;
         partialError = errText(e);
         break;
       }
@@ -415,7 +419,8 @@ Deno.serve(async (req) => {
           if (error) throw error;
         }
       }
-      if (rawCount < PAGE_SIZE) break; // last page
+      if (rawCount < PAGE_SIZE) break; // last page of the EU list
+      if (page === lastPage) nextPage = lastPage + 1; // more pages may remain: continue in the next batch
     }
 
     const finished = new Date().toISOString();
@@ -426,7 +431,7 @@ Deno.serve(async (req) => {
     if (rawSample) await db.from("bov_eu_scan_runs").update({ raw_sample: rawSample }).eq("id", run.id);
     await db.from("bov_eu_funding_sources").update({ last_scanned_at: finished, scan_status: "success", last_error: partialError }).eq("source_key", "eu-ft");
 
-    return reply({ ok: true, method, pages, fetched, inserted, updated, skipped, partialError,
+    return reply({ ok: true, method, startPage, nextPage, pages, fetched, inserted, updated, skipped, partialError,
       source: "EU Funding & Tenders official API", note: "Imported records require eligibility and deadline verification" });
   } catch (e) {
     const message = e instanceof Error ? errText(e) : (typeof e === "object" && e && "message" in e) ? String((e as any).message) : String(e);
