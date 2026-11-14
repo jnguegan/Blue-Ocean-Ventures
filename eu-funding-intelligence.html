@@ -207,7 +207,7 @@ const CONTINENTS=[
 [[-11,36],[-10,43],[-5,50],[6,54],[10,60],[22,70],[45,70],[65,75],[100,73],[130,65],[162,58],[180,55],[178,42],[150,35],[135,28],[122,20],[112,4],[105,-7],[95,5],[82,8],[72,23],[59,25],[46,38],[36,43],[29,40],[23,35],[16,38],[8,43]],
 [[113,-11],[127,-12],[141,-15],[153,-27],[145,-38],[131,-36],[115,-24]],[[43,-13],[50,-14],[49,-25],[45,-26]],[[-52,60],[-42,60],[-39,70],[-44,82],[-57,83],[-60,70]],
 [[-10,51.5],[-6,55.3],[-8,58.5],[-3,58.7],[1.7,52.7],[1.3,51],[-5.7,50]]];
-const G={yaw:-0.22,pitch:0.55,zoom:1.15,playing:!matchMedia("(prefers-reduced-motion: reduce)").matches,drag:false,moved:0,lx:0,ly:0,mouse:null,points:[],max:1,eu:0,dots:[],raf:0,visible:true,ticks:0,anim:null,size:{w:0,h:0},hub:null};
+const HOME={yaw:-0.26,pitch:0.5,zoom:1.75};const G={yaw:HOME.yaw,pitch:HOME.pitch,zoom:HOME.zoom,sway:0,playing:!matchMedia("(prefers-reduced-motion: reduce)").matches,drag:false,moved:0,lx:0,ly:0,mouse:null,points:[],max:1,eu:0,dots:[],raf:0,visible:true,ticks:0,anim:null,size:{w:0,h:0},hub:null};
 function gInside(lon,lat,poly){let c=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const a=poly[i],b=poly[j];if((a[1]>lat)!==(b[1]>lat)&&lon<(b[0]-a[0])*(lat-a[1])/(b[1]-a[1])+a[0])c=!c}return c}
 const gxyz=(lon,lat)=>[Math.cos(lat)*Math.sin(lon),Math.sin(lat),Math.cos(lat)*Math.cos(lon)];
 function grot(p){const cy=Math.cos(G.yaw),sy=Math.sin(G.yaw),cp=Math.cos(G.pitch),sp=Math.sin(G.pitch);const x=p[0]*cy+p[2]*sy,z=p[2]*cy-p[0]*sy;return[x,p[1]*cp-z*sp,p[1]*sp+z*cp]}
@@ -226,7 +226,7 @@ function initGlobe(){
  $("gr-gplay").onclick=()=>{G.playing=!G.playing;$("gr-gplay").textContent=G.playing?"Pause":"Play";$("gr-gplay").setAttribute("aria-label",G.playing?"Pause globe rotation":"Resume globe rotation")};
  $("gr-gplay").textContent=G.playing?"Pause":"Play";
  $("gr-gin").onclick=()=>{G.zoom=Math.min(4,G.zoom*1.35)};$("gr-gout").onclick=()=>{G.zoom=Math.max(.9,G.zoom/1.35)};
- $("gr-greset").onclick=()=>{G.anim={yaw:-0.22,pitch:0.55,zoom:1.15}};
+ $("gr-greset").onclick=()=>{G.anim={...HOME}};
  new IntersectionObserver(en=>{G.visible=en[0].isIntersecting;cancelAnimationFrame(G.raf);if(G.visible)gDraw()}).observe(canvas.parentElement);
  gDraw();
 }
@@ -277,7 +277,7 @@ function gDraw(){
  // hover tooltip
  const hit=gHit(),tipEl=$("gr-gtip");canvas.style.cursor=G.drag?"grabbing":hit?"pointer":"grab";
  if(hit&&!G.drag){const s=hit==="hub"?G.hub:hit.s;tipEl.innerHTML=hit==="hub"?`<b>🇪🇺 EU-wide calls</b>${G.eu.toLocaleString("en-GB")} open across member states · click to filter`:`<b>${esc(COUNTRY[hit.c][0])}</b>${hit.n} country-specific call${hit.n===1?"":"s"} · click to filter`;tipEl.style.left=s.x+"px";tipEl.style.top=s.y+"px";tipEl.classList.add("show")}else tipEl.classList.remove("show");
- if(G.playing&&!G.drag&&!hit&&!G.anim)G.yaw+=.0016;
+ if(G.playing&&!G.drag&&!hit&&!G.anim){G.sway+=.006;G.yaw+=.0028*Math.cos(G.sway)} // gentle sway that keeps Europe & Africa in view
  if(G.visible)G.raf=requestAnimationFrame(gDraw);
 }
 function renderMap(){
