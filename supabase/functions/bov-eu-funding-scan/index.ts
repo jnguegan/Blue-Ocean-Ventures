@@ -1,26 +1,21 @@
-// Supabase Edge Function: bov-eu-funding-scan  (v2)
+// Supabase Edge Function: bov-eu-funding-scan  (v3)
 // Deploy with Verify JWT OFF. Staff JWT is verified in-function; scheduled callers may use EU_SCAN_SECRET.
-// Only imports official European Commission grants, not tenders or fabricated regional calls.
+// Imports open and forthcoming EU Funding & Tenders opportunities: EU topics (types 1, 2) and
+// cascade calls run by EU-funded projects (type 8). Requires blue-ocean-eu-scanner-v3.sql.
 //
-// v2.2: saves a truncated raw sample to bov_eu_scan_runs.raw_sample (optional column).
-// v2.1: multipart body sent as fixed-size bytes; GET fallback; detailed network error causes.
-// v2 changes:
-//  - Small pages (PAGE_SIZE) fetched one after another, instead of one huge 100-row reply
-//    (fixes "error reading a body from connection").
-//  - One automatic retry per page on network errors, and an overall time budget.
-//  - Reads fields from the nested `metadata` object the EU search API uses (values are arrays).
-//  - Only asks for forthcoming + open calls (closed calls are no longer requested).
-//  - Response includes `sampleKeys` so we can confirm the live EU schema.
+// v3: correct field mapping from the live API sample (callTitle, ccm2Id, url, budget, projectAcronym);
+//     one record per real call; audience tags (SMEs, students, research, public, NGOs, individuals)
+//     instead of a keyword filter; country detection; batched database writes; larger scans.
+// v2.x: small pages, retries, fixed-size multipart body with GET fallback, raw sample logging.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const PAGE_SIZE = 10;          // rows per EU API request — keep small
-const MAX_PAGES = 5;           // max pages per run (PAGE_SIZE x MAX_PAGES rows scanned)
-const PAGE_TIMEOUT_MS = 20000; // per request
-const TIME_BUDGET_MS = 100000; // stop starting new pages after this (Edge limit is ~150s)
+const PAGE_SIZE = 50;           // rows per EU API request
+const MAX_PAGES = 20;           // up to 1,000 calls per run
+const PAGE_TIMEOUT_MS = 25000;  // per request
+const TIME_BUDGET_MS = 110000;  // stop starting new pages after this (Edge limit is ~150s)
 
 const API_BASE = "https://api.tech.ec.europa.eu/search-api/prod/rest/search";
-const ORIGIN = "https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/";
-const keywords = /agricultur|farm|food|rural|sme|small business|entrepreneur|start.up|renewable|solar|energy|touris|hospitality|digital|innovation|manufactur|circular|bioeconomy|local develop/i;
+const TOPIC_URL = "https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/";
 
 // Read a value from the result, checking `metadata` first, then the top level.
 // EU metadata values are usually arrays of strings, e.g. { identifier: ["HORIZON-..."] }.
@@ -78,11 +73,6 @@ function stripHtml(s: string): string {
   return s.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
 }
 
-function classify(text: string) {
-  return /\b(public authorities only|public administrations only|government bodies only)\b/i.test(text) ? "public_only"
-    : /\b(sme|micro.enterprise|entrepreneur|start.up|farmer|private enterprise|business|company|cooperative)\b/i.test(text) ? "private_possible"
-    : "unreviewed";
-}
 
 // type 1,2,8 = grant topics / cascade; status 31094501 = forthcoming, 31094502 = open
 const WANTED_TYPES = new Set(["1", "2", "8"]);
@@ -159,7 +149,111 @@ async function readRows(response: Response, pageNumber: number): Promise<any[]> 
   catch { throw Object.assign(Error(`EU API page ${pageNumber} was not valid JSON: ${text.slice(0, 300)}`), { noRetry: true }); }
 }
 
-// Shorten long strings so a raw sample stays small.
+
+
+
+// ---- Audience tags -------------------------------------------------------
+const AUDIENCE_RULES: [string, RegExp][] = [
+  ["sme", /\b(smes?|small and medium|micro[- ]?enterprises?|start[- ]?ups?|scale[- ]?ups?|entrepreneurs?|companies|company|businesses|business|industry|industrial|enterprises?|farmers?|cooperatives?)\b/i],
+  ["students", /\b(students?|internships?|traineeships?|trainees?|scholarships?|master'?s?|bachelor|phd|doctoral|graduates?|young people|youth|learners?)\b/i],
+  ["research", /\b(research(ers)?|universit(y|ies)|academi(a|c)|institutes?|scientists?|laborator(y|ies)|r&d|higher education)\b/i],
+  ["public", /\b(public authorit(y|ies)|public bodies|municipalit(y|ies)|local authorit(y|ies)|regional authorit(y|ies)|governments?|public administrations?|cities)\b/i],
+  ["ngo", /\b(ngos?|non[- ]?profit|not[- ]for[- ]profit|civil society|associations?|foundations?|charit(y|ies)|social economy)\b/i],
+  ["individuals", /\b(individuals?|natural persons?|artists?|creators?|freelancers?|professionals?)\b/i],
+];
+function audienceTags(text: string): string[] {
+  return AUDIENCE_RULES.filter(([, re]) => re.test(text)).map(([tag]) => tag);
+}
+// Map onto the older single-value `audience` column (kept for compatibility).
+function audienceLegacy(tags: string[], text: string) {
+  if (/\b(public authorities only|public administrations only|government bodies only)\b/i.test(text)) return "public_only";
+  if (tags.includes("sme") || tags.includes("individuals")) return tags.length > 1 ? "mixed" : "private_possible";
+  return tags.length ? "mixed" : "unreviewed";
+}
+
+// ---- Country detection (only when a call clearly targets specific countries) ----
+const COUNTRIES: [string, string[]][] = [
+  ["AT", ["austria", "austrian"]], ["BE", ["belgium", "belgian"]], ["BG", ["bulgaria", "bulgarian"]],
+  ["HR", ["croatia", "croatian"]], ["CY", ["cyprus", "cypriot"]], ["CZ", ["czechia", "czech republic", "czech"]],
+  ["DK", ["denmark", "danish"]], ["EE", ["estonia", "estonian"]], ["FI", ["finland", "finnish"]],
+  ["FR", ["france", "french"]], ["DE", ["germany", "german"]], ["GR", ["greece", "greek"]],
+  ["HU", ["hungary", "hungarian"]], ["IE", ["ireland", "irish"]], ["IT", ["italy", "italian"]],
+  ["LV", ["latvia", "latvian"]], ["LT", ["lithuania", "lithuanian"]], ["LU", ["luxembourg"]],
+  ["MT", ["malta", "maltese"]], ["NL", ["netherlands", "dutch"]], ["PL", ["poland", "polish"]],
+  ["PT", ["portugal", "portuguese", "madeira", "azores"]], ["RO", ["romania", "romanian"]],
+  ["SK", ["slovakia", "slovak"]], ["SI", ["slovenia", "slovenian"]], ["ES", ["spain", "spanish", "canary islands", "canarias"]],
+  ["SE", ["sweden", "swedish"]], ["NO", ["norway", "norwegian"]], ["IS", ["iceland", "icelandic"]],
+  ["UA", ["ukraine", "ukrainian"]], ["RS", ["serbia", "serbian"]], ["AL", ["albania", "albanian"]],
+  ["MK", ["north macedonia"]], ["ME", ["montenegro"]], ["BA", ["bosnia"]], ["MD", ["moldova"]],
+  ["TR", ["türkiye", "turkey", "turkish"]], ["GE", ["georgia"]], ["AM", ["armenia"]],
+];
+const COUNTRY_CODES = new Set(COUNTRIES.map(([c]) => c));
+// Looks only at the call name and organiser (not the long description, which mentions many countries).
+function detectCountries(nameText: string, acronym: string): string[] {
+  const found = new Set<string>();
+  const t = nameText.toLowerCase();
+  for (const [code, words] of COUNTRIES) if (words.some((w) => new RegExp(`\\b${w}\\b`, "i").test(t))) found.add(code);
+  const ncc = /\bNCC[-_ ]([A-Z]{2})\b/.exec(acronym + " " + nameText);   // e.g. NCC-HU = Hungarian national coordination centre
+  if (ncc && COUNTRY_CODES.has(ncc[1])) found.add(ncc[1]);
+  return [...found];
+}
+
+// ---- Map one EU API row to a register record ------------------------------
+function toRecord(raw: any, now: string, today: string) {
+  const type = field(raw, "type");
+  const isCascade = type === "8";
+  const topicId = field(raw, "identifier");
+  const topicTitle = field(raw, "title");
+  const callName = field(raw, "callTitle", "caName") || String(raw?.summary ?? raw?.content ?? "");
+
+  // Unique ID per real call: cascade calls have their own portal ID (ccm2Id); EU topics use the topic identifier.
+  const externalId = isCascade ? (field(raw, "ccm2Id") ? "cs-" + field(raw, "ccm2Id") : "") : topicId;
+  const title = isCascade ? callName : (topicTitle || callName);
+  if (!externalId || !title) return null;
+
+  const description = stripHtml(field(raw, "description", "descriptionByte"));
+  const extra = stripHtml(field(raw, "furtherInformation") + " " + field(raw, "beneficiaryAdministration"));
+  const deadline = nextDeadline(raw, today);
+  if (deadline && deadline < today) return null;
+
+  const organiser = isCascade ? [field(raw, "projectAcronym"), field(raw, "projectName")].filter(Boolean).join(" — ") : "";
+  const tagText = [title, description, extra].join(" ");
+  const tags = audienceTags(tagText);
+  const countries = detectCountries(title + " " + field(raw, "projectName"), field(raw, "projectAcronym"));
+  const budget = Number(field(raw, "budget"));
+  const statusCode = field(raw, "status");
+  const link = field(raw, "url", "esST_URL") || (raw?.url as string) || TOPIC_URL + encodeURIComponent(topicId.toLowerCase());
+
+  return {
+    source_key: "eu-ft",
+    source_external_id: externalId,
+    title: title.slice(0, 250),
+    programme: (isCascade ? (topicTitle || "EU cascade funding") : (field(raw, "callTitle") || topicTitle || "EU Funding & Tenders")).slice(0, 200),
+    category: "regional",
+    country_region: countries.length ? countries.join(", ") : "EU-wide",
+    theme: (isCascade ? "Cascade funding (third-party call)" : "EU topic").slice(0, 200),
+    summary: (description || extra).slice(0, 5000),
+    official_url: link.startsWith("https://") ? link : TOPIC_URL + encodeURIComponent(topicId.toLowerCase()),
+    deadline,
+    eligibility_notes: "Eligibility must be verified against the official call. Automated audience tags are preliminary.",
+    audience: audienceLegacy(tags, tagText),
+    audience_tags: tags,
+    country_codes: countries,
+    call_kind: isCascade ? "cascade" : "topic",
+    parent_topic: topicTitle.slice(0, 250) || null,
+    parent_topic_id: topicId || null,
+    organiser: organiser.slice(0, 300) || null,
+    total_budget_eur: Number.isFinite(budget) && budget > 0 ? budget : null,
+    eu_status: statusCode === "31094501" ? "forthcoming" : "open",
+    opening_date: dateOf(field(raw, "startDate")),
+    last_seen_at: now,
+  };
+}
+
+// Fields the scanner may refresh on records staff have not reviewed yet (status 'research', not verified).
+const SCANNER_FIELDS = ["title", "programme", "country_region", "theme", "summary", "official_url", "deadline", "audience",
+  "audience_tags", "country_codes", "call_kind", "parent_topic", "parent_topic_id", "organiser", "total_budget_eur", "eu_status", "opening_date"];
+
 function trimDeep(v: any, depth = 0): any {
   if (typeof v === "string") return v.length > 400 ? v.slice(0, 400) + "…" : v;
   if (Array.isArray(v)) return v.slice(0, 8).map((x) => trimDeep(x, depth + 1));
@@ -203,10 +297,8 @@ Deno.serve(async (req) => {
   const { data: run, error: runErr } = await db.from("bov_eu_scan_runs").insert({ source_key: "eu-ft" }).select("id").single();
   if (runErr) return reply({ error: "Scanner migration missing or scan log unavailable", detail: runErr.message }, 500);
 
-  let fetched = 0, inserted = 0, updated = 0, skipped = 0, pages = 0;
-  let sampleKeys: { top: string[]; metadata: string[] } | null = null;
+  let fetched = 0, inserted = 0, updated = 0, skipped = 0, pages = 0, method = "";
   let partialError: string | null = null;
-  let method = "";
   let rawSample: any = null;
 
   try {
@@ -220,8 +312,8 @@ Deno.serve(async (req) => {
         const got = await fetchPage(page);
         results = got.rows; rawCount = got.rawCount; method = got.method;
       } catch (e) {
-        if (page === 1) throw e; // nothing fetched at all: real failure
-        partialError = e instanceof Error ? e.message : String(e); // keep what we already imported
+        if (page === 1) throw e;
+        partialError = errText(e);
         break;
       }
       pages++;
@@ -231,47 +323,45 @@ Deno.serve(async (req) => {
       }
       fetched += results.length;
       if (!rawSample && results.length) rawSample = { method, rows: trimDeep(results.slice(0, 3)) };
-      if (!sampleKeys && results.length) {
-        const r = results[0];
-        sampleKeys = { top: Object.keys(r ?? {}), metadata: Object.keys(r?.metadata ?? r?._source?.metadata ?? {}) };
-      }
 
+      // Build records, de-duplicated within the page.
+      const byId = new Map<string, any>();
       for (const raw of results) {
-        const id = field(raw, "identifier", "topicIdentifier", "callIdentifier", "topicId");
-        const title = field(raw, "title", "topicTitle", "callTitle", "name");
-        if (!id || !title) { skipped++; continue; }
-
-        const summary = stripHtml(field(raw, "descriptionByte", "description", "summary", "topicDescription") || String(raw?.summary ?? raw?.content ?? ""));
-        const programme = field(raw, "frameworkProgrammeName", "programmeName", "programme", "callTitle") || "EU Funding & Tenders";
-        const text = [title, summary, programme].join(" ");
-        if (!keywords.test(text)) { skipped++; continue; }
-
-        const deadline = nextDeadline(raw, today);
-        if (deadline && deadline < today) { skipped++; continue; }
-
-        const audience = classify(text);
-        if (audience === "public_only") { skipped++; continue; }
-
-        const record = {
-          source_key: "eu-ft", source_external_id: id, title: title.slice(0, 250), programme: programme.slice(0, 200),
-          category: "regional", country_region: "EU-wide",
-          theme: field(raw, "keywords", "tags", "typesOfAction").slice(0, 200) || "EU funding",
-          summary: summary.slice(0, 5000), official_url: ORIGIN + encodeURIComponent(id.toLowerCase()),
-          status: "research", deadline,
-          eligibility_notes: "Eligibility must be verified against the official call. Automated private-sector relevance is preliminary.",
-          audience, discovered_at: now, last_seen_at: now,
-        };
-
-        const { data: existing, error: findErr } = await db.from("bov_eu_funding_calls").select("id")
-          .eq("source_key", "eu-ft").eq("source_external_id", id).maybeSingle();
+        const rec = toRecord(raw, now, today);
+        if (!rec) { skipped++; continue; }
+        byId.set(rec.source_external_id, rec);
+      }
+      const ids = [...byId.keys()];
+      if (ids.length) {
+        const { data: existing, error: findErr } = await db.from("bov_eu_funding_calls")
+          .select("id,source_external_id,status,verified_on").eq("source_key", "eu-ft").in("source_external_id", ids);
         if (findErr) throw findErr;
-        if (existing) {
-          // Preserve staff-reviewed status, notes and verification. Only refresh last_seen_at.
-          const { error } = await db.from("bov_eu_funding_calls").update({ last_seen_at: now }).eq("id", existing.id);
-          if (error) throw error; updated++;
-        } else {
-          const { error } = await db.from("bov_eu_funding_calls").insert(record);
-          if (error) throw error; inserted++;
+        const known = new Map((existing ?? []).map((r: any) => [r.source_external_id, r]));
+
+        // New calls: one bulk insert.
+        const fresh = ids.filter((id) => !known.has(id)).map((id) => ({ ...byId.get(id), status: "research", discovered_at: now }));
+        if (fresh.length) {
+          const { error } = await db.from("bov_eu_funding_calls").insert(fresh);
+          if (error) throw error;
+          inserted += fresh.length;
+        }
+
+        // Existing calls: refresh scanner fields only if staff have not reviewed them; otherwise just last_seen_at.
+        const reviewedIds: string[] = [];
+        for (const id of ids.filter((i) => known.has(i))) {
+          const row: any = known.get(id);
+          if (row.status === "research" && !row.verified_on) {
+            const rec = byId.get(id);
+            const patch: Record<string, unknown> = { last_seen_at: now };
+            for (const k of SCANNER_FIELDS) patch[k] = rec[k];
+            const { error } = await db.from("bov_eu_funding_calls").update(patch).eq("id", row.id);
+            if (error) throw error;
+          } else reviewedIds.push(row.id);
+          updated++;
+        }
+        if (reviewedIds.length) {
+          const { error } = await db.from("bov_eu_funding_calls").update({ last_seen_at: now }).in("id", reviewedIds);
+          if (error) throw error;
         }
       }
       if (rawCount < PAGE_SIZE) break; // last page
@@ -282,17 +372,17 @@ Deno.serve(async (req) => {
       finished_at: finished, status: "success", fetched_count: fetched, inserted_count: inserted, updated_count: updated,
       error_message: partialError ? ("Partial: " + partialError).slice(0, 1500) : null,
     }).eq("id", run.id);
+    if (rawSample) await db.from("bov_eu_scan_runs").update({ raw_sample: rawSample }).eq("id", run.id);
     await db.from("bov_eu_funding_sources").update({ last_scanned_at: finished, scan_status: "success", last_error: partialError }).eq("source_key", "eu-ft");
 
-    if (rawSample) await db.from("bov_eu_scan_runs").update({ raw_sample: rawSample }).eq("id", run.id);
-    return reply({ ok: true, method, pages, fetched, inserted, updated, skipped, partialError, sampleKeys,
+    return reply({ ok: true, method, pages, fetched, inserted, updated, skipped, partialError,
       source: "EU Funding & Tenders official API", note: "Imported records require eligibility and deadline verification" });
   } catch (e) {
     const message = e instanceof Error ? errText(e) : (typeof e === "object" && e && "message" in e) ? String((e as any).message) : String(e);
     await db.from("bov_eu_scan_runs").update({ finished_at: new Date().toISOString(), status: "error", fetched_count: fetched,
       inserted_count: inserted, updated_count: updated, error_message: message.slice(0, 1500) }).eq("id", run.id);
-    await db.from("bov_eu_funding_sources").update({ scan_status: "error", last_error: message.slice(0, 1000) }).eq("source_key", "eu-ft");
     if (rawSample) await db.from("bov_eu_scan_runs").update({ raw_sample: rawSample }).eq("id", run.id);
-    return reply({ ok: false, error: message, pages, fetched, inserted, sampleKeys }, 502);
+    await db.from("bov_eu_funding_sources").update({ scan_status: "error", last_error: message.slice(0, 1000) }).eq("source_key", "eu-ft");
+    return reply({ ok: false, error: message, pages, fetched, inserted }, 502);
   }
 });
