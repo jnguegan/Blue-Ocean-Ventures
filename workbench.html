@@ -51,7 +51,7 @@ async function load(){
 async function detail(){
  const id=$('projectPicker').value;selected=projects.find(p=>p.id===id);
  $('projectDetail').classList.toggle('hidden',!selected);document.querySelectorAll('.project-row').forEach((row,i)=>row.classList.toggle('active',projects[i]?.id===id));if(!selected)return;
- $('projectTitle').textContent=selected.project_name+' · '+selected.country;window.bovSelectedProject=selected;window.bovProjectPackage?.(selected);window.bovFundingMatches?.(selected);
+ $('projectTitle').textContent=selected.project_name+' · '+selected.country;window.bovSelectedProject=selected;window.bovClientAccess?.(selected);window.bovProjectPackage?.(selected);window.bovFundingMatches?.(selected);
  $('projectStage').value=selected.stage;$('projectStatus').value=selected.status;$('projectNextAction').value=selected.next_action||'';
  const manager=$('projectManager');manager.replaceChildren();const none=txt('option','Unassigned');none.value='';manager.append(none);
  for(const u of staff){const o=txt('option',u.user_id+' ('+u.role+')');o.value=u.user_id;manager.append(o)}manager.value=selected.project_manager||'';
@@ -437,6 +437,142 @@ async function open(p){
 }
 window.bovProjectPackage=p=>{open(p).catch(e=>{shell();$('pkPanel').textContent='Project package unavailable: '+(e?.message||e)})};
 if(window.bovSelectedProject&&!$('projectDetail')?.classList.contains('hidden'))window.bovProjectPackage(window.bovSelectedProject);
+</script>
+
+<style>
+#clientInbox .ib-grid{display:grid;grid-template-columns:360px minmax(0,1fr);gap:14px;align-items:start}
+#clientInbox .ib-list{display:grid;gap:6px;max-height:68vh;overflow:auto}
+#clientInbox .ib-item{border:1px solid #dbe5ef;border-radius:10px;padding:10px 12px;background:#fff;text-align:left;width:100%;font:inherit;color:inherit;cursor:pointer}
+#clientInbox .ib-item.sel{border-color:#1767c9;box-shadow:0 0 0 2px #1767c933}
+#clientInbox .ib-item b{display:block;color:#102d55;font-size:14px}
+#clientInbox .ib-item small{display:block;color:#607288;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#clientInbox .ib-meta{display:flex;justify-content:space-between;gap:6px;font-size:11px;color:#607288;margin-top:3px}
+.ib-badge{background:#c62828;color:#fff;border-radius:999px;padding:1px 8px;font-size:11px;font-weight:800}
+.ib-wait{background:#fff4dd;color:#8a5200;border-radius:999px;padding:1px 8px;font-size:11px;font-weight:800}
+.ib-filters{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
+.ib-filters button{border:1px solid #cbd7e6;background:#fff;color:#102d55;border-radius:999px;padding:5px 12px;font:700 12px system-ui;cursor:pointer}
+.ib-filters button[aria-pressed=true]{background:#102d55;color:#fff;border-color:#102d55}
+.ib-thread{display:flex;flex-direction:column;min-height:60vh}
+.ib-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;border-bottom:1px solid #e3eaf2;padding-bottom:10px;margin-bottom:10px;flex-wrap:wrap}
+.ib-head h3{margin:0;color:#102d55}
+.ib-msgs{flex:1;overflow:auto;display:flex;flex-direction:column;gap:10px;max-height:50vh;padding:4px 2px 10px}
+.ib-msg{max-width:78%;border-radius:14px;padding:10px 13px;font-size:14.5px;white-space:pre-wrap;word-wrap:break-word}
+.ib-msg .who{font-size:11px;font-weight:800;opacity:.75;margin-bottom:2px}.ib-msg .when{font-size:11px;opacity:.6;margin-top:4px;text-align:right}
+.ib-msg.staff{align-self:flex-end;background:#1767c9;color:#fff;border-bottom-right-radius:4px}
+.ib-msg.client{align-self:flex-start;background:#eef3f8;color:#203a58;border-bottom-left-radius:4px}
+.ib-msg.system{align-self:center;background:#fff8e6;color:#6b4b00;border:1px solid #f1dfaa;font-size:12.5px;max-width:92%}
+.ib-compose{display:flex;gap:8px;border-top:1px solid #e3eaf2;padding-top:10px}
+.ib-compose textarea,#clientInbox input,#clientInbox select,#caPanel input{font:inherit;font-size:14px;border:1px solid #cbd7e6;border-radius:8px;padding:9px;width:100%;background:#fff}
+.ib-compose textarea{min-height:48px;resize:vertical}
+#caPanel .ca-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0}
+#caPanel .ca-client{display:flex;justify-content:space-between;gap:8px;border:1px solid #e0e7f1;border-radius:10px;padding:8px 12px;margin:6px 0;background:#fff;font-size:14px;align-items:center}
+#caPanel .ca-client button,.ib-small{border:1px solid #cbd7e6;background:#fff;color:#102d55;border-radius:8px;padding:5px 10px;font:700 12px system-ui;cursor:pointer}
+@media(max-width:900px){#clientInbox .ib-grid{grid-template-columns:1fr}}
+</style>
+<script type="module">
+import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const db=createClient('https://tzpbdfbedwmawmpygwpx.supabase.co','sb_publishable_I82ausx72XBOYcWxWe83zQ_A5DGjqM4');
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const when=d=>{const t=new Date(d),n=new Date();return t.toDateString()===n.toDateString()?t.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):t.toLocaleDateString([],{day:'numeric',month:'short'})+' '+t.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})};
+const TOPICS={general:'General question',project:'Project',funding:'Funding opportunities',website:'Website',other:'Other'};
+let items=[],current=null,filter='open',me=null,listening=false;
+
+// ---- navigation: "Client inbox" item in the left menu ----
+const projBtn=$('projectsNav');
+const navBtn=document.createElement('button');navBtn.type='button';navBtn.id='inboxNav';navBtn.innerHTML='💬 Client inbox <span id="inboxCount"></span>';
+navBtn.style.cssText='background:#0c2447;color:#fff;margin-top:6px';
+projBtn.after(navBtn);
+const section=document.createElement('section');section.id='clientInbox';section.className='hidden';
+section.innerHTML=`<div class="card"><h2>Client inbox</h2><p>Questions from clients' Dashboards. Replies appear instantly for the client.</p>
+ <div class="ib-grid"><div><div class="ib-filters"><button type="button" data-f="open" aria-pressed="true">Open</button><button type="button" data-f="closed" aria-pressed="false">Closed</button><button type="button" data-f="all" aria-pressed="false">All</button><button type="button" class="ib-small" id="ibNew" style="margin-left:auto">+ Message a client</button></div><div class="ib-list" id="ibList"><p>Loading…</p></div></div>
+ <div class="card" style="margin:0" id="ibPane"><p class="muted">Select a conversation.</p></div></div></div>`;
+$('savedProjects').after(section);
+function showInbox(){
+ document.querySelectorAll('section.page').forEach(e=>e.classList.add('hidden'));$('savedProjects').classList.add('hidden');section.classList.remove('hidden');
+ projBtn.classList.remove('active');document.querySelectorAll('[data-page]').forEach(n=>n.classList.remove('active'));navBtn.classList.add('active');
+ $('heading').textContent='Client inbox';loadList();
+}
+navBtn.onclick=()=>{location.hash='inbox';showInbox()};
+projBtn.addEventListener('click',()=>{section.classList.add('hidden');navBtn.classList.remove('active')});
+document.querySelectorAll('[data-page]').forEach(e=>e.addEventListener('click',()=>{section.classList.add('hidden');navBtn.classList.remove('active')}));
+section.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{filter=b.dataset.f;section.querySelectorAll('[data-f]').forEach(x=>x.setAttribute('aria-pressed',x===b));loadList()});
+$('ibNew').onclick=()=>composeNew();
+
+async function loadList(){
+ const {data,error}=await db.rpc('bov_staff_inbox',{p_status:filter});
+ if(error){$('ibList').innerHTML=`<p class="muted">Inbox not available: ${esc(error.message)}</p>`;return}
+ items=data||[];
+ $('ibList').innerHTML=items.length?items.map(c=>`<button class="ib-item${current===c.id?' sel':''}" data-id="${c.id}" type="button"><b>${esc(c.subject)}</b>
+  <small>${esc(c.client_name||c.client_email)}${c.organisation?' · '+esc(c.organisation):''}${c.project_name?' · '+esc(c.project_name):''}</small><small>${esc(c.last_body||'')}</small>
+  <div class="ib-meta"><span>${esc(TOPICS[c.topic]||'')}${c.status==='closed'?' · closed':''}</span><span>${c.unread?`<span class="ib-badge">${c.unread} new</span>`:c.last_sender_role==='client'?'<span class="ib-wait">awaiting reply</span>':esc(when(c.last_message_at))}</span></div></button>`).join(''):'<p class="muted">No conversations here.</p>';
+ $('ibList').querySelectorAll('.ib-item').forEach(b=>b.onclick=()=>openConv(b.dataset.id));
+ updateCount();
+}
+async function updateCount(){
+ const {data}=await db.rpc('bov_staff_inbox',{p_status:'open'});const n=(data||[]).reduce((s,c)=>s+(c.unread||0),0);
+ const el=$('inboxCount');if(el)el.innerHTML=n?`<span class="ib-badge">${n}</span>`:'';
+}
+async function openConv(id){
+ current=id;const c=items.find(x=>x.id===id)||{};loadList();
+ $('ibPane').innerHTML=`<div class="ib-thread"><div class="ib-head"><div><h3>${esc(c.subject||'Conversation')}</h3><div class="muted" style="font-size:13px">${esc(c.client_name||'')} &lt;${esc(c.client_email||'')}&gt;${c.organisation?' · '+esc(c.organisation):''}${c.project_name?' · Project: '+esc(c.project_name):''}</div></div>
+  <button type="button" class="ib-small" id="ibStatus">${c.status==='closed'?'Re-open':'Mark as closed'}</button></div>
+  <div class="ib-msgs" id="ibMsgs"></div><form class="ib-compose" id="ibCompose"><textarea id="ibBody" rows="2" maxlength="5000" placeholder="Write a reply… (Ctrl+Enter to send)" required></textarea><button class="btn" id="ibSend" type="submit">Reply</button></form></div>`;
+ $('ibStatus').onclick=async()=>{await db.rpc('bov_set_conversation_status',{p_conversation:id,p_status:c.status==='closed'?'open':'closed'});await loadList();const n=items.find(x=>x.id===id);if(n)openConv(id);else $('ibPane').innerHTML='<p class="muted">Conversation moved.</p>'};
+ $('ibBody').onkeydown=e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();$('ibCompose').requestSubmit()}};
+ $('ibCompose').onsubmit=async e=>{e.preventDefault();const v=$('ibBody').value.trim();if(!v)return;$('ibSend').disabled=true;
+  const {error}=await db.from('bov_messages').insert({conversation_id:id,body:v});$('ibSend').disabled=false;if(error){alert('Could not send: '+error.message);return}
+  $('ibBody').value='';loadMessages();loadList()};
+ loadMessages();
+}
+async function loadMessages(quiet){
+ if(!current)return;const id=current;
+ const {data}=await db.from('bov_messages').select('sender_role,sender_name,body,created_at').eq('conversation_id',id).order('created_at');
+ const box=$('ibMsgs');if(!box||id!==current)return;const atBottom=box.scrollHeight-box.scrollTop-box.clientHeight<60;
+ box.innerHTML=(data||[]).map(m=>`<div class="ib-msg ${m.sender_role}"><div class="who">${esc(m.sender_role==='system'?'Automatic reply':m.sender_name)}</div>${esc(m.body)}<div class="when">${esc(when(m.created_at))}</div></div>`).join('');
+ if(!quiet||atBottom)box.scrollTop=box.scrollHeight;
+ await db.rpc('bov_mark_read',{p_conversation:id});updateCount();
+}
+function composeNew(email,projectId,projectName){
+ current=null;
+ $('ibPane').innerHTML=`<h3 style="margin-top:0">Message a client</h3><form id="ibNewForm">
+  <label class="field">Client's account email<input id="ibEmail" type="email" required value="${esc(email||'')}"></label>
+  <label class="field">Subject<input id="ibSubj" maxlength="200" required value="${projectName?esc('About your project: '+projectName):''}"></label>
+  <label class="field">Message<textarea id="ibMsg" rows="5" maxlength="5000" required style="font:inherit;font-size:14px;border:1px solid #cbd7e6;border-radius:8px;padding:9px;width:100%"></textarea></label>
+  <button class="btn" type="submit">Send</button> <span class="muted" id="ibNewStatus"></span></form>`;
+ $('ibNewForm').onsubmit=async e=>{e.preventDefault();$('ibNewStatus').textContent='Sending…';
+  const {data,error}=await db.rpc('bov_staff_start_conversation',{p_email:$('ibEmail').value,p_subject:$('ibSubj').value,p_body:$('ibMsg').value,p_project:projectId||null});
+  if(error){$('ibNewStatus').textContent=error.message;return}filter='open';await loadList();openConv(data)};
+}
+function listen(){
+ if(listening)return;listening=true;
+ db.channel('staff-inbox').on('postgres_changes',{event:'INSERT',schema:'public',table:'bov_messages'},p=>{
+  if(p.new?.conversation_id===current)loadMessages(true);if(!section.classList.contains('hidden'))loadList();else updateCount();
+ }).subscribe();
+ setInterval(()=>{if(!section.classList.contains('hidden')){loadList();if(current)loadMessages(true)}else updateCount()},30000);
+}
+
+// ---- project detail: "Client access" panel ----
+async function clientAccess(p){
+ let panel=$('caPanel');
+ if(!panel){const anchor=[...document.querySelectorAll('#projectDetail h2')].find(h=>['Project package','Funding matches','Saved assessments'].includes(h.textContent.trim()))||$('pkHeading');
+  const h=document.createElement('h2');h.textContent='Client access & messages';panel=document.createElement('div');panel.id='caPanel';(anchor||$('projectDetail').lastElementChild).before(h,panel)}
+ panel.innerHTML='<p class="muted">Loading…</p>';
+ const {data,error}=await db.rpc('bov_project_clients',{p_project:p.id});
+ if(error){panel.innerHTML=`<p class="muted">Client access not set up yet: ${esc(error.message)}</p>`;return}
+ panel.innerHTML=`<p class="muted">Clients linked here see this project in their Dashboard and can ask questions about it. They must have signed up on the website first.</p>
+  ${(data||[]).map(c=>`<div class="ca-client"><span><b>${esc(c.full_name||c.email)}</b> · ${esc(c.email)}${c.organisation?' · '+esc(c.organisation):''}</span><span><button type="button" data-msg="${esc(c.email)}">Message</button> <button type="button" data-unlink="${c.user_id}">Remove</button></span></div>`).join('')||'<p class="muted">No client linked yet.</p>'}
+  <form class="ca-row" id="caForm"><input id="caEmail" type="email" placeholder="client@email.com" required style="max-width:320px"><button class="btn" type="submit">Link client</button><span class="muted" id="caStatus"></span></form>`;
+ $('caForm').onsubmit=async e=>{e.preventDefault();$('caStatus').textContent='Linking…';const {error}=await db.rpc('bov_link_client',{p_project:p.id,p_email:$('caEmail').value});
+  if(error){$('caStatus').textContent=error.message;return}clientAccess(p)};
+ panel.querySelectorAll('[data-unlink]').forEach(b=>b.onclick=async()=>{if(!confirm('Remove this client from the project?'))return;await db.rpc('bov_unlink_client',{p_project:p.id,p_user:b.dataset.unlink});clientAccess(p)});
+ panel.querySelectorAll('[data-msg]').forEach(b=>b.onclick=()=>{location.hash='inbox';showInbox();composeNew(b.dataset.msg,p.id,p.project_name)});
+}
+window.bovClientAccess=p=>{clientAccess(p).catch(e=>console.warn(e))};
+
+(async()=>{const {data:{user}}=await db.auth.getUser();if(!user)return;me=user;updateCount();listen();
+ if(location.hash.startsWith('#inbox'))showInbox();
+ if(window.bovSelectedProject&&!$('projectDetail')?.classList.contains('hidden'))clientAccess(window.bovSelectedProject);})();
 </script>
 
 </body></html>
