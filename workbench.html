@@ -51,7 +51,7 @@ async function load(){
 async function detail(){
  const id=$('projectPicker').value;selected=projects.find(p=>p.id===id);
  $('projectDetail').classList.toggle('hidden',!selected);document.querySelectorAll('.project-row').forEach((row,i)=>row.classList.toggle('active',projects[i]?.id===id));if(!selected)return;
- $('projectTitle').textContent=selected.project_name+' · '+selected.country;window.bovSelectedProject=selected;window.bovFundingMatches?.(selected);
+ $('projectTitle').textContent=selected.project_name+' · '+selected.country;window.bovSelectedProject=selected;window.bovProjectPackage?.(selected);window.bovFundingMatches?.(selected);
  $('projectStage').value=selected.stage;$('projectStatus').value=selected.status;$('projectNextAction').value=selected.next_action||'';
  const manager=$('projectManager');manager.replaceChildren();const none=txt('option','Unassigned');none.value='';manager.append(none);
  for(const u of staff){const o=txt('option',u.user_id+' ('+u.role+')');o.value=u.user_id;manager.append(o)}manager.value=selected.project_manager||'';
@@ -277,6 +277,166 @@ async function loadMatches(){
 }
 window.bovFundingMatches=p=>{open(p).catch(e=>{const s=$('fmStatus');if(s)s.textContent='Funding matches unavailable: '+(e?.message||e)})};
 if(window.bovSelectedProject&&!$('projectDetail')?.classList.contains('hidden'))window.bovFundingMatches(window.bovSelectedProject);
+</script>
+
+<style>
+#pkPanel{margin:8px 0 22px}
+.pk-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 12px}
+.pk-tabs button{border:1px solid #cbd7e6;background:#fff;color:#102d55;border-radius:999px;padding:7px 14px;font:700 13px system-ui;cursor:pointer}
+.pk-tabs button[aria-selected=true]{background:#102d55;border-color:#102d55;color:#fff}
+#pkPanel fieldset{border:1px solid #e0e7f1;border-radius:12px;padding:6px 14px 10px;margin:0 0 12px}
+#pkPanel legend{font-weight:800;color:#102d55;padding:0 6px;font-size:14px}
+#pkPanel .pk-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px 12px}
+#pkPanel .pk-wide{grid-column:1/-1}
+#pkPanel .field input,#pkPanel .field select,#pkPanel .field textarea{font:inherit;font-size:14px;font-weight:400;color:#253a52;padding:8px 10px;border:1px solid #cbd7e6;border-radius:8px;background:#fff}
+#pkPanel .hint{font-weight:400;color:#7a8a9e}
+.pk-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:4px 0}
+.pk-ev{display:grid;gap:8px}
+.pk-ev-row{display:grid;grid-template-columns:minmax(0,1fr) 170px minmax(0,220px);gap:10px;align-items:center;border:1px solid #e0e7f1;border-radius:10px;padding:10px 12px;background:#fff}
+.pk-ev-row b{color:#102d55;font-size:14px}.pk-ev-row small{display:block;color:#5f7288;font-size:12px;margin-top:2px}
+.pk-ev-row select,.pk-ev-row input{font:inherit;font-size:13px;padding:7px 8px;border:1px solid #cbd7e6;border-radius:8px;width:100%}
+.pk-ev-row.st-received,.pk-ev-row.st-verified{border-left:4px solid #1b6e3c}.pk-ev-row.st-missing{border-left:4px solid #c62828}.pk-ev-row.st-requested{border-left:4px solid #e0a100}.pk-ev-row.st-not_applicable{opacity:.6}
+.pk-cat{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#5f7288;font-weight:800;margin:10px 0 2px}
+.pk-ready{display:grid;grid-template-columns:200px minmax(0,1fr);gap:18px;align-items:start}
+.pk-ring{width:170px;height:170px;border-radius:50%;display:grid;place-items:center;margin:auto}
+.pk-ring div{width:132px;height:132px;border-radius:50%;background:#fff;display:grid;place-items:center;text-align:center}
+.pk-ring b{font-size:34px;color:#102d55;display:block}.pk-ring span{font-size:12px;color:#5f7288}
+.pk-sub{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.pk-sub div{background:#f4f9ff;border:1px solid #d6e6fa;border-radius:10px;padding:10px}
+.pk-sub b{font-size:20px;color:#102d55;display:block}.pk-sub span{font-size:12px;color:#5f7288}
+.pk-gaps{list-style:none;padding:0;margin:0;display:grid;gap:6px}
+.pk-gaps li{background:#fff;border:1px solid #e0e7f1;border-radius:8px;padding:8px 10px;font-size:13px}
+.pk-gaps li.prio{background:#fff4dd;border-color:#f1d9a6;color:#7a4a00;font-weight:700}
+.pk-badge{display:inline-block;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:800}
+.pk-badge.ready_for_review{background:#e7f6ec;color:#1b6e3c}.pk-badge.requires_improvement{background:#fff4dd;color:#8a5200}.pk-badge.not_ready,.pk-badge.not_started{background:#fdecec;color:#b42318}
+@media(max-width:800px){#pkPanel .pk-grid{grid-template-columns:1fr}.pk-ev-row{grid-template-columns:1fr}.pk-ready{grid-template-columns:1fr}}
+</style>
+<script type="module">
+import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const db=createClient('https://tzpbdfbedwmawmpygwpx.supabase.co','sb_publishable_I82ausx72XBOYcWxWe83zQ_A5DGjqM4');
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const list=v=>String(v||'').split(/[,;\n]/).map(x=>x.trim()).filter(Boolean);
+const L={
+en:{submission_language:'Language the client submitted in',title:'Project package',intro:'Guided intake, evidence checklist and readiness for the funding package. Working language: English (translate client submissions in German, French or Spanish before entering them). Document generation comes in the next phase.',tIntake:'1 · Intake',tEvidence:'2 · Evidence checklist',tReady:'3 · Readiness',lang:'Document language',
+ promoter:'Promoter',land:'Land / site',ownership:'Ownership & right to use',idea:'The project idea',money:'Investment & timeline',
+ promoter_name:'Promoter name',promoter_type:'Promoter type',legal_form:'Legal form',tax_id:'Tax ID (NIF/CIF/NIE)',promoter_experience:'Experience / track record',contact_email:'Contact email',contact_phone:'Contact phone',
+ site_address:'Site address',municipality:'Municipality',region:'Region / island',country:'Country (2-letter code)',cadastral_reference:'Cadastral reference',land_area_m2:'Land area (m²)',land_classification:'Land classification',current_land_use:'Current land use',water_access:'Water access',power_access:'Electricity access',road_access:'Road access',existing_buildings:'Existing buildings / structures',
+ ownership_type:'Promoter\'s right to use the land',owner_names:'Owner name(s)',owner_entity:'Owning company / entity (if any)',land_registry_reference:'Land Registry reference (finca nº)',ownership_notes:'Ownership notes (charges, co-owners, inheritance…)',
+ idea_title:'Project title',idea_summary:'Project summary (what, why, for whom — at least a paragraph)',activities:'Main activities (one per line)',sectors:'Sectors (comma separated)',target_beneficiaries:'Target beneficiaries',jobs_created:'Jobs created',environmental_benefits:'Environmental benefits',innovation_aspects:'Innovation aspects',
+ total_investment_eur:'Total investment (EUR)',own_contribution_eur:'Own contribution (EUR)',funding_requested_eur:'Funding requested (EUR)',other_financing:'Other financing (loans, investors…)',planned_start:'Planned start',duration_months:'Duration (months)',
+ status:'Intake status',save:'Save intake',saved:'Intake saved.',yes:'Yes',no:'No',unk:'Unknown',select:'Select…',
+ opt:{promoter_type:{individual:'Individual / self-employed',company:'Company',cooperative:'Cooperative',ngo:'NGO / association',public_body:'Public body',other:'Other'},
+  land_classification:{rustic:'Rustic (suelo rústico)',urban:'Urban',developable:'Developable (urbanizable)',protected:'Protected',unknown:'Unknown'},
+  ownership_type:{owner:'Owner',co_owner:'Co-owner',company_owned:'Owned by promoter\'s company',lease:'Lease',permission_of_owner:'Owner\'s permission',purchase_option:'Purchase option',other:'Other',unknown:'Unknown'},
+  status:{draft:'Draft',in_review:'In review',complete:'Complete'},
+  submission_language:{en:'English',de:'German',fr:'French',es:'Spanish'},
+  ev:{missing:'Missing',requested:'Requested',received:'Received',verified:'Verified',not_applicable:'Not applicable'}},
+ cats:{promoter:'Promoter',land:'Land',ownership:'Ownership',permits:'Permits',financial:'Financial',technical:'Technical',other:'Other'},
+ note:'Note / where it is',evSaved:'Saved',score:'readiness',intakePct:'Intake complete',evPct:'Documents received',gaps:'What is still needed',refresh:'Recalculate',
+ st:{ready_for_review:'Ready for review',requires_improvement:'Needs improvement',not_ready:'Not ready',not_started:'Not started'},needIntake:'Save the intake first: the checklist adapts to the project (land, company, works).'}};
+const SECTIONS=[['promoter',['promoter_name','promoter_type:sel','submission_language:sel','legal_form','tax_id','contact_email','contact_phone','promoter_experience:area']],
+ ['land',['site_address','municipality','region','country','cadastral_reference','land_area_m2:num','land_classification:sel','water_access:bool','power_access:bool','road_access:bool','current_land_use','existing_buildings:area']],
+ ['ownership',['ownership_type:sel','owner_names','owner_entity','land_registry_reference','ownership_notes:area']],
+ ['idea',['idea_title:wide','idea_summary:area','activities:lines','sectors','target_beneficiaries','jobs_created:int','environmental_benefits:area','innovation_aspects:area']],
+ ['money',['total_investment_eur:num','own_contribution_eur:num','funding_requested_eur:num','other_financing','planned_start:date','duration_months:int','status:sel']]];
+let project=null,lang='en',tab='intake',intake=null,catalog=[],evidence=new Map(),docs=[];
+const t=k=>L[lang][k]??L.en[k]??k;
+
+function shell(){
+ let p=$('pkPanel');if(p)return p;
+ const anchor=[...document.querySelectorAll('#projectDetail h2')].find(h=>['Funding matches','Saved assessments'].includes(h.textContent.trim()));
+ const h=document.createElement('h2');h.id='pkHeading';p=document.createElement('div');p.id='pkPanel';anchor.before(h,p);return p;
+}
+function render(){
+ shell();$('pkHeading').textContent=t('title');
+ $('pkPanel').innerHTML=`<p class="muted">${esc(t('intro'))}</p>
+ <div class="pk-tabs" role="tablist">${['intake','evidence','ready'].map(k=>`<button type="button" role="tab" data-tab="${k}" aria-selected="${tab===k}">${esc(t({intake:'tIntake',evidence:'tEvidence',ready:'tReady'}[k]))}</button>`).join('')}</div>
+ <div id="pkBody"></div>`;
+ $('pkPanel').querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render()});
+ ({intake:renderIntake,evidence:renderEvidence,ready:renderReady})[tab]();
+}
+function input(spec){
+ const [k,type='text']=spec.split(':'),v=intake?.[k],id='pk_'+k,cls=['area','lines','wide'].includes(type)?'field pk-wide':'field';
+ let ctl;
+ if(type==='sel')ctl=`<select id="${id}"><option value="">${esc(t('select'))}</option>${Object.entries(L[lang].opt[k]).map(([o,l])=>`<option value="${o}"${v===o?' selected':''}>${esc(l)}</option>`).join('')}</select>`;
+ else if(type==='bool')ctl=`<select id="${id}"><option value="">${esc(t('unk'))}</option><option value="true"${v===true?' selected':''}>${esc(t('yes'))}</option><option value="false"${v===false?' selected':''}>${esc(t('no'))}</option></select>`;
+ else if(type==='area')ctl=`<textarea id="${id}" rows="3">${esc(v||'')}</textarea>`;
+ else if(type==='lines')ctl=`<textarea id="${id}" rows="3">${esc((v||[]).join('\n'))}</textarea>`;
+ else if(k==='sectors')ctl=`<input id="${id}" value="${esc((v||[]).join(', '))}">`;
+ else ctl=`<input id="${id}" type="${{num:'number',int:'number',date:'date'}[type]||'text'}"${type==='num'?' step="100" min="0"':''}${type==='int'?' step="1" min="0"':''}${k==='country'?' maxlength="2"':''} value="${esc(v??'')}">`;
+ return `<label class="${cls}">${esc(t(k))}${ctl}</label>`;
+}
+function renderIntake(){
+ $('pkBody').innerHTML=`<form id="pkForm">${SECTIONS.map(([s,fs])=>`<fieldset><legend>${esc(t(s))}</legend><div class="pk-grid">${fs.map(input).join('')}</div></fieldset>`).join('')}
+ <div class="pk-actions"><button class="btn" type="submit">${esc(t('save'))}</button><span id="pkStatus" class="muted"></span></div></form>`;
+ $('pkForm').onsubmit=async e=>{e.preventDefault();await saveIntake()};
+}
+async function saveIntake(){
+ const row={project_id:project.id,document_language:'en',updated_at:new Date().toISOString()};
+ for(const [,fs] of SECTIONS)for(const spec of fs){const [k,type='text']=spec.split(':'),el=$('pk_'+k);if(!el)continue;const raw=el.value.trim();
+  row[k]=type==='bool'?(raw===''?null:raw==='true'):type==='lines'?list(raw.replace(/,/g,'\n').split('\n').join('\n')).filter(Boolean):k==='sectors'?list(raw).map(s=>s.toLowerCase()):['num','int'].includes(type)?(raw===''?null:Number(raw)):raw===''?null:raw}
+ if(row.activities)row.activities=String($('pk_activities').value).split('\n').map(s=>s.trim()).filter(Boolean);
+ if(row.country)row.country=row.country.toUpperCase();
+ if(!row.status)row.status='draft';if(!row.submission_language)row.submission_language='en';
+ const {data,error}=await db.from('bov_project_intake').upsert(row).select().single();
+ $('pkStatus').textContent=error?'Error: '+error.message:t('saved');
+ if(!error){intake=data;
+  // keep the matching profile in step with the intake (only fills empty fields)
+  const {data:prof}=await db.from('bov_project_funding_profile').select('*').eq('project_id',project.id).maybeSingle();
+  const typeMap={individual:'individuals',company:'sme',cooperative:'sme',ngo:'ngo',public_body:'public'};
+  await db.from('bov_project_funding_profile').upsert({project_id:project.id,applicant_type:prof?.applicant_type||typeMap[data.promoter_type]||null,country:prof?.country||(data.country&&/^[A-Z]{2}$/.test(data.country)?data.country:null),
+   sectors:prof?.sectors?.length?prof.sectors:data.sectors,summary:prof?.summary||data.idea_summary,budget_needed_eur:prof?.budget_needed_eur??data.funding_requested_eur??data.total_investment_eur,
+   cofinancing_available_pct:prof?.cofinancing_available_pct??(data.total_investment_eur&&data.own_contribution_eur!=null?Math.min(100,Math.round(100*data.own_contribution_eur/data.total_investment_eur)):null),
+   duration_months:prof?.duration_months??data.duration_months,updated_at:new Date().toISOString()});
+ }
+}
+function applies(c){
+ const land=!!(intake&&(intake.land_area_m2>0||intake.cadastral_reference||intake.site_address)),company=['company','cooperative','ngo'].includes(intake?.promoter_type),
+  works=/(build|construct|install|works|obra|constru|instal|rehabil)/i.test((intake?.activities||[]).join(' '))||!!intake?.existing_buildings;
+ return c.applies_to==='all'||(c.applies_to==='land'&&land)||(c.applies_to==='company'&&company)||(c.applies_to==='individual'&&!company)||(c.applies_to==='works'&&works);
+}
+function renderEvidence(){
+ if(!intake){$('pkBody').innerHTML=`<p class="muted">${esc(t('needIntake'))}</p>`;return}
+ const items=catalog.filter(applies);let cat='',html='';
+ for(const c of items){const e=evidence.get(c.code)||{status:'missing'};if(c.category!==cat){cat=c.category;html+=`<div class="pk-cat">${esc(L[lang].cats[cat])}</div>`}
+  html+=`<div class="pk-ev-row st-${e.status}" data-code="${c.code}"><div><b>${esc(c.label_en)}</b><small>${esc(c.help_en)}</small></div>
+   <select data-k="status">${Object.entries(L[lang].opt.ev).map(([o,l])=>`<option value="${o}"${e.status===o?' selected':''}>${esc(l)}</option>`).join('')}</select>
+   ${docs.length?`<select data-k="document_id"><option value="">${esc(t('note'))}…</option>${docs.map(d=>`<option value="${d.id}"${e.document_id===d.id?' selected':''}>📎 ${esc(d.file_name)}</option>`).join('')}</select>`:`<input data-k="note" placeholder="${esc(t('note'))}" value="${esc(e.note||'')}">`}</div>`}
+ $('pkBody').innerHTML=`<div class="pk-ev">${html}</div><p class="muted" id="pkEvStatus"></p>`;
+ $('pkBody').querySelectorAll('.pk-ev-row').forEach(row=>row.querySelectorAll('[data-k]').forEach(el=>el.onchange=async()=>{
+  const code=row.dataset.code,cur=evidence.get(code)||{status:'missing'},next={...cur,project_id:project.id,code,[el.dataset.k]:el.value||null,updated_at:new Date().toISOString()};
+  if(!next.status)next.status='missing';
+  const {error}=await db.from('bov_project_evidence').upsert({project_id:project.id,code,status:next.status,document_id:next.document_id||null,note:next.note||null,updated_at:next.updated_at});
+  $('pkEvStatus').textContent=error?'Error: '+error.message:t('evSaved')+' ✓';if(!error){evidence.set(code,next);row.className='pk-ev-row st-'+next.status}}));
+}
+async function renderReady(){
+ $('pkBody').innerHTML=`<p class="muted">…</p>`;
+ const {data,error}=await db.rpc('bov_project_readiness',{p_project:project.id,p_lang:'en'});
+ if(error){$('pkBody').innerHTML=`<p class="muted">Error: ${esc(error.message)}</p>`;return}
+ const s=data.score||0,col=s>=85?'#1b6e3c':s>=50?'#d08a00':'#c62828';
+ $('pkBody').innerHTML=`<div class="pk-ready"><div><div class="pk-ring" style="background:conic-gradient(${col} ${s*3.6}deg,#e8eef5 0)"><div><span><b>${s}%</b>${esc(t('score'))}</span></div></div>
+  <p style="text-align:center"><span class="pk-badge ${data.status}">${esc(L[lang].st[data.status]||data.status)}</span></p></div>
+  <div><div class="pk-sub"><div><b>${data.intake_pct}%</b><span>${esc(t('intakePct'))}</span></div><div><b>${data.evidence_received??0}/${data.evidence_required??0}</b><span>${esc(t('evPct'))}</span></div></div>
+  <h3 style="margin:6px 0">${esc(t('gaps'))}</h3><ul class="pk-gaps">${(data.gaps||[]).map(g=>`<li class="${/^(Priority|Prioridad)/.test(g)?'prio':''}">${esc(g)}</li>`).join('')}</ul>
+  <div class="pk-actions" style="margin-top:10px"><button class="btn alt" type="button" id="pkRefresh">${esc(t('refresh'))}</button></div></div></div>`;
+ $('pkRefresh').onclick=renderReady;
+}
+async function open(p){
+ project=p;tab='intake';
+ const [a,b,c,d]=await Promise.all([db.from('bov_project_intake').select('*').eq('project_id',p.id).maybeSingle(),db.from('bov_evidence_catalog').select('*').order('sort'),
+  db.from('bov_project_evidence').select('*').eq('project_id',p.id),db.from('bov_hub_project_documents').select('id,file_name').eq('project_name',p.project_name||p.title||'').limit(200)]);
+ if(b.error){shell();$('pkHeading').textContent='Project package';$('pkPanel').innerHTML=`<p class="muted">Project package not set up yet: ${esc(b.error.message)}</p>`;return}
+ intake=a.data||null;catalog=b.data||[];evidence=new Map((c.data||[]).map(r=>[r.code,r]));docs=d.data||[];
+ if(!intake){intake=null}
+ render();
+ if(!a.data){ // prefill from the project record
+  const pre={promoter_name:p.organisation_name,country:/^[A-Z]{2}$/.test(String(p.country||'').toUpperCase())?String(p.country).toUpperCase():'',idea_title:p.project_name||p.title,idea_summary:p.description||p.objectives};
+  for(const [k,v] of Object.entries(pre)){const el=$('pk_'+k);if(el&&v&&!el.value)el.value=v}
+ }
+}
+window.bovProjectPackage=p=>{open(p).catch(e=>{shell();$('pkPanel').textContent='Project package unavailable: '+(e?.message||e)})};
+if(window.bovSelectedProject&&!$('projectDetail')?.classList.contains('hidden'))window.bovProjectPackage(window.bovSelectedProject);
 </script>
 
 </body></html>
