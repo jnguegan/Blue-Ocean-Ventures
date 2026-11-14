@@ -117,11 +117,11 @@ async function detail(){
   doc.body.append(txt('p','Version '+r.version+' · '+new Date(r.created_at).toLocaleString()));
   doc.body.append(txt('h2','Report 1 — Institutional relevance'));
   const agencies=r.relevance_report?.agencies||[];
-  const agencyTable=makeTable(['Agency','Relevance','Matching project areas'],agencies.map(a=>[a.agency,a.score+'%',a.direct?.join(', ')||'No direct match recorded']));doc.body.append(agencyTable);
+  const agencyTable=makeTable(['Agency / programme','Relevance','Matching project areas'],agencies.map(a=>[(a.source?a.source+' · ':'')+a.agency,a.score+'%',a.direct?.join(', ')||'No direct match recorded']));doc.body.append(agencyTable);
   doc.body.append(txt('h2','Report 2 — Funding intelligence'));
   const f=r.funding_report||{},calls=f.verified_open_calls||[],pending=f.pathways_requiring_verification||[];
-  doc.body.append(txt('p',calls.length+' verified open calls · '+pending.length+' pathways requiring verification'));
-  doc.body.append(makeTable(['Agency','Programme / pathway','Verification'],[...calls.map(x=>[x.agency,x.title,'Verified open at assessment']),...pending.map(x=>[x.agency,x.title,'Requires verification'])]));
+  doc.body.append(txt('p',calls.length+' open calls · '+pending.length+' forthcoming calls or pathways requiring verification'));
+  doc.body.append(makeTable(['Source · body','Call / pathway','Fit','Status'],[...calls.map(x=>[(x.source?x.source+' · ':'')+x.agency,x.title,x.fit!=null?x.fit+'%':'—',(x.source==='EU'?'Open on EU portal':'Verified open at assessment')+(x.deadline?' · deadline '+x.deadline:'')]),...pending.map(x=>[(x.source?x.source+' · ':'')+x.agency,x.title,x.fit!=null?x.fit+'%':'—',(x.source==='EU'?'Forthcoming EU call':'Requires verification')+(x.deadline?' · deadline '+x.deadline:'')])]));
   doc.body.append(txt('p','Internal research only. Relevance does not imply eligibility approval or funding probability.'));
   win.focus();win.print();
  }
@@ -175,105 +175,52 @@ if(location.hash.startsWith('#projects')){showProjects();load()}
 @media(max-width:800px){#fmPanel .fm-grid{grid-template-columns:1fr}.fm-row{grid-template-columns:1fr}.fm-bars{grid-template-columns:1fr}}
 </style>
 <script type="module">
+// Funding matches: shows the latest saved result of the single UN + EU matching
+// (run with "Find Matching Funding Programmes" in the Knowledge Hub and saved to the Workbench).
 import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 const db=createClient('https://tzpbdfbedwmawmpygwpx.supabase.co','sb_publishable_I82ausx72XBOYcWxWe83zQ_A5DGjqM4');
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const APPLICANTS={sme:'SME / company / entrepreneur',ngo:'NGO / association',public:'Public body',research:'Research / university',students:'Student / intern',individuals:'Individual / creative'};
-const list=v=>String(v||'').split(',').map(x=>x.trim()).filter(Boolean);
-let project=null,showIneligible=false;
-
+let showAll=false,current=null;
 function panel(){
  let p=$('fmPanel');if(p)return p;
  const anchor=[...document.querySelectorAll('#projectDetail h2')].find(h=>h.textContent.trim()==='Saved assessments');
- const h=document.createElement('h2');h.textContent='Funding matches';
+ const h=document.createElement('h2');h.textContent='Funding matches (UN and EU)';
  p=document.createElement('div');p.id='fmPanel';
- p.innerHTML=`<p class="muted">Complete the funding profile, then find matching open calls. Score = 40% relevance + 35% eligibility + 25% criteria fit.</p>
- <form id="fmForm"><div class="fm-grid">
-  <label class="field">Applicant type<select id="fmApplicant"><option value="">Select…</option>${Object.entries(APPLICANTS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></label>
-  <label class="field">Country <span class="fm-hint">(2-letter code, e.g. ES, AT, BJ)</span><input id="fmCountry" maxlength="2" placeholder="ES"></label>
-  <label class="field">Sectors <span class="fm-hint">(comma separated)</span><input id="fmSectors" placeholder="energy, agriculture, tourism"></label>
-  <label class="field fm-wide">Project summary <span class="fm-hint">(objectives, activities, beneficiaries: used for relevance)</span><textarea id="fmSummary" rows="3"></textarea></label>
-  <label class="field">Keywords <span class="fm-hint">(comma separated)</span><input id="fmKeywords" placeholder="solar, agrivoltaics, farms"></label>
-  <label class="field">Budget needed (EUR)<input id="fmBudget" type="number" min="0" step="1000"></label>
-  <label class="field">Co-financing available (%)<input id="fmCofin" type="number" min="0" max="100"></label>
-  <label class="field">Technology readiness (TRL)<select id="fmTrl"><option value="">Not applicable / unknown</option>${[1,2,3,4,5,6,7,8,9].map(n=>`<option>${n}</option>`).join('')}</select></label>
-  <label class="field">Partners in consortium <span class="fm-hint">(incl. applicant)</span><input id="fmPartners" type="number" min="1" value="1"></label>
-  <label class="field">Partner countries <span class="fm-hint">(codes, comma separated)</span><input id="fmPartnerCountries" placeholder="PT, IT"></label>
-  <label class="field">Duration (months)<input id="fmDuration" type="number" min="1" max="120"></label>
- </div>
- <div class="fm-actions"><button class="btn" id="fmRun" type="submit">Save profile &amp; find matches</button><label style="font-size:13px"><input type="checkbox" id="fmShowIneligible"> Show ineligible calls</label><span id="fmStatus" class="muted"></span></div></form>
+ p.innerHTML=`<p class="muted">One matching for UN and EU funding. It reads the project documents and ranks UN agencies, EU programmes, UN pathways and live EU calls together. To update it, open the project in the Knowledge Hub, click <b>Find Matching Funding Programmes</b>, then <b>Save both reports to Workbench</b>.</p>
+ <div class="fm-actions"><a class="btn" href="/knowledge-hub.html#hub-assessment" target="_blank" rel="noopener">Run matching in Knowledge Hub ↗</a><label style="font-size:13px"><input type="checkbox" id="fmShowAll"> Show all saved opportunities</label><span id="fmStatus" class="muted"></span></div>
  <div id="fmResults" class="fm-results"></div>`;
- anchor.before(h,p);
- $('fmForm').onsubmit=e=>{e.preventDefault();run()};
- $('fmShowIneligible').onchange=e=>{showIneligible=e.target.checked;loadMatches()};
+ if(anchor)anchor.before(h,p);else $('projectDetail')?.append(h,p);
+ $('fmShowAll').onchange=e=>{showAll=e.target.checked;if(current)render(current)};
  return p;
 }
-
-function fill(prof){
- const p=project,c=(prof?.country||p.country||'').toUpperCase();
- $('fmApplicant').value=prof?.applicant_type||(APPLICANTS[p.applicant_type]?p.applicant_type:'');
- $('fmCountry').value=/^[A-Z]{2}$/.test(c)?c:'';
- $('fmSectors').value=(prof?.sectors||[]).join(', ');
- $('fmSummary').value=prof?.summary||p.description||p.objectives||'';
- $('fmKeywords').value=(prof?.keywords||[]).join(', ');
- $('fmBudget').value=prof?.budget_needed_eur??'';
- $('fmCofin').value=prof?.cofinancing_available_pct??'';
- $('fmTrl').value=prof?.trl??'';
- $('fmPartners').value=prof?.partner_count??1;
- $('fmPartnerCountries').value=(prof?.partner_countries||[]).join(', ');
- $('fmDuration').value=prof?.duration_months??'';
-}
-
-async function open(p){
- project=p;panel();$('fmResults').replaceChildren();$('fmStatus').textContent='Loading…';
- const {data:prof,error}=await db.from('bov_project_funding_profile').select('*').eq('project_id',p.id).maybeSingle();
- if(error){$('fmStatus').textContent='Matching not set up yet: '+error.message;return}
- fill(prof);$('fmStatus').textContent=prof?'':'No funding profile yet: complete it and click "Save profile & find matches".';
- if(prof)await loadMatches();
-}
-
-async function run(){
- if(!project)return;
- const country=$('fmCountry').value.trim().toUpperCase();
- if(country&&!/^[A-Z]{2}$/.test(country)){$('fmStatus').textContent='Country must be a 2-letter code (e.g. ES).';return}
- const num=id=>$(id).value===''?null:Number($(id).value);
- const row={project_id:project.id,applicant_type:$('fmApplicant').value||null,country:country||null,
-  sectors:list($('fmSectors').value).map(s=>s.toLowerCase()),keywords:list($('fmKeywords').value),summary:$('fmSummary').value.trim()||null,
-  budget_needed_eur:num('fmBudget'),cofinancing_available_pct:num('fmCofin'),trl:num('fmTrl'),
-  partner_count:Math.max(1,num('fmPartners')||1),partner_countries:list($('fmPartnerCountries').value).map(s=>s.toUpperCase()).filter(s=>/^[A-Z]{2}$/.test(s)),
-  duration_months:num('fmDuration'),updated_at:new Date().toISOString()};
- $('fmRun').disabled=true;$('fmStatus').textContent='Saving profile…';
- const {error:e1}=await db.from('bov_project_funding_profile').upsert(row);
- if(e1){$('fmStatus').textContent='Could not save profile: '+e1.message;$('fmRun').disabled=false;return}
- $('fmStatus').textContent='Matching against all open calls…';
- const {error:e2}=await db.rpc('bov_match_project',{p_project:project.id});
- $('fmRun').disabled=false;
- if(e2){$('fmStatus').textContent='Matching failed: '+e2.message;return}
- await loadMatches();
-}
-
-async function loadMatches(){
- if(!project)return;
- let q=db.from('bov_project_call_matches').select('total_score,relevance_score,eligibility_score,criteria_score,eligibility_status,reasons,missing,computed_at,bov_eu_funding_calls(title,official_url,deadline,organiser,parent_topic,total_budget_eur)').eq('project_id',project.id).order('total_score',{ascending:false}).limit(25);
- if(!showIneligible)q=q.neq('eligibility_status','ineligible');
- const {data,error}=await q;
- if(error){$('fmStatus').textContent='Could not load matches: '+error.message;return}
- const box=$('fmResults');box.replaceChildren();
- if(!data.length){$('fmStatus').textContent='No matches yet.';return}
- $('fmStatus').textContent=`Top ${data.length} matches · computed ${new Date(data[0].computed_at).toLocaleString()}`;
- for(const m of data){
-  const c=m.bov_eu_funding_calls||{},el=document.createElement('article');el.className='fm-row';
-  const bar=(l,v)=>`<div class="fm-bar">${l} ${Math.round(v)}%<i><b style="width:${Math.max(2,v)}%"></b></i></div>`;
-  const chips=(m.reasons||[]).map(r=>{const k=Object.keys(r)[0];return `<span class="fm-chip ${k}">${esc(r[k])}</span>`}).join('')+(m.missing||[]).map(x=>`<span class="fm-chip miss">Missing: ${esc(x)}</span>`).join('');
-  const dl=c.deadline?new Date(c.deadline+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'No fixed deadline';
-  el.innerHTML=`<div class="fm-score"><b>${Math.round(m.total_score)}%</b><small>match</small></div>
-   <div><h4><a href="${esc(c.official_url)}" target="_blank" rel="noopener">${esc(c.title)}</a><span class="fm-status ${m.eligibility_status}">${m.eligibility_status==='unconfirmed'?'to confirm':m.eligibility_status}</span></h4>
-   <div class="fm-meta">${esc([c.organiser||c.parent_topic,'Deadline '+dl,c.total_budget_eur>=1000?'Call budget €'+Number(c.total_budget_eur).toLocaleString('en-GB'):''].filter(Boolean).join(' · '))}</div>
-   <div class="fm-bars">${bar('Relevance',m.relevance_score)}${bar('Eligibility',m.eligibility_score)}${bar('Criteria fit',m.criteria_score)}</div>
+function render(r){
+ const box=$('fmResults');box.innerHTML='';
+ const f=r.funding_report||{},ev=r.relevance_report?.evidence;
+ const opps=[...(f.verified_open_calls||[]).map(x=>({...x,open:true})),...(f.pathways_requiring_verification||[]).map(x=>({...x,open:false}))].sort((a,b)=>(b.fit??-1)-(a.fit??-1));
+ const top=(r.relevance_report?.agencies||[]).slice(0,6).map(a=>`${esc(a.source||'UN')} · ${esc(a.agency)} ${a.score}%`).join(' · ');
+ $('fmStatus').textContent=`Saved ${new Date(r.created_at).toLocaleString()} · version ${r.version}`+(ev?` · ${ev.documents_read||0} document(s) read`:'');
+ const head=document.createElement('p');head.className='muted';head.innerHTML='<b>Most relevant agencies and programmes:</b> '+(top||'—');box.append(head);
+ if(ev?.checks?.length){const w=document.createElement('p');w.className='muted';w.textContent='Checks: '+ev.checks.join(' · ');box.append(w)}
+ if(!opps.some(o=>o.fit!=null)){const n=document.createElement('p');n.className='muted';n.textContent='This assessment was saved before the combined UN + EU matching. Run the matching again in the Knowledge Hub and save it to see ranked opportunities here.';box.append(n)}
+ for(const o of (showAll?opps:opps.slice(0,15))){
+  const el=document.createElement('article');el.className='fm-row';
+  const status=o.source==='EU'?(o.open?'open':'forthcoming'):(o.open?'verified':'to verify');
+  const chips=(o.fits||[]).map(t=>`<span class="fm-chip ok">${esc(t)}</span>`).join('')+(o.flags||[]).map(t=>`<span class="fm-chip warn">${esc(t)}</span>`).join('');
+  el.innerHTML=`<div class="fm-score"><b>${o.fit!=null?o.fit+'%':'—'}</b><small>fit</small></div>
+   <div><h4>${o.source_url?`<a href="${esc(o.source_url)}" target="_blank" rel="noopener">${esc(o.title)}</a>`:esc(o.title)}<span class="fm-status ${o.open?'eligible':'unconfirmed'}">${esc((o.source||'UN')+' · '+status)}</span></h4>
+   <div class="fm-meta">${esc([o.agency,o.deadline?'Deadline '+o.deadline:'No deadline recorded'].join(' · '))}</div>
    <div class="fm-chips">${chips}</div></div>`;
   box.append(el);
  }
+ if(!showAll&&opps.length>15){const m=document.createElement('p');m.className='muted';m.textContent=(opps.length-15)+' more saved opportunities: tick "Show all saved opportunities".';box.append(m)}
+}
+async function open(p){
+ panel();current=null;$('fmResults').innerHTML='';$('fmStatus').textContent='Loading saved matching…';
+ const {data,error}=await db.from('bov_project_reports').select('version,created_at,relevance_report,funding_report').eq('project_id',p.id).order('version',{ascending:false}).order('created_at',{ascending:false}).limit(1);
+ if(error)throw error;
+ if(!data?.length){$('fmStatus').textContent='No matching saved for this project yet. Run it in the Knowledge Hub and save both reports.';return}
+ current=data[0];render(current);
 }
 window.bovFundingMatches=p=>{open(p).catch(e=>{const s=$('fmStatus');if(s)s.textContent='Funding matches unavailable: '+(e?.message||e)})};
 if(window.bovSelectedProject&&!$('projectDetail')?.classList.contains('hidden'))window.bovFundingMatches(window.bovSelectedProject);
