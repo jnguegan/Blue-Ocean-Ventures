@@ -262,7 +262,10 @@ function drawFuture(d3,el,data){
    if(x(acc)-x0>70)svg.append('text').attr('x',x0+8).attr('y',yy+30).attr('font-size',11.5).attr('font-weight',700).attr('fill',j===3&&i===1?C.ink:'#fff').attr('pointer-events','none').text(fmtB(p.value));
    rct.on('pointermove',ev=>tip(`<b>${esc(p.name)}</b>${row(b.label,fmtB(p.value))}`,ev)).on('pointerleave',()=>tip(null))})});
  const lg=document.createElement('div');lg.className='ep-legend';lg.style.marginTop='4px';lg.innerHTML=bars.flatMap((b,i)=>b.parts.map((p,j)=>`<span><i style="background:${cols[i][j]}"></i>${esc(p.name)}</span>`)).join('');
- el.querySelector('.ep-legend')?.remove();el.append(lg);
+ el.querySelector('.ep-legend')?.remove();el.querySelector('.ep-mff')?.remove();el.append(lg);
+ const nt=document.createElement('p');nt.className='ep-note ep-mff';nt.style.cssText='margin-top:12px;font-size:13px;color:#52606f;border-top:1px solid #e6ebf1;padding-top:10px';
+ nt.innerHTML='<strong>MFF = Multiannual Financial Framework</strong>: the EU\'s long-term budget, agreed for seven years at a time. It sets the maximum the EU can spend each year in each area; the yearly EU budgets are agreed within these limits. <strong>NextGenerationEU</strong> is a temporary recovery fund (2021–2026), financed by EU borrowing, added on top after COVID-19.';
+ el.append(nt);
 }
 
 // ---------- Live data from the nightly scan ----------
