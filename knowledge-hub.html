@@ -230,6 +230,7 @@ const aAreaTerms={
  'Humanitarian assistance':['humanitar','refugee','displac','emergency relief','disaster','conflict-affected','asylum','migrant','floods?(?![\\p{L}])','drought','earthquake','humanitär','flüchtl','katastroph','réfugi','refugiad','desplazad','emergencia'],
  'Digital innovation':['digital','software','apps?(?![\\p{L}])','online platform','ict(?![\\p{L}])','technolog','internet','connectivity','e-learning','artificial intelligence','innovat','numérique','tecnolog','informátic','innovación']
 };
+const aWeakTerms={'Climate and environment':/^(sustainab|durable|sostenib|nachhaltig|resilien)/,'Digital innovation':/^(innovat|innovación)/};
 const aAreaRx=Object.fromEntries(Object.entries(aAreaTerms).map(([a,t])=>[a,new RegExp('(?<![\\p{L}\\p{N}])(?:'+t.join('|')+')','giu')]));
 const aTypeTerms={
  'Non-Governmental Organisation (NGO) / Civil Society Organisation (CSO)':['ngos?','non-governmental','non-profit','nonprofit','not-for-profit','charit(?:y|able)','civil society','ong','verein','e\\.v\\.','asociaci[oó]n','sin [aá]nimo de lucro','sans but lucratif','gemeinnützig'],
@@ -268,10 +269,13 @@ function aAnalyseEvidence(x,docs){
    a.hits+=r.hits;for(const [t,n] of r.terms)a.terms.set(t,(a.terms.get(t)||0)+n);a.files.add(s.name);
   }
  }
- for(const a of Object.values(areas)){
+ for(const [name,a] of Object.entries(areas)){
+  // General words (e.g. "sustainable", "innovation") appear in most project texts; they are shown but do not prove an area on their own.
+  const weak=aWeakTerms[name],strong=[...a.terms.entries()].filter(([t])=>!(weak&&weak.test(t)));
+  const sHits=strong.reduce((n,[,c])=>n+c,0),sDistinct=strong.length;
   a.distinct=a.terms.size;
-  a.strength=Math.min(1,0.5*Math.min(a.distinct,4)/4+0.5*Math.min(a.hits,20)/20);
-  a.evidenced=(a.hits>=3&&a.distinct>=2)||a.hits>=6;
+  a.strength=Math.min(1,0.5*Math.min(sDistinct,4)/4+0.5*Math.min(sHits,20)/20);
+  a.evidenced=(sHits>=3&&sDistinct>=2)||sHits>=6;
   a.top=[...a.terms.entries()].sort((p,q)=>q[1]-p[1]).slice(0,5).map(([t,n])=>t+' ×'+n);
   a.files=[...a.files];
  }
