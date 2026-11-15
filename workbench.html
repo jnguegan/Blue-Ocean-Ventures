@@ -522,4 +522,64 @@ window.bovClientAccess=p=>{clientAccess(p).catch(e=>console.warn(e))};
  if(window.bovSelectedProject&&!$('projectDetail')?.classList.contains('hidden'))clientAccess(window.bovSelectedProject);})();
 </script>
 
+
+<style>
+#clientSubs .cs-row{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) 170px;gap:12px;align-items:center;border:1px solid #e0e7f1;border-radius:12px;padding:12px 14px;background:#fff;margin-bottom:10px}
+#clientSubs .cs-row b{color:#102d55;font-size:15px}#clientSubs small{display:block;color:#5f7288;font-size:12.5px}
+#clientSubs .cs-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+#clientSubs .cs-actions button,#clientSubs .cs-actions a{font-size:12.5px;padding:6px 10px}
+#clientSubs select{width:100%}
+#clientSubs .cs-files{font-size:12.5px;margin-top:6px}
+#clientSubs .cs-files a{margin-right:10px}
+#subsNav .n{background:#1767c9;color:#fff;border-radius:999px;padding:0 7px;font-size:11px;margin-left:6px}
+@media(max-width:800px){#clientSubs .cs-row{grid-template-columns:1fr}}
+</style>
+<script type="module">
+// Client submissions: projects submitted by clients from their Client Dashboard.
+import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const db=createClient('https://tzpbdfbedwmawmpygwpx.supabase.co','sb_publishable_I82ausx72XBOYcWxWe83zQ_A5DGjqM4');
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ST={submitted:'Submitted (new)',under_review:'Under review',matching:'Funding matching',proposal_sent:'Proposal sent',closed:'Closed'};
+let filter='active';
+const projBtn=$('projectsNav');if(projBtn){
+ const nav=document.createElement('button');nav.type='button';nav.id='subsNav';nav.innerHTML='📥 Client submissions<span id="subsCount"></span>';
+ nav.style.cssText='background:#0c2447;color:#fff;margin-top:6px';(($('inboxNav')||projBtn)).after(nav);
+ const sec=document.createElement('section');sec.id='clientSubs';sec.className='hidden';
+ sec.innerHTML=`<div class="card"><h2>Client submissions</h2><p>Projects submitted by clients from their Client Dashboard. Each one already exists as a Workbench project with its documents. Changing the status sends the client an automatic message.</p>
+  <div style="display:flex;gap:6px;margin:8px 0 12px;flex-wrap:wrap"><button type="button" class="btn alt" data-sf="active" aria-pressed="true">Active</button><button type="button" class="btn alt" data-sf="submitted" aria-pressed="false">New</button><button type="button" class="btn alt" data-sf="all" aria-pressed="false">All</button></div>
+  <div id="csList"><p class="muted">Loading…</p></div></div>`;
+ $('savedProjects').after(sec);
+ const others=()=>[$('clientInbox')].filter(Boolean);
+ function showSubs(){document.querySelectorAll('section.page').forEach(e=>e.classList.add('hidden'));$('savedProjects').classList.add('hidden');others().forEach(e=>e.classList.add('hidden'));sec.classList.remove('hidden');
+  projBtn.classList.remove('active');$('inboxNav')?.classList.remove('active');document.querySelectorAll('[data-page]').forEach(n=>n.classList.remove('active'));nav.classList.add('active');$('heading').textContent='Client submissions';load()}
+ nav.onclick=()=>{location.hash='submissions';showSubs()};
+ const hide=()=>{sec.classList.add('hidden');nav.classList.remove('active')};
+ projBtn.addEventListener('click',hide);$('inboxNav')?.addEventListener('click',hide);document.querySelectorAll('[data-page]').forEach(e=>e.addEventListener('click',hide));
+ sec.querySelectorAll('[data-sf]').forEach(b=>b.onclick=()=>{filter=b.dataset.sf;sec.querySelectorAll('[data-sf]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));load()});
+ async function count(){const {data}=await db.rpc('bov_staff_submissions',{p_status:'submitted'});const n=(data||[]).length;$('subsCount').innerHTML=n?`<span class="n">${n}</span>`:''}
+ async function load(){
+  const {data,error}=await db.rpc('bov_staff_submissions',{p_status:filter});
+  if(error){$('csList').innerHTML=`<p class="muted">Client submissions are not available yet: ${esc(error.message)}. Run the client-submissions SQL step in Supabase.</p>`;return}
+  count();
+  const rows=data||[];
+  $('csList').innerHTML=rows.length?rows.map(r=>`<div class="cs-row"><div><b>${esc(r.project_title)}</b><small>${esc([r.country,r.organisation_name||r.contact_name,r.applicant_type].filter(Boolean).join(' · '))}</small>
+   <small>${esc(r.client_email||'')} · submitted ${r.submitted_at?new Date(r.submitted_at).toLocaleString():''}</small>
+   <div class="cs-actions"><button class="btn alt" type="button" data-open="${r.project_id}">Open project</button><a class="btn" href="/knowledge-hub.html?project=${encodeURIComponent(r.project_id)}#hub-assessment" target="_blank" rel="noopener" style="text-decoration:none">Assess &amp; match ↗</a><button class="btn alt" type="button" data-files="${r.id}">Documents (${r.files})</button><button class="btn alt" type="button" data-chat="${r.conversation_id||''}">Messages</button></div><div class="cs-files" id="files-${r.id}"></div></div>
+   <div><small>Areas</small>${esc((r.project_areas||[]).join(', ')||'—')}<small style="margin-top:6px">Funding sought</small>${r.funding_requested!=null?esc(new Intl.NumberFormat('en-GB',{style:'currency',currency:r.currency||'EUR',maximumFractionDigits:0}).format(r.funding_requested)):'—'}</div>
+   <div><small>Status</small><select data-status="${r.id}">${Object.entries(ST).map(([k,l])=>`<option value="${k}" ${r.status===k?'selected':''}>${esc(l)}</option>`).join('')}</select><small id="st-${r.id}"></small></div></div>`).join(''):'<p class="muted">No client submissions here yet.</p>';
+  $('csList').querySelectorAll('[data-status]').forEach(sel=>sel.onchange=async()=>{const id=sel.dataset.status,note=sel.value==='closed'?prompt('Optional note to the client (e.g. why the project is closed):')||null:null;
+   $('st-'+id).textContent='Saving…';const {error}=await db.rpc('bov_set_submission_status',{p_submission:id,p_status:sel.value,p_note:note});$('st-'+id).textContent=error?'Error: '+error.message:'Saved · client notified';count()});
+  $('csList').querySelectorAll('[data-open]').forEach(b=>b.onclick=async()=>{projBtn.click();await new Promise(r=>setTimeout(r,150));const pk=$('projectPicker');
+   if(![...pk.options].some(o=>o.value===b.dataset.open)){$('projectsRefresh')?.click();await new Promise(r=>setTimeout(r,1200))}
+   pk.value=b.dataset.open;pk.dispatchEvent(new Event('change'))});
+  $('csList').querySelectorAll('[data-chat]').forEach(b=>b.onclick=()=>{location.hash='inbox';$('inboxNav')?.click()});
+  $('csList').querySelectorAll('[data-files]').forEach(b=>b.onclick=async()=>{const box=$('files-'+b.dataset.files);box.textContent='Loading…';
+   const {data:fs,error}=await db.from('bov_client_submission_files').select('file_name,storage_path').eq('submission_id',b.dataset.files).order('created_at');
+   if(error){box.textContent='Documents unavailable: '+error.message;return}if(!fs?.length){box.textContent='No documents uploaded.';return}
+   box.innerHTML='';for(const f of fs){const {data:u}=await db.storage.from('bov-hub-project-documents').createSignedUrl(f.storage_path,600);const a=document.createElement('a');a.textContent='📄 '+f.file_name;a.href=u?.signedUrl||'#';a.target='_blank';a.rel='noopener';box.append(a)}});
+ }
+ count();if(location.hash==='#submissions')setTimeout(showSubs,300);
+}
+</script>
 </body></html>
