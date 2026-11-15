@@ -188,7 +188,7 @@ function panel(){
  const h=document.createElement('h2');h.textContent='Funding matches (UN and EU)';
  p=document.createElement('div');p.id='fmPanel';
  p.innerHTML=`<p class="muted">One matching for UN and EU funding. It reads the project documents and ranks UN agencies, EU programmes, UN pathways and live EU calls together. To update it, open the project in the Knowledge Hub, click <b>Find Matching Funding Programmes</b>, then <b>Save both reports to Workbench</b>.</p>
- <div class="fm-actions"><a class="btn" href="/knowledge-hub.html#hub-assessment" target="_blank" rel="noopener">Run matching in Knowledge Hub ↗</a><label style="font-size:13px"><input type="checkbox" id="fmShowAll"> Show all saved opportunities</label><span id="fmStatus" class="muted"></span></div>
+ <div class="fm-actions"><a class="btn" id="fmRunLink" href="/knowledge-hub.html#hub-assessment" target="_blank" rel="noopener">Run matching in Knowledge Hub ↗</a><label style="font-size:13px"><input type="checkbox" id="fmShowAll"> Show all saved opportunities</label><span id="fmStatus" class="muted"></span></div>
  <div id="fmResults" class="fm-results"></div>`;
  if(anchor)anchor.before(h,p);else $('projectDetail')?.append(h,p);
  $('fmShowAll').onchange=e=>{showAll=e.target.checked;if(current)render(current)};
@@ -216,7 +216,7 @@ function render(r){
  if(!showAll&&opps.length>15){const m=document.createElement('p');m.className='muted';m.textContent=(opps.length-15)+' more saved opportunities: tick "Show all saved opportunities".';box.append(m)}
 }
 async function open(p){
- panel();current=null;$('fmResults').innerHTML='';$('fmStatus').textContent='Loading saved matching…';
+ panel();current=null;$('fmResults').innerHTML='';$('fmRunLink').href='/knowledge-hub.html?project='+encodeURIComponent(p.id)+'#hub-assessment';$('fmStatus').textContent='Loading saved matching…';
  const {data,error}=await db.from('bov_project_reports').select('version,created_at,relevance_report,funding_report').eq('project_id',p.id).order('version',{ascending:false}).order('created_at',{ascending:false}).limit(1);
  if(error)throw error;
  if(!data?.length){$('fmStatus').textContent='No matching saved for this project yet. Run it in the Knowledge Hub and save both reports.';return}
