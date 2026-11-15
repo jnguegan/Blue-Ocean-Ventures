@@ -411,7 +411,7 @@ async function aLoadEU(progress){
 function aEuGeography(code,prog,call){
  const intl=prog?.category==='international'||/worldwide|third countr|partner countr|africa|global|non-eu/i.test(prog?.geography||'')||call?.category==='africa';
  if(!code)return {pts:6,note:'Project country not recognised; check geographic eligibility',state:'unknown'};
- const listed=[...(call?.req?.eligible_countries||[]),...(call?.country_codes||[])].map(v=>String(v).toUpperCase());
+ const listed=[...new Set([...(call?.req?.eligible_countries||[]),...(call?.country_codes||[])].map(v=>String(v).toUpperCase()))];
  if(listed.length){return listed.includes(code)?{pts:15,fit:'Country eligible: '+aCountryLabel(code),state:'ok'}:{pts:0,note:'Call targets '+listed.slice(0,6).join(', ')+(listed.length>6?'…':'')+', not '+aCountryLabel(code),state:'no'}}
  if(A_EU27.includes(code)||A_EEA.includes(code))return {pts:15,fit:aCountryLabel(code)+' is an EU/EEA country',state:'ok'};
  if(intl)return {pts:13,fit:'International programme: '+aCountryLabel(code)+' can be covered',state:'ok'};
@@ -477,7 +477,12 @@ function aEuCallFits(x,areas,ev){
   if(dl){const days=Math.round((new Date(dl)-today)/864e5);if(days<0)return null;if(days<21){time=1;flags.push('Deadline in '+days+' day(s)')}else time=5}
   if(c.req?.consortium_required||c.prog?.consortium==='required'){const mp=c.req?.min_partners??c.prog?.min_partners,mc=c.req?.min_countries??c.prog?.min_countries;flags.push('Consortium required'+(mp?' (at least '+mp+' partners'+(mc?' from '+mc+' countries':'')+')':''))}
   if(c.call_kind==='cascade')fits.push('Cascade call run by '+(c.organiser||'an EU-funded project')+': usually simpler applications');
-  const fit=Math.max(0,Math.min(100,Math.round(th.pts+10*th.support*(th.overlap.length?1:0)+app.pts+geo.pts+budget+time)));
+  let raw=th.pts+10*th.support*(th.overlap.length?1:0)+app.pts+geo.pts+budget+time;
+  // Eligibility gates: a call the applicant cannot lead must not rank near the top.
+  if(geo.state==='no'){raw*=0.3;flags.push('Score reduced by 70%: call is for another country')}
+  else if(geo.state==='limited'){raw*=0.6;flags.push('Score reduced by 40%: mainly for EU countries')}
+  if(app.pts===0){raw*=0.5;flags.push('Score reduced by 50%: legal type not eligible')}
+  const fit=Math.max(0,Math.min(100,Math.round(raw)));
   const open=c.eu_status==='open'||c.status==='open';
   return {source:'EU',fit,fits,flags,open,c,title:c.title,agency:c.prog?.code||c.programme||'EU',deadline:dl,url:c.official_url,status:c.eu_status||c.status};
  }).filter(Boolean).sort((a,b)=>b.fit-a.fit||String(a.deadline||'9').localeCompare(String(b.deadline||'9')));
