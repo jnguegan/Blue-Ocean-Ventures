@@ -1,0 +1,2104 @@
+{
+ "version": "2026-11-15",
+ "as_of": "15 November 2026",
+ "fx_note": "Amounts converted to US dollars at approximate late-October 2026 rates (EUR 1.12; pegged Gulf currencies at their pegs; BRL 5.0, NZD 1.72, HKD 7.8, SGD 1.28 per US$). Entry thresholds only: fees, taxes and due-diligence costs come on top.",
+ "glossary": [
+  {
+   "term": "CBI",
+   "long": "Citizenship by investment",
+   "text": "A passport granted for a fixed donation or investment. The person becomes a full citizen, usually without living there."
+  },
+  {
+   "term": "RBI",
+   "long": "Residence by investment",
+   "text": "The right to live in a country in exchange for an investment. It is not citizenship; a passport only comes later through normal naturalisation."
+  },
+  {
+   "term": "Golden visa",
+   "long": "Marketing name",
+   "text": "An umbrella label for residence-by-investment schemes. It is not one legal status and rules differ in every country."
+  },
+  {
+   "term": "Visa-free access",
+   "long": "The real product",
+   "text": "Much of a CBI passport's value is visa-free travel (Schengen, UK). When a destination withdraws it, the passport loses value for every holder."
+  }
+ ],
+ "programmes": [
+  {
+   "id": "KNA",
+   "country": "St Kitts & Nevis",
+   "iso3": "KNA",
+   "lat": 17.3,
+   "lon": -62.7,
+   "region": "Caribbean",
+   "name": "Citizenship by Investment (SISC)",
+   "buys": "citizenship",
+   "status": "open",
+   "amount": 250000,
+   "currency": "USD",
+   "usd": 250000,
+   "asset": "donation",
+   "launched": 1984,
+   "closed": null,
+   "note": "Real estate from US$325,000 (7-year hold). Ireland requires visas since 15 June 2026; biometrics mandatory.",
+   "url": "https://ciu.gov.kn/",
+   "sources": [
+    {
+     "title": "NTL Trust, Caribbean CBI 2026 post-MoA",
+     "url": "https://ntltrust.com/news/industry-updates/post-moa-comprehensive-update-on-the-caribbean-cbis/"
+    },
+    {
+     "title": "IMI Daily, Ireland visas for St Kitts and Saint Lucia",
+     "url": "https://www.imidaily.com/caribbean/ireland-cuts-visa-free-access-for-saint-kitts-saint-lucia-and-nicaragua/"
+    },
+    {
+     "title": "European Commission, 8th Visa Suspension Mechanism report (Dec 2025)",
+     "url": "https://www.parlament.gv.at/dokument/XXVIII/EU/52000/imfname_11560506.pdf"
+    }
+   ],
+   "db_change": "Database listed the US$325k real-estate route only; the cheaper US$250k contribution route added."
+  },
+  {
+   "id": "DMA",
+   "country": "Dominica",
+   "iso3": "DMA",
+   "lat": 15.4,
+   "lon": -61.4,
+   "region": "Caribbean",
+   "name": "Citizenship by Investment (EDF)",
+   "buys": "citizenship",
+   "status": "open",
+   "amount": 200000,
+   "currency": "USD",
+   "usd": 200000,
+   "asset": "donation",
+   "launched": 1993,
+   "closed": null,
+   "note": "Real estate also from US$200,000. UK visa required since July 2023; US visa restrictions since January 2026.",
+   "url": "https://www.cbiu.gov.dm/",
+   "sources": [
+    {
+     "title": "NTL Trust, Caribbean CBI 2026 post-MoA",
+     "url": "https://ntltrust.com/news/industry-updates/post-moa-comprehensive-update-on-the-caribbean-cbis/"
+    },
+    {
+     "title": "European Commission, 8th Visa Suspension Mechanism report (Dec 2025)",
+     "url": "https://www.parlament.gv.at/dokument/XXVIII/EU/52000/imfname_11560506.pdf"
+    }
+   ],
+   "db_change": null
+  },
+  {
+   "id": "ATG",
+   "country": "Antigua & Barbuda",
+   "iso3": "ATG",
+   "lat": 17.1,
+   "lon": -61.8,
+   "region": "Caribbean",
+   "name": "Citizenship by Investment (NDF)",
+   "buys": "citizenship",
+   "status": "winding",
+   "amount": 230000,
+   "currency": "USD",
+   "usd": 230000,
+   "asset": "donation",
+   "launched": 2013,
+   "closed": null,
+   "note": "Still accepting applications (CIU memo, 12 Nov 2026), but the government has told the EU it will phase the programme out, proposing end-2030 instead of the EU's June 2028. Real estate from US$300,000 (some sources say US$325,000).",
+   "url": "https://cip.gov.ag/",
+   "sources": [
+    {
+     "title": "Caribpulse, Antigua CIU memo of 12 Nov 2026",
+     "url": "https://www.caribpulse.com/2026/11/14/antigua-and-barbuda-citizenship-by-investment-programme-remains-open-unit-says?postId=106368"
+    },
+    {
+     "title": "Reuters via US News, EU pressure on Antigua (29 Oct 2026)",
+     "url": "https://www.usnews.com/news/world/articles/2026-10-29/eu-pressure-on-antiguas-golden-passport-trade-threatens-budget-cushion"
+    },
+    {
+     "title": "NTL Trust, Caribbean CBI 2026 post-MoA",
+     "url": "https://ntltrust.com/news/industry-updates/post-moa-comprehensive-update-on-the-caribbean-cbis/"
+    }
+   ],
+   "db_change": "Status changed: open but being wound down."
+  },
+  {
+   "id": "GRD",
+   "country": "Grenada",
+   "iso3": "GRD",
+   "lat": 12.1,
+   "lon": -61.7,
+   "region": "Caribbean",
+   "name": "Citizenship by Investment (NTF)",
+   "buys": "citizenship",
+   "status": "open",
+   "amount": 235000,
+   "currency": "USD",
+   "usd": 235000,
+   "asset": "donation",
+   "launched": 2013,
+   "closed": null,
+   "note": "Real estate from US$270,000 (shared) or US$350,000 (sole). Hosts the new regional regulator ECCIRA.",
+   "url": "https://imagrenada.gd/",
+   "sources": [
+    {
+     "title": "NTL Trust, Caribbean CBI 2026 post-MoA",
+     "url": "https://ntltrust.com/news/industry-updates/post-moa-comprehensive-update-on-the-caribbean-cbis/"
+    },
+    {
+     "title": "Arton Capital, Caribbean price change 2024",
+     "url": "https://artoncapital.com/industry-news/caribbean-citizenship-by-investment-programs-price-hike-is-officially-in-place"
+    }
+   ],
+   "db_change": null
+  },
+  {
+   "id": "LCA",
+   "country": "Saint Lucia",
+   "iso3": "LCA",
+   "lat": 13.9,
+   "lon": -61.0,
+   "region": "Caribbean",
+   "name": "Citizenship by Investment (NEF)",
+   "buys": "citizenship",
+   "status": "open",
+   "amount": 240000,
+   "currency": "USD",
+   "usd": 240000,
+   "asset": "donation",
+   "launched": 2015,
+   "closed": null,
+   "note": "Real estate from US$300,000 (5-year hold); bond option. UK visa since 5 March 2026; Ireland visa since 15 June 2026.",
+   "url": "https://www.cipsaintlucia.com/",
+   "sources": [
+    {
+     "title": "NTL Trust, Caribbean CBI 2026 post-MoA",
+     "url": "https://ntltrust.com/news/industry-updates/post-moa-comprehensive-update-on-the-caribbean-cbis/"
+    },
+    {
+     "title": "IMI Daily, Ireland visas for St Kitts and Saint Lucia",
+     "url": "https://www.imidaily.com/caribbean/ireland-cuts-visa-free-access-for-saint-kitts-saint-lucia-and-nicaragua/"
+    }
+   ],
+   "db_change": "Database marked \"Verify\"; confirmed open at US$240k / US$300k."
+  },
+  {
+   "id": "VCT",
+   "country": "St Vincent & the Grenadines",
+   "iso3": "VCT",
+   "lat": 13.25,
+   "lon": -61.2,
+   "region": "Caribbean",
+   "name": "Planned citizenship programme",
+   "buys": "citizenship",
+   "status": "coming",
+   "amount": null,
+   "currency": "USD",
+   "usd": null,
+   "asset": "donation",
+   "launched": null,
+   "closed": null,
+   "note": "Announced for mid-2026 with a residency requirement; the Prime Minister now points to early 2027. Rules not yet published.",
+   "url": "https://www.imidaily.com/caribbean/saint-vincent-pm-eyes-q1-2027-for-cbi-program-but-not-cbi-in-the-old-sense/",
+   "sources": [
+    {
+     "title": "IMI Daily, Saint Vincent eyes Q1 2027",
+     "url": "https://www.imidaily.com/caribbean/saint-vincent-pm-eyes-q1-2027-for-cbi-program-but-not-cbi-in-the-old-sense/"
+    }
+   ],
+   "db_change": "New: not in the database."
+  },
+  {
+   "id": "TUR",
+   "country": "Türkiye",
+   "iso3": "TUR",
+   "lat": 39.0,
+   "lon": 35.0,
+   "region": "Europe/Asia",
+   "name": "Citizenship by real estate investment",
+   "buys": "citizenship",
+   "status": "open",
+   "amount": 400000,
+   "currency": "USD",
+   "usd": 400000,
+   "asset": "property",
+   "launched": 2017,
+   "closed": null,
+   "note": "Property held 3 years; US$500,000 for other routes. Threshold raised from US$250,000 in 2022.",
+   "url": "https://www.invest.gov.tr/en/InvestmentGuide/Pages/acquiring-property-and-citizenship.aspx",
+   "sources": [
+    {
+     "title": "Republic of Türkiye Investment Office",
+     "url": "https://www.invest.gov.tr/en/InvestmentGuide/Pages/acquiring-property-and-citizenship.aspx"
+    }
+   ],
+   "db_change": null
+  },
+  {
+   "id": "EGY",
+   "country": "Egypt",
+   "iso3": "EGY",
+   "lat": 26.8,
+   "lon": 30.8,
+   "region": "Africa",
+   "name": "Citizenship linked to property",
+   "buys": "citizenship",
+   "status": "verify",
+   "amount": 300000,
+   "currency": "USD",
+   "usd": 300000,
+   "asset": "property",
+   "launched": 2019,
+   "closed": null,
+   "note": "US$300,000 property route reported since 2023; lawyers dispute that it works as a fixed statutory product. Confirm with the authority.",
+   "url": "https://www.investinegypt.gov.eg/",
+   "sources": [
+    {
+     "title": "Immigrant Invest, State of CBI 2026",
+     "url": "https://immigrantinvest.com/reports/state-of-cbi-report/"
+    }
+   ],
+   "db_change": null
+  },
+  {
+   "id": "JOR",
+   "country": "Jordan",
+   "iso3": "JOR",
+   "lat": 31.0,
+   "lon": 36.5,
+   "region": "Middle East",
+   "name": "Citizenship by investment",
+   "buys": "citizenship",
+   "status": "verify",
+   "amount": 750000,
+   "currency": "USD",
+   "usd": 750000,
+   "asset": "business",
+   "launched": 2018,
+   "closed": null,
+   "note": "New Cabinet framework from July 2025; routes start around US$750,000 (sources differ). 65 investors naturalised in H1 2026.",
+   "url": "https://www.moin.gov.jo/",
+   "sources": [
+    {
+     "title": "Immigrant Invest, State of CBI 2026",
+     "url": "https://immigrantinvest.com/reports/state-of-cbi-report/"
+    }
+   ],
+   "db_change": "Database had no amount; now about US$750k."
+  },
+  {
+   "id": "KHM",
+   "country": "Cambodia",
+   "iso3": "KHM",
+   "lat": 12.6,
+   "lon": 105.0,
+   "region": "Asia",
+   "name": "Citizenship by donation or investment",
+   "buys": "citizenship",
+   "status": "verify",
+   "amount": 1000000,
+   "currency": "USD",
+   "usd": 1000000,
+   "asset": "business",
+   "launched": 1996,
+   "closed": null,
+   "note": "Thresholds raised sharply in early 2026: about US$1 million investment or US$3 million donation (previously about US$245,000).",
+   "url": "https://cdc.gov.kh/",
+   "sources": [
+    {
+     "title": "Phnom Penh Post via Asia News Network (Jan 2026)",
+     "url": "https://asianews.network/cambodian-citizenship-available-to-3m-donors-1m-investors/"
+    }
+   ],
+   "db_change": "Price rose roughly fourfold in 2026."
+  },
+  {
+   "id": "VUT",
+   "country": "Vanuatu",
+   "iso3": "VUT",
+   "lat": -16.0,
+   "lon": 167.0,
+   "region": "Pacific",
+   "name": "Development Support Program",
+   "buys": "citizenship",
+   "status": "open",
+   "amount": 130000,
+   "currency": "USD",
+   "usd": 130000,
+   "asset": "donation",
+   "launched": 2017,
+   "closed": null,
+   "note": "Lost Schengen visa-free access permanently in December 2024 and UK visa-free access in 2023, yet raised a record US$95.5m in H1 2026.",
+   "url": "https://citizenship.gov.vu/",
+   "sources": [
+    {
+     "title": "Immigrant Invest, State of CBI 2026",
+     "url": "https://immigrantinvest.com/reports/state-of-cbi-report/"
+    }
+   ],
+   "db_change": "Database had no amount; US$130k."
+  },
+  {
+   "id": "NRU",
+   "country": "Nauru",
+   "iso3": "NRU",
+   "lat": -0.5,
+   "lon": 166.9,
+   "region": "Pacific",
+   "name": "Economic & Climate Resilience Citizenship",
+   "buys": "citizenship",
+   "status": "open",
+   "amount": 90000,
+   "currency": "USD",
+   "usd": 90000,
+   "asset": "donation",
+   "launched": 2024,
+   "closed": null,
+   "note": "US$90,000 promotional price to 31 Dec 2026, then US$115,000. UK visa-free access withdrawn December 2025.",
+   "url": "https://www.naurugov.nr/",
+   "sources": [
+    {
+     "title": "Immigrant Invest, State of CBI 2026",
+     "url": "https://immigrantinvest.com/reports/state-of-cbi-report/"
+    }
+   ],
+   "db_change": "Database marked \"Verify\"; open since 2024."
+  },
+  {
+   "id": "STP",
+   "country": "São Tomé & Príncipe",
+   "iso3": "STP",
+   "lat": 0.3,
+   "lon": 6.7,
+   "region": "Africa",
+   "name": "National Transformation Fund",
+   "buys": "citizenship",
+   "status": "open",
+   "amount": 90000,
+   "currency": "USD",
+   "usd": 90000,
+   "asset": "donation",
+   "launched": 2025,
+   "closed": null,
+   "note": "Launched 2025; first passports issued January 2026. Lowest entry price on the market.",
+   "url": "https://www.gov.st/",
+   "sources": [
+    {
+     "title": "Immigrant Invest, State of CBI 2026",
+     "url": "https://immigrantinvest.com/reports/state-of-cbi-report/"
+    }
+   ],
+   "db_change": "Database marked \"Verify\"; open at US$90k."
+  },
+  {
+   "id": "SLE",
+   "country": "Sierra Leone",
+   "iso3": "SLE",
+   "lat": 8.5,
+   "lon": -11.8,
+   "region": "Africa",
+   "name": "Citizenship by investment",
+   "buys": "citizenship",
+   "status": "open",
+   "amount": 140000,
+   "currency": "USD",
+   "usd": 140000,
+   "asset": "donation",
+   "launched": 2024,
+   "closed": null,
+   "note": "Fast-track route US$140,000; heritage route US$100,000 for people of African descent.",
+   "url": "https://www.statehouse.gov.sl/",
+   "sources": [
+    {
+     "title": "Immigrant Invest, State of CBI 2026",
+     "url": "https://immigrantinvest.com/reports/state-of-cbi-report/"
+    }
+   ],
+   "db_change": "New: not in the database."
+  },
+  {
+   "id": "ARG",
+   "country": "Argentina",
+   "iso3": "ARG",
+   "lat": -34.6,
+   "lon": -64.0,
+   "region": "Americas",
+   "name": "Citizenship by Investment Programme",
+   "buys": "citizenship",
+   "status": "coming",
+   "amount": 350000,
+   "currency": "USD",
+   "usd": 350000,
+   "asset": "donation",
+   "launched": null,
+   "closed": null,
+   "note": "Announced 2 Oct 2026 for Q4 2026: US$350,000 treasury contribution or US$800,000 bond. A June 2026 court ruling on the enabling decree adds legal uncertainty.",
+   "url": "https://www.argentina.gob.ar/economia",
+   "sources": [
+    {
+     "title": "Sable International, Argentina programme status (Oct 2026)",
+     "url": "https://www.sableinternational.com/citizenship-by-investment/argentina-coming-soon"
+    }
+   ],
+   "db_change": "New: not in the database."
+  },
+  {
+   "id": "MLT_C",
+   "country": "Malta",
+   "iso3": "MLT",
+   "lat": 35.9,
+   "lon": 14.4,
+   "region": "Europe",
+   "name": "Citizenship by investment (MEIN)",
+   "buys": "citizenship",
+   "status": "closed",
+   "amount": null,
+   "currency": "EUR",
+   "usd": null,
+   "asset": "donation",
+   "launched": 2014,
+   "closed": 2025,
+   "note": "EU Court of Justice ruled it illegal on 29 April 2025; repealed July 2025 and replaced by a discretionary \"merit\" route.",
+   "url": "https://komunita.gov.mt/",
+   "sources": [
+    {
+     "title": "Case C-181/23 Commission v Malta (CJEU, 29 Apr 2025)",
+     "url": "https://www.mondaq.com/article/1623652"
+    }
+   ],
+   "db_change": "Status changed from \"Verify\" to closed."
+  },
+  {
+   "id": "CYP_C",
+   "country": "Cyprus",
+   "iso3": "CYP",
+   "lat": 35.1,
+   "lon": 33.4,
+   "region": "Europe",
+   "name": "Cyprus Investment Programme",
+   "buys": "citizenship",
+   "status": "closed",
+   "amount": null,
+   "currency": "EUR",
+   "usd": null,
+   "asset": "property",
+   "launched": 2013,
+   "closed": 2020,
+   "note": "Ended in November 2020 after a corruption scandal.",
+   "url": "https://www.moi.gov.cy/",
+   "sources": [],
+   "db_change": null
+  },
+  {
+   "id": "GRC",
+   "country": "Greece",
+   "iso3": "GRC",
+   "lat": 39.1,
+   "lon": 22.9,
+   "region": "Europe",
+   "name": "Golden Visa (real estate)",
+   "buys": "residence",
+   "status": "open",
+   "amount": 400000,
+   "currency": "EUR",
+   "usd": 448000,
+   "asset": "property",
+   "launched": 2013,
+   "closed": null,
+   "note": "€800,000 in Attica, Thessaloniki, Mykonos, Santorini and large islands; €400,000 elsewhere; €250,000 for conversions and listed buildings. 34,278 active investor permits (July 2026).",
+   "url": "https://migration.gov.gr/en/golden-visa/",
+   "sources": [
+    {
+     "title": "Greek Ministry of Migration statistics via Movingto (May 2026)",
+     "url": "https://movingto.com/gr/greece-golden-visa-applications-fall-q1-2026"
+    },
+    {
+     "title": "Uglobal, Greek filings H1 2026",
+     "url": "https://uglobal.com/blog/high-thresholds-drive-sharp-drop-in-new-greek-residency-filings/"
+    }
+   ],
+   "db_change": null
+  },
+  {
+   "id": "PRT",
+   "country": "Portugal",
+   "iso3": "PRT",
+   "lat": 39.6,
+   "lon": -8.0,
+   "region": "Europe",
+   "name": "ARI Golden Visa (funds)",
+   "buys": "residence",
+   "status": "open",
+   "amount": 500000,
+   "currency": "EUR",
+   "usd": 560000,
+   "asset": "fund",
+   "launched": 2012,
+   "closed": null,
+   "note": "No property route since October 2023. Citizenship now needs 10 years of residence (law of May 2026, previously 5).",
+   "url": "https://aima.gov.pt/",
+   "sources": [
+    {
+     "title": "AIMA / SEF ARI statistics (compiled by Global Citizen Solutions)",
+     "url": "https://www.globalcitizensolutions.com/pt/portugal-golden-visa-statistics/"
+    },
+    {
+     "title": "Global Citizen Solutions, Portugal changes 2026",
+     "url": "https://www.globalcitizensolutions.com/pt-pt/novas-regras-do-golden-visa-portugal/"
+    }
+   ],
+   "db_change": "Database had no amount; €500k fund route."
+  },
+  {
+   "id": "ESP",
+   "country": "Spain",
+   "iso3": "ESP",
+   "lat": 40.2,
+   "lon": -3.7,
+   "region": "Europe",
+   "name": "Golden Visa",
+   "buys": "residence",
+   "status": "closed",
+   "amount": 500000,
+   "currency": "EUR",
+   "usd": 560000,
+   "asset": "property",
+   "launched": 2013,
+   "closed": 2025,
+   "note": "Abolished on 3 April 2025 over housing pressure; nearly 16,000 visas issued 2013–2025, about 95% through property.",
+   "url": "https://www.inclusion.gob.es/",
+   "sources": [
+    {
+     "title": "Idealista, Spain closes golden visa",
+     "url": "https://www.idealista.com/en/news/node/838966"
+    }
+   ],
+   "db_change": null
+  },
+  {
+   "id": "HUN",
+   "country": "Hungary",
+   "iso3": "HUN",
+   "lat": 47.2,
+   "lon": 19.4,
+   "region": "Europe",
+   "name": "Guest Investor Programme",
+   "buys": "residence",
+   "status": "open",
+   "amount": 250000,
+   "currency": "EUR",
+   "usd": 280000,
+   "asset": "fund",
+   "launched": 2024,
+   "closed": null,
+   "note": "€250,000 in an approved real estate fund, or a €1 million university donation. Direct property route dropped in January 2025. 10-year permit.",
+   "url": "https://www.henleyglobal.com/residence-investment/hungary",
+   "sources": [
+    {
+     "title": "Henley & Partners, Hungary guest investor",
+     "url": "https://www.henleyglobal.com/residence-investment/hungary"
+    }
+   ],
+   "db_change": "Database marked \"Verify\"; open at €250k fund."
+  },
+  {
+   "id": "MLT",
+   "country": "Malta",
+   "iso3": "MLT",
+   "lat": 35.9,
+   "lon": 14.4,
+   "region": "Europe",
+   "name": "Permanent Residence Programme",
+   "buys": "permanent",
+   "status": "open",
+   "amount": 375000,
+   "currency": "EUR",
+   "usd": 420000,
+   "asset": "property",
+   "launched": 2021,
+   "closed": null,
+   "note": "Buy from €375,000 or rent from €14,000 a year, plus €99,000 in government payments.",
+   "url": "https://residencymalta.gov.mt/",
+   "sources": [
+    {
+     "title": "Andersen Malta, MPRP requirements (May 2026)",
+     "url": "https://www.mt.andersen.com/insights/malta-permanent-residence-programme-requirements"
+    }
+   ],
+   "db_change": "Database had no amount; €375k purchase."
+  },
+  {
+   "id": "CYP",
+   "country": "Cyprus",
+   "iso3": "CYP",
+   "lat": 35.1,
+   "lon": 33.4,
+   "region": "Europe",
+   "name": "Permanent residence (Reg. 6(2))",
+   "buys": "permanent",
+   "status": "open",
+   "amount": 300000,
+   "currency": "EUR",
+   "usd": 336000,
+   "asset": "property",
+   "launched": 2013,
+   "closed": null,
+   "note": "€300,000 + VAT in new property (or company/fund), plus €50,000 annual income from abroad.",
+   "url": "https://www.moi.gov.cy/",
+   "sources": [
+    {
+     "title": "Global Citizen Solutions, Cyprus permanent residence 2026",
+     "url": "https://www.globalcitizensolutions.com/cyprus-permanent-residency/"
+    }
+   ],
+   "db_change": null
+  },
+  {
+   "id": "ITA",
+   "country": "Italy",
+   "iso3": "ITA",
+   "lat": 42.8,
+   "lon": 12.5,
+   "region": "Europe",
+   "name": "Investor Visa",
+   "buys": "residence",
+   "status": "open",
+   "amount": 250000,
+   "currency": "EUR",
+   "usd": 280000,
+   "asset": "business",
+   "launched": 2017,
+   "closed": null,
+   "note": "€250,000 innovative start-up, €500,000 company, €1 million donation or €2 million government bonds. No property route.",
+   "url": "https://investorvisa.mise.gov.it/",
+   "sources": [
+    {
+     "title": "IMI Daily, Every golden visa still open in Europe 2026",
+     "url": "https://www.imidaily.com/analysis/every-golden-visa-still-open-in-europe-in-2026/"
+    }
+   ],
+   "db_change": "New: not in the database."
+  },
+  {
+   "id": "LVA",
+   "country": "Latvia",
+   "iso3": "LVA",
+   "lat": 56.9,
+   "lon": 24.6,
+   "region": "Europe",
+   "name": "Residence by investment",
+   "buys": "residence",
+   "status": "verify",
+   "amount": 250000,
+   "currency": "EUR",
+   "usd": 280000,
+   "asset": "property",
+   "launched": 2010,
+   "closed": null,
+   "note": "€250,000 real estate route; reported to be under review in 2026.",
+   "url": "https://www.pmlp.gov.lv/en",
+   "sources": [
+    {
+     "title": "IMI Daily, Every golden visa still open in Europe 2026",
+     "url": "https://www.imidaily.com/analysis/every-golden-visa-still-open-in-europe-in-2026/"
+    }
+   ],
+   "db_change": "New: not in the database."
+  },
+  {
+   "id": "IRL",
+   "country": "Ireland",
+   "iso3": "IRL",
+   "lat": 53.2,
+   "lon": -8.0,
+   "region": "Europe",
+   "name": "Immigrant Investor Programme",
+   "buys": "residence",
+   "status": "closed",
+   "amount": null,
+   "currency": "EUR",
+   "usd": null,
+   "asset": "business",
+   "launched": 2012,
+   "closed": 2023,
+   "note": "Closed to new applications in February 2023.",
+   "url": "https://www.irishimmigration.ie/",
+   "sources": [],
+   "db_change": null
+  },
+  {
+   "id": "GBR",
+   "country": "United Kingdom",
+   "iso3": "GBR",
+   "lat": 53.0,
+   "lon": -1.5,
+   "region": "Europe",
+   "name": "Tier 1 Investor visa",
+   "buys": "residence",
+   "status": "closed",
+   "amount": null,
+   "currency": "GBP",
+   "usd": null,
+   "asset": "fund",
+   "launched": 2008,
+   "closed": 2022,
+   "note": "Closed in February 2022 over security concerns.",
+   "url": "https://www.gov.uk/",
+   "sources": [],
+   "db_change": null
+  },
+  {
+   "id": "ARE",
+   "country": "United Arab Emirates",
+   "iso3": "ARE",
+   "lat": 24.2,
+   "lon": 54.4,
+   "region": "Middle East",
+   "name": "Golden Visa (property)",
+   "buys": "residence",
+   "status": "open",
+   "amount": 2000000,
+   "currency": "AED",
+   "usd": 544588,
+   "asset": "property",
+   "launched": 2019,
+   "closed": null,
+   "note": "10-year renewable visa for property worth AED 2 million; mortgaged property accepted.",
+   "url": "https://icp.gov.ae/",
+   "sources": [
+    {
+     "title": "IMI Daily, Gulf golden visa guide 2026",
+     "url": "https://www.imidaily.com/analysis/gcc-golden-visa-guide-2026/"
+    }
+   ],
+   "db_change": null
+  },
+  {
+   "id": "SAU",
+   "country": "Saudi Arabia",
+   "iso3": "SAU",
+   "lat": 24.0,
+   "lon": 45.0,
+   "region": "Middle East",
+   "name": "Premium Residency – Real Estate Owner",
+   "buys": "residence",
+   "status": "open",
+   "amount": 4000000,
+   "currency": "SAR",
+   "usd": 1066667,
+   "asset": "property",
+   "launched": 2024,
+   "closed": null,
+   "note": "Unmortgaged residential property worth SAR 4 million; renewable permit up to 5 years.",
+   "url": "https://pr.gov.sa/",
+   "sources": [
+    {
+     "title": "IMI Daily, Gulf golden visa guide 2026",
+     "url": "https://www.imidaily.com/analysis/gcc-golden-visa-guide-2026/"
+    }
+   ],
+   "db_change": null
+  },
+  {
+   "id": "QAT",
+   "country": "Qatar",
+   "iso3": "QAT",
+   "lat": 25.3,
+   "lon": 51.2,
+   "region": "Middle East",
+   "name": "Residence by real estate",
+   "buys": "residence",
+   "status": "open",
+   "amount": 730000,
+   "currency": "QAR",
+   "usd": 200549,
+   "asset": "property",
+   "launched": 2018,
+   "closed": null,
+   "note": "QAR 730,000 in freehold zones for a renewable permit; QAR 3.65 million for permanent residence (capped at 100 a year).",
+   "url": "https://portal.moi.gov.qa/",
+   "sources": [
+    {
+     "title": "IMI Daily, Gulf golden visa guide 2026",
+     "url": "https://www.imidaily.com/analysis/gcc-golden-visa-guide-2026/"
+    }
+   ],
+   "db_change": null
+  },
+  {
+   "id": "BHR",
+   "country": "Bahrain",
+   "iso3": "BHR",
+   "lat": 26.0,
+   "lon": 50.55,
+   "region": "Middle East",
+   "name": "Golden Residence",
+   "buys": "residence",
+   "status": "open",
+   "amount": 130000,
+   "currency": "BHD",
+   "usd": 345745,
+   "asset": "property",
+   "launched": 2022,
+   "closed": null,
+   "note": "Property threshold cut 35% in late 2025, from BHD 200,000 to BHD 130,000. 10-year renewable permit.",
+   "url": "https://www.npra.gov.bh/",
+   "sources": [
+    {
+     "title": "IMI Daily, Gulf golden visa guide 2026",
+     "url": "https://www.imidaily.com/analysis/gcc-golden-visa-guide-2026/"
+    }
+   ],
+   "db_change": "Database marked \"Verify\"; now BHD 130k."
+  },
+  {
+   "id": "OMN",
+   "country": "Oman",
+   "iso3": "OMN",
+   "lat": 21.0,
+   "lon": 57.0,
+   "region": "Middle East",
+   "name": "Investor Residency (Golden)",
+   "buys": "residence",
+   "status": "open",
+   "amount": 200000,
+   "currency": "OMR",
+   "usd": 520156,
+   "asset": "mixed",
+   "launched": 2021,
+   "closed": null,
+   "note": "Relaunched August 2025: OMR 200,000 across seven routes (property, bonds, shares, deposit, company) for 10 years.",
+   "url": "https://investoman.om/",
+   "sources": [
+    {
+     "title": "IMI Daily, Gulf golden visa guide 2026",
+     "url": "https://www.imidaily.com/analysis/gcc-golden-visa-guide-2026/"
+    }
+   ],
+   "db_change": "Database marked \"Verify\"; now OMR 200k."
+  },
+  {
+   "id": "KWT",
+   "country": "Kuwait",
+   "iso3": "KWT",
+   "lat": 29.3,
+   "lon": 47.6,
+   "region": "Middle East",
+   "name": "Property & investor residency",
+   "buys": "residence",
+   "status": "verify",
+   "amount": null,
+   "currency": "USD",
+   "usd": null,
+   "asset": "property",
+   "launched": 2025,
+   "closed": null,
+   "note": "New 10-year property route and 15-year investor route from 23 Dec 2025; no fixed minimum and foreign property ownership still restricted.",
+   "url": "https://www.moi.gov.kw/",
+   "sources": [
+    {
+     "title": "IMI Daily, Gulf golden visa guide 2026",
+     "url": "https://www.imidaily.com/analysis/gcc-golden-visa-guide-2026/"
+    }
+   ],
+   "db_change": "New: not in the database."
+  },
+  {
+   "id": "USA",
+   "country": "United States",
+   "iso3": "USA",
+   "lat": 39.0,
+   "lon": -98.0,
+   "region": "Americas",
+   "name": "EB-5 Immigrant Investor",
+   "buys": "permanent",
+   "status": "open",
+   "amount": 800000,
+   "currency": "USD",
+   "usd": 800000,
+   "asset": "business",
+   "launched": 1990,
+   "closed": null,
+   "note": "US$800,000 in a targeted area or infrastructure project, US$1,050,000 elsewhere; must create 10 jobs. Amounts rise for petitions from 1 Jan 2027.",
+   "url": "https://www.uscis.gov/",
+   "sources": [
+    {
+     "title": "Immigration World, EB-5 and Gold Card 2026",
+     "url": "https://www.immigrationworld.com/usa/eb-5-visa/"
+    }
+   ],
+   "db_change": null
+  },
+  {
+   "id": "USA_G",
+   "country": "United States",
+   "iso3": "USA",
+   "lat": 39.0,
+   "lon": -98.0,
+   "region": "Americas",
+   "name": "Gold Card (US$1m gift)",
+   "buys": "permanent",
+   "status": "open",
+   "amount": 1000000,
+   "currency": "USD",
+   "usd": 1000000,
+   "asset": "donation",
+   "launched": 2025,
+   "closed": null,
+   "note": "Executive order of Sept 2025; open since December 2025. A US$1 million gift plus US$15,000 fee. Very few approvals so far.",
+   "url": "https://trumpcard.gov/",
+   "sources": [
+    {
+     "title": "Immigration World, EB-5 and Gold Card 2026",
+     "url": "https://www.immigrationworld.com/usa/eb-5-visa/"
+    }
+   ],
+   "db_change": "New: not in the database."
+  },
+  {
+   "id": "CAN",
+   "country": "Canada",
+   "iso3": "CAN",
+   "lat": 56.0,
+   "lon": -106.0,
+   "region": "Americas",
+   "name": "Federal Start-Up Visa / Quebec investor",
+   "buys": "permanent",
+   "status": "closed",
+   "amount": null,
+   "currency": "CAD",
+   "usd": null,
+   "asset": "business",
+   "launched": null,
+   "closed": 2026,
+   "note": "No federal investor route: Start-Up Visa closed to new applications on 1 Jan 2026; Quebec investor intake largely suspended.",
+   "url": "https://www.canada.ca/en/immigration-refugees-citizenship.html",
+   "sources": [
+    {
+     "title": "Immigration.ca, Start-Up Visa closed",
+     "url": "https://immigration.ca/?p=14"
+    }
+   ],
+   "db_change": "Status changed from \"Selective\" to closed/paused."
+  },
+  {
+   "id": "PAN",
+   "country": "Panama",
+   "iso3": "PAN",
+   "lat": 8.6,
+   "lon": -80.1,
+   "region": "Americas",
+   "name": "Qualified Investor",
+   "buys": "permanent",
+   "status": "open",
+   "amount": 300000,
+   "currency": "USD",
+   "usd": 300000,
+   "asset": "property",
+   "launched": 2020,
+   "closed": null,
+   "note": "Direct permanent residence. Since 16 Sept 2026 US$300,000 applies only to new property; resale property needs US$500,000.",
+   "url": "https://www.migracion.gob.pa/",
+   "sources": [
+    {
+     "title": "IMI Daily, Paraguay Investor Pass and Panama change",
+     "url": "https://www.imidaily.com/opinion/what-paraguays-investor-pass-hints-at-the-future-of-temporary-residency/"
+    }
+   ],
+   "db_change": "Rule tightened in Sept 2026."
+  },
+  {
+   "id": "CRI",
+   "country": "Costa Rica",
+   "iso3": "CRI",
+   "lat": 9.9,
+   "lon": -84.1,
+   "region": "Americas",
+   "name": "Investor residence",
+   "buys": "residence",
+   "status": "open",
+   "amount": 150000,
+   "currency": "USD",
+   "usd": 150000,
+   "asset": "property",
+   "launched": 2009,
+   "closed": null,
+   "note": "US$150,000 in property or other qualifying assets; temporary residence, renewable.",
+   "url": "https://www.migracion.go.cr/",
+   "sources": [],
+   "db_change": null
+  },
+  {
+   "id": "DOM",
+   "country": "Dominican Republic",
+   "iso3": "DOM",
+   "lat": 18.7,
+   "lon": -70.2,
+   "region": "Americas",
+   "name": "Investor residence",
+   "buys": "residence",
+   "status": "verify",
+   "amount": 200000,
+   "currency": "USD",
+   "usd": 200000,
+   "asset": "business",
+   "launched": 2013,
+   "closed": null,
+   "note": "About US$200,000 certified investment.",
+   "url": "https://migracion.gob.do/",
+   "sources": [
+    {
+     "title": "Henley & Partners, countries overview",
+     "url": "https://www.henleyglobal.com/countries-overview/"
+    }
+   ],
+   "db_change": "Database had no amount; about US$200k."
+  },
+  {
+   "id": "PRY",
+   "country": "Paraguay",
+   "iso3": "PRY",
+   "lat": -23.4,
+   "lon": -58.4,
+   "region": "Americas",
+   "name": "Investor Pass",
+   "buys": "permanent",
+   "status": "open",
+   "amount": 200000,
+   "currency": "USD",
+   "usd": 200000,
+   "asset": "property",
+   "launched": 2026,
+   "closed": null,
+   "note": "Launched April 2026: direct permanent residence for US$200,000 in income-producing property or securities, or US$150,000 in tourism.",
+   "url": "https://www.mic.gov.py/",
+   "sources": [
+    {
+     "title": "IMI Daily, Paraguay Investor Pass and Panama change",
+     "url": "https://www.imidaily.com/opinion/what-paraguays-investor-pass-hints-at-the-future-of-temporary-residency/"
+    }
+   ],
+   "db_change": "New programme since the database."
+  },
+  {
+   "id": "BRA",
+   "country": "Brazil",
+   "iso3": "BRA",
+   "lat": -10.0,
+   "lon": -52.0,
+   "region": "Americas",
+   "name": "Investor visa (VIPER)",
+   "buys": "residence",
+   "status": "open",
+   "amount": 1000000,
+   "currency": "BRL",
+   "usd": 200000,
+   "asset": "property",
+   "launched": 2018,
+   "closed": null,
+   "note": "BRL 1 million in urban property, BRL 700,000 in the North and Northeast.",
+   "url": "https://www.gov.br/mj/pt-br/",
+   "sources": [],
+   "db_change": null
+  },
+  {
+   "id": "NZL",
+   "country": "New Zealand",
+   "iso3": "NZL",
+   "lat": -41.5,
+   "lon": 172.8,
+   "region": "Pacific",
+   "name": "Active Investor Plus",
+   "buys": "permanent",
+   "status": "open",
+   "amount": 5000000,
+   "currency": "NZD",
+   "usd": 2906977,
+   "asset": "fund",
+   "launched": 2025,
+   "closed": null,
+   "note": "Growth category NZ$5 million over 3 years (Balanced NZ$10 million). 609 applications covering 1,948 people by early 2026.",
+   "url": "https://www.immigration.govt.nz/",
+   "sources": [
+    {
+     "title": "Immigration New Zealand, Active Investor Plus statistics",
+     "url": "https://www.immigration.govt.nz/about-us/news-centre/investor-category"
+    }
+   ],
+   "db_change": "Database had no amount; NZ$5m."
+  },
+  {
+   "id": "AUS",
+   "country": "Australia",
+   "iso3": "AUS",
+   "lat": -25.0,
+   "lon": 134.0,
+   "region": "Pacific",
+   "name": "Business Innovation & Investment",
+   "buys": "permanent",
+   "status": "closed",
+   "amount": null,
+   "currency": "AUD",
+   "usd": null,
+   "asset": "fund",
+   "launched": 2012,
+   "closed": 2024,
+   "note": "Closed to new applications in 2024.",
+   "url": "https://immi.homeaffairs.gov.au/",
+   "sources": [],
+   "db_change": null
+  },
+  {
+   "id": "HKG",
+   "country": "Hong Kong SAR",
+   "iso3": "HKG",
+   "lat": 22.3,
+   "lon": 114.2,
+   "region": "Asia",
+   "name": "New Capital Investment Entrant Scheme",
+   "buys": "residence",
+   "status": "open",
+   "amount": 30000000,
+   "currency": "HKD",
+   "usd": 3846154,
+   "asset": "fund",
+   "launched": 2024,
+   "closed": null,
+   "note": "HK$30 million in financial assets; over 3,000 applications since 2024.",
+   "url": "https://www.newcies.gov.hk/",
+   "sources": [
+    {
+     "title": "Immigration New Zealand, Active Investor Plus statistics",
+     "url": "https://www.immigration.govt.nz/about-us/news-centre/investor-category"
+    }
+   ],
+   "db_change": "Database had no amount; HK$30m."
+  },
+  {
+   "id": "SGP",
+   "country": "Singapore",
+   "iso3": "SGP",
+   "lat": 1.35,
+   "lon": 103.8,
+   "region": "Asia",
+   "name": "Global Investor Programme",
+   "buys": "permanent",
+   "status": "open",
+   "amount": 10000000,
+   "currency": "SGD",
+   "usd": 7812500,
+   "asset": "business",
+   "launched": 2004,
+   "closed": null,
+   "note": "S$10 million into a business, S$25 million into a fund or a S$200 million family office. About 450 PRs granted 2015–2025.",
+   "url": "https://www.edb.gov.sg/",
+   "sources": [
+    {
+     "title": "Singapore MTI, reply on GIP (Feb 2026)",
+     "url": "https://www.mti.gov.sg/newsroom/oral-reply-to-pq-on-permanent-residency-grants-under-the-global-investor-programme-and-cumulative-investment-from-these-gip-permanent-residents-from-2015-to-2025"
+    }
+   ],
+   "db_change": "Database had no amount; S$10m."
+  },
+  {
+   "id": "MYS",
+   "country": "Malaysia",
+   "iso3": "MYS",
+   "lat": 3.9,
+   "lon": 102.0,
+   "region": "Asia",
+   "name": "MM2H",
+   "buys": "residence",
+   "status": "open",
+   "amount": 150000,
+   "currency": "USD",
+   "usd": 150000,
+   "asset": "deposit",
+   "launched": 2002,
+   "closed": null,
+   "note": "Silver tier: US$150,000 fixed deposit plus a property of at least RM 600,000 (5-year visa).",
+   "url": "https://www.motac.gov.my/",
+   "sources": [
+    {
+     "title": "Global Investments, Asia-Pacific residency compared (Jun 2026)",
+     "url": "https://www.globalinvestments.net/citizenship/guides/asia-pacific-residency-options-compared"
+    }
+   ],
+   "db_change": "Database had no amount; US$150k deposit."
+  },
+  {
+   "id": "IDN",
+   "country": "Indonesia",
+   "iso3": "IDN",
+   "lat": -2.5,
+   "lon": 118.0,
+   "region": "Asia",
+   "name": "Golden Visa",
+   "buys": "residence",
+   "status": "verify",
+   "amount": 350000,
+   "currency": "USD",
+   "usd": 350000,
+   "asset": "mixed",
+   "launched": 2023,
+   "closed": null,
+   "note": "Individual investors from about US$350,000 for 5 years (about US$700,000 for 10); confirm current amounts. 1,274 visas issued by May 2026.",
+   "url": "https://evisa.imigrasi.go.id/",
+   "sources": [
+    {
+     "title": "Southeast Asia Globe, long-term residency compared (Sep 2026)",
+     "url": "https://seasia.co/2026/09/19/long-term-residency-in-southeast-asia-compared-which-one-is-better"
+    }
+   ],
+   "db_change": "Database marked \"Verify\"; open."
+  },
+  {
+   "id": "THA",
+   "country": "Thailand",
+   "iso3": "THA",
+   "lat": 15.5,
+   "lon": 101.0,
+   "region": "Asia",
+   "name": "Long-Term Resident (wealthy citizen)",
+   "buys": "residence",
+   "status": "open",
+   "amount": 500000,
+   "currency": "USD",
+   "usd": 500000,
+   "asset": "mixed",
+   "launched": 2022,
+   "closed": null,
+   "note": "US$500,000 invested in Thailand plus US$1 million in assets for a 10-year visa. Thailand Privilege is a paid membership, not an investment.",
+   "url": "https://ltr.boi.go.th/",
+   "sources": [
+    {
+     "title": "Global Investments, Asia-Pacific residency compared (Jun 2026)",
+     "url": "https://www.globalinvestments.net/citizenship/guides/asia-pacific-residency-options-compared"
+    }
+   ],
+   "db_change": null
+  },
+  {
+   "id": "PHL",
+   "country": "Philippines",
+   "iso3": "PHL",
+   "lat": 12.5,
+   "lon": 122.0,
+   "region": "Asia",
+   "name": "Special Investor's Resident Visa",
+   "buys": "residence",
+   "status": "verify",
+   "amount": 75000,
+   "currency": "USD",
+   "usd": 75000,
+   "asset": "fund",
+   "launched": 1986,
+   "closed": null,
+   "note": "US$75,000 in qualifying investments.",
+   "url": "https://boi.gov.ph/",
+   "sources": [],
+   "db_change": null
+  },
+  {
+   "id": "MUS",
+   "country": "Mauritius",
+   "iso3": "MUS",
+   "lat": -20.25,
+   "lon": 57.55,
+   "region": "Africa",
+   "name": "Residence by property",
+   "buys": "permanent",
+   "status": "open",
+   "amount": 375000,
+   "currency": "USD",
+   "usd": 375000,
+   "asset": "property",
+   "launched": 2015,
+   "closed": null,
+   "note": "US$375,000 in an approved scheme; permit lasts while the property is owned. Purchase duty doubled from 1 July 2026.",
+   "url": "https://www.edbmauritius.org/",
+   "sources": [
+    {
+     "title": "Henley & Partners, Mauritius residence",
+     "url": "https://henleyglobal.com/residence-investment/mauritius"
+    }
+   ],
+   "db_change": null
+  }
+ ],
+ "buys": {
+  "citizenship": {
+   "label": "Citizenship (passport)",
+   "color": "#6250d6"
+  },
+  "permanent": {
+   "label": "Permanent residence",
+   "color": "#1baf7a"
+  },
+  "residence": {
+   "label": "Long-term residence",
+   "color": "#2a78d6"
+  }
+ },
+ "status": {
+  "open": {
+   "label": "Open",
+   "color": "#1baf7a"
+  },
+  "winding": {
+   "label": "Open, being phased out",
+   "color": "#eda100"
+  },
+  "verify": {
+   "label": "Open, terms to verify",
+   "color": "#7fb3e8"
+  },
+  "coming": {
+   "label": "Announced, not yet open",
+   "color": "#e87ba4"
+  },
+  "closed": {
+   "label": "Closed",
+   "color": "#d03b3b"
+  }
+ },
+ "assets": {
+  "donation": "Donation / contribution",
+  "property": "Property",
+  "fund": "Fund / financial assets",
+  "business": "Business / job creation",
+  "deposit": "Bank deposit",
+  "mixed": "Choice of assets"
+ },
+ "timeline": [
+  {
+   "year": 1984,
+   "kind": "open",
+   "label": "St Kitts & Nevis launches the first CBI"
+  },
+  {
+   "year": 1993,
+   "kind": "open",
+   "label": "Dominica CBI"
+  },
+  {
+   "year": 2008,
+   "kind": "open",
+   "label": "UK Tier 1 Investor"
+  },
+  {
+   "year": 2012,
+   "kind": "open",
+   "label": "Portugal golden visa"
+  },
+  {
+   "year": 2013,
+   "kind": "open",
+   "label": "Spain, Greece, Antigua, Grenada, Cyprus"
+  },
+  {
+   "year": 2014,
+   "kind": "open",
+   "label": "Malta citizenship programme"
+  },
+  {
+   "year": 2015,
+   "kind": "open",
+   "label": "Saint Lucia CBI"
+  },
+  {
+   "year": 2017,
+   "kind": "open",
+   "label": "Türkiye CBI, Vanuatu, Italy"
+  },
+  {
+   "year": 2019,
+   "kind": "open",
+   "label": "UAE golden visa, Egypt"
+  },
+  {
+   "year": 2020,
+   "kind": "close",
+   "label": "Cyprus CBI ends"
+  },
+  {
+   "year": 2022,
+   "kind": "close",
+   "label": "UK Tier 1 closes; Vanuatu loses part of Schengen access"
+  },
+  {
+   "year": 2023,
+   "kind": "close",
+   "label": "Ireland closes; Portugal drops property"
+  },
+  {
+   "year": 2024,
+   "kind": "open",
+   "label": "Hungary, Hong Kong, Nauru, Saudi property route"
+  },
+  {
+   "year": 2024,
+   "kind": "close",
+   "label": "Australia closes; Vanuatu loses Schengen for good"
+  },
+  {
+   "year": 2025,
+   "kind": "open",
+   "label": "São Tomé, NZ relaunch, US Gold Card, Oman relaunch"
+  },
+  {
+   "year": 2025,
+   "kind": "close",
+   "label": "Spain abolished; EU court ends Malta CBI"
+  },
+  {
+   "year": 2026,
+   "kind": "open",
+   "label": "Paraguay Investor Pass; Argentina announced"
+  },
+  {
+   "year": 2026,
+   "kind": "close",
+   "label": "Canada pauses; EU asks Caribbean five to close by 2028"
+  }
+ ],
+ "caribbean_prices": {
+  "rows": [
+   {
+    "country": "Antigua & Barbuda",
+    "before": 100000,
+    "after": 230000
+   },
+   {
+    "country": "Dominica",
+    "before": 100000,
+    "after": 200000
+   },
+   {
+    "country": "Grenada",
+    "before": 150000,
+    "after": 235000
+   },
+   {
+    "country": "Saint Lucia",
+    "before": 100000,
+    "after": 240000
+   },
+   {
+    "country": "St Kitts & Nevis",
+    "before": 150000,
+    "after": 250000,
+    "note": "St Kitts raised its price in July 2023, ahead of the others."
+   }
+  ],
+  "description": "Minimum donation for a single applicant before and after the March 2024 regional agreement (in force from 30 June 2024; St Kitts moved in July 2023)."
+ },
+ "skn_revenue": {
+  "rows": [
+   {
+    "year": 2019,
+    "v": 14.8
+   },
+   {
+    "year": 2020,
+    "v": 11.3
+   },
+   {
+    "year": 2021,
+    "v": 23.4
+   },
+   {
+    "year": 2022,
+    "v": 25.3
+   },
+   {
+    "year": 2023,
+    "v": 21.7
+   },
+   {
+    "year": 2024,
+    "v": 8.1
+   },
+   {
+    "year": 2025,
+    "v": 5,
+    "est": true
+   }
+  ],
+  "description": "St Kitts & Nevis CBI revenue, % of GDP (IMF; 2025 is an IMF estimate)."
+ },
+ "access": {
+  "destinations": [
+   "Schengen",
+   "United Kingdom",
+   "Ireland",
+   "United States"
+  ],
+  "rows": [
+   {
+    "country": "Antigua & Barbuda",
+    "cells": [
+     "ok",
+     "ok",
+     "ok",
+     "limited"
+    ],
+    "notes": [
+     "EU asked for phase-out by June 2028",
+     "Visa-free with ETA",
+     "Visa-free",
+     "Partial visa restrictions since Jan 2026"
+    ]
+   },
+   {
+    "country": "Dominica",
+    "cells": [
+     "ok",
+     "visa",
+     "visa",
+     "limited"
+    ],
+    "notes": [
+     "EU asked for phase-out by June 2028",
+     "Visa required since July 2023",
+     "Visa required since March 2024",
+     "Partial visa restrictions since Jan 2026"
+    ]
+   },
+   {
+    "country": "Grenada",
+    "cells": [
+     "ok",
+     "ok",
+     "ok",
+     "visa"
+    ],
+    "notes": [
+     "EU asked for phase-out by June 2028",
+     "Visa-free with ETA",
+     "Visa-free",
+     "Visa required (E-2 treaty available)"
+    ]
+   },
+   {
+    "country": "Saint Lucia",
+    "cells": [
+     "ok",
+     "visa",
+     "visa",
+     "visa"
+    ],
+    "notes": [
+     "EU asked for phase-out by June 2028",
+     "Visa required since 5 March 2026",
+     "Visa required since 15 June 2026",
+     "Visa required"
+    ]
+   },
+   {
+    "country": "St Kitts & Nevis",
+    "cells": [
+     "ok",
+     "ok",
+     "visa",
+     "visa"
+    ],
+    "notes": [
+     "EU asked for phase-out by June 2028",
+     "Visa-free with ETA",
+     "Visa required since 15 June 2026",
+     "Visa required; immigrant visas suspended Jan 2026"
+    ]
+   },
+   {
+    "country": "Vanuatu",
+    "cells": [
+     "visa",
+     "visa",
+     "visa",
+     "visa"
+    ],
+    "notes": [
+     "Visa waiver revoked December 2024",
+     "Visa required since July 2023",
+     "Visa required since March 2024",
+     "Visa required"
+    ]
+   },
+   {
+    "country": "Nauru",
+    "cells": [
+     "visa",
+     "visa",
+     "visa",
+     "visa"
+    ],
+    "notes": [
+     "Not visa-free",
+     "Visa-free access withdrawn December 2025",
+     "Visa required",
+     "Visa required"
+    ]
+   }
+  ],
+  "legend": {
+   "ok": "Visa-free",
+   "limited": "Visa-free under pressure / restricted",
+   "visa": "Visa required"
+  },
+  "events": [
+   {
+    "date": "2022-02",
+    "label": "EU partly suspends Vanuatu visa waiver"
+   },
+   {
+    "date": "2023-07",
+    "label": "UK imposes visas on Dominica and Vanuatu"
+   },
+   {
+    "date": "2024-06",
+    "label": "Caribbean US$200,000 price floor"
+   },
+   {
+    "date": "2024-12",
+    "label": "EU revokes Vanuatu visa waiver"
+   },
+   {
+    "date": "2025-09",
+    "label": "Five states create regional regulator ECCIRA"
+   },
+   {
+    "date": "2025-12",
+    "label": "EU: running a CBI is itself grounds for suspension"
+   },
+   {
+    "date": "2026-03",
+    "label": "UK imposes visas on Saint Lucia"
+   },
+   {
+    "date": "2026-06",
+    "label": "EU letters: close CBI by June 2028; Ireland adds visas"
+   },
+   {
+    "date": "2026-11",
+    "label": "12 Nov reply deadline; Antigua proposes 2030 exit"
+   },
+   {
+    "date": "2026-12",
+    "label": "EU suspension report due"
+   },
+   {
+    "date": "2028-06",
+    "label": "EU phase-out date"
+   }
+  ]
+ },
+ "volumes": {
+  "portugal": {
+   "rows": [
+    [
+     2013,
+     494
+    ],
+    [
+     2014,
+     1526
+    ],
+    [
+     2015,
+     766
+    ],
+    [
+     2016,
+     1414
+    ],
+    [
+     2017,
+     1351
+    ],
+    [
+     2018,
+     1409
+    ],
+    [
+     2019,
+     1245
+    ],
+    [
+     2020,
+     1182
+    ],
+    [
+     2021,
+     865
+    ],
+    [
+     2022,
+     1281
+    ],
+    [
+     2023,
+     2901
+    ],
+    [
+     2024,
+     2081
+    ],
+    [
+     2025,
+     2685
+    ]
+   ],
+   "description": "Portugal golden visa permits to main investors per year (AIMA/SEF). Property was removed in October 2023."
+  },
+  "greece": {
+   "rows": [
+    [
+     2024,
+     4535
+    ],
+    [
+     2025,
+     8879
+    ]
+   ],
+   "description": "Greece initial golden visa approvals per year (Enterprise Greece / Ministry of Migration)."
+  },
+  "scale": [
+   {
+    "label": "Caribbean five: passports issued (all years)",
+    "v": 107000,
+    "src": "EU Commission estimate, Dec 2025"
+   },
+   {
+    "label": "Greece: active investor permits",
+    "v": 34278,
+    "src": "Ministry of Migration, July 2026"
+   },
+   {
+    "label": "Spain: golden visas 2013–2025",
+    "v": 16000,
+    "src": "Idealista, near 16,000"
+   },
+   {
+    "label": "Portugal: main investors 2012–2025",
+    "v": 19202,
+    "src": "AIMA/SEF yearly totals summed"
+   },
+   {
+    "label": "New Zealand AIP: applications since 2025",
+    "v": 609,
+    "src": "Immigration NZ, early 2026"
+   },
+   {
+    "label": "Singapore GIP: PRs granted 2015–2025",
+    "v": 450,
+    "src": "Singapore MTI, Feb 2026"
+   }
+  ]
+ },
+ "commentary": {
+  "map": {
+   "title": "Our commentary",
+   "points": [
+    {
+     "head": "Two worlds",
+     "text": "Passports for money are concentrated in small island states (the Caribbean five, Vanuatu, Nauru, São Tomé). Large economies sell residence, not citizenship."
+    },
+    {
+     "head": "Europe is closing, the Gulf and Latin America are opening",
+     "text": "Spain, Ireland, the UK, Cyprus (CBI) and Malta (CBI) have closed since 2020. Every Gulf state now runs a long-term residence scheme, and Paraguay and Argentina are new entrants in 2026."
+    },
+    {
+     "head": "What this means for Blue Ocean",
+     "text": "Client conversations should start from the goal (a passport, an EU base, a Gulf base, a tax home) and only then the country. A red or amber dot means do not sell it without a written check with the authority."
+    }
+   ]
+  },
+  "ladder": {
+   "title": "Our commentary",
+   "points": [
+    {
+     "head": "A passport can cost less than a residence permit",
+     "text": "The cheapest passports (US$90,000–250,000) cost less than most European residence permits (€250,000–800,000). The difference is what the passport can do: weaker travel access and growing political risk."
+    },
+    {
+     "head": "Premium residence is a different market",
+     "text": "Singapore, Hong Kong and New Zealand ask US$3–8 million and want active investment. They target family offices, not lifestyle buyers."
+    },
+    {
+     "head": "Entry price is not the full cost",
+     "text": "Fees, due diligence, taxes and holding costs typically add 10–30% on top. Always quote the all-in figure to clients."
+    }
+   ],
+   "sources": []
+  },
+  "flow": {
+   "title": "Our commentary",
+   "points": [
+    {
+     "head": "Property is still the main door",
+     "text": "Property is the most common qualifying asset, but it mostly buys residence. Most passports are bought with a non-refundable donation."
+    },
+    {
+     "head": "Funds are replacing property in Europe",
+     "text": "Portugal and Hungary moved from property to funds to cool housing markets. Expect the same shift elsewhere in the EU."
+    }
+   ]
+  },
+  "timeline": {
+   "title": "Our commentary",
+   "points": [
+    {
+     "head": "Boom, then backlash",
+     "text": "2012–2019 was the boom: Europe used golden visas to attract capital after the financial crisis. Since 2020 closures outnumber openings in Europe and Australia, driven by housing costs and security concerns."
+    },
+    {
+     "head": "The market is moving, not shrinking",
+     "text": "Openings continue in the Gulf, Asia, Africa, the Pacific and Latin America. New programmes are smaller, cheaper or more selective."
+    }
+   ]
+  },
+  "caribbean": {
+   "title": "Our commentary",
+   "points": [
+    {
+     "head": "The price war ended in 2024",
+     "text": "Under pressure from the US and EU the five states agreed a US$200,000 floor; prices roughly doubled in a month."
+    },
+    {
+     "head": "Demand fell where the price rose most",
+     "text": "St Kitts' CBI revenue fell from about 22% of GDP in 2023 to 8% in 2024 and about 5% in 2025 (IMF). These islands depend on the money, which is why the EU decision matters so much."
+    }
+   ],
+   "sources": [
+    {
+     "title": "Arton Capital, Caribbean price change 2024",
+     "url": "https://artoncapital.com/industry-news/caribbean-citizenship-by-investment-programs-price-hike-is-officially-in-place"
+    },
+    {
+     "title": "IMF, St Kitts and Nevis 2025 Article IV",
+     "url": "https://www.elibrary.imf.org/view/journals/002/2025/107/article-A001-en.xml"
+    }
+   ]
+  },
+  "access": {
+   "title": "Our commentary",
+   "points": [
+    {
+     "head": "The value of a passport is set abroad",
+     "text": "Each red cell was green a few years ago. When the UK, Ireland or the EU withdraws visa-free travel, every holder of that passport is affected, including people who bought it years ago."
+    },
+    {
+     "head": "The EU deadline is the key risk for 2027–2028",
+     "text": "The EU asked all five Caribbean states to close their programmes by 1 June 2028; Antigua has proposed end-2030 and is still accepting applications. The Commission report due in December 2026 will show whether Schengen access is at risk."
+    },
+    {
+     "head": "Advice to clients",
+     "text": "Do not present Caribbean CBI as a long-term Schengen solution. Present it as a travel document with political risk, and put EU residence options alongside it."
+    }
+   ],
+   "sources": [
+    {
+     "title": "Reuters via US News, EU pressure on Antigua (29 Oct 2026)",
+     "url": "https://www.usnews.com/news/world/articles/2026-10-29/eu-pressure-on-antiguas-golden-passport-trade-threatens-budget-cushion"
+    },
+    {
+     "title": "Caribpulse, Antigua CIU memo of 12 Nov 2026",
+     "url": "https://www.caribpulse.com/2026/11/14/antigua-and-barbuda-citizenship-by-investment-programme-remains-open-unit-says?postId=106368"
+    },
+    {
+     "title": "IMI Daily, Ireland visas for St Kitts and Saint Lucia",
+     "url": "https://www.imidaily.com/caribbean/ireland-cuts-visa-free-access-for-saint-kitts-saint-lucia-and-nicaragua/"
+    },
+    {
+     "title": "Regulation (EU) 2025/2441 (revised visa suspension mechanism)",
+     "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ%3AL_202502441"
+    }
+   ]
+  },
+  "volumes": {
+   "title": "Our commentary",
+   "points": [
+    {
+     "head": "Closing the property route did not kill demand",
+     "text": "Portugal issued more golden visas in 2023–2025 than in any year before, through funds, after property was removed."
+    },
+    {
+     "head": "Greece took Spain's place",
+     "text": "Greek approvals nearly doubled in 2025 even after prices rose to €400,000–800,000, as Spain closed and processing sped up. New applications have since fallen."
+    },
+    {
+     "head": "Scale is very uneven",
+     "text": "The Caribbean five have issued over 100,000 passports; premium Asian programmes grant a few hundred permits in a decade."
+    }
+   ],
+   "sources": [
+    {
+     "title": "AIMA / SEF ARI statistics (compiled by Global Citizen Solutions)",
+     "url": "https://www.globalcitizensolutions.com/pt/portugal-golden-visa-statistics/"
+    },
+    {
+     "title": "Il Sole 24 Ore, Portugal 2025 ARI record",
+     "url": "https://en.ilsole24ore.com/art/new-record-in-portugal-for-simplified-visas-for-major-investors-AJBzYWRB"
+    },
+    {
+     "title": "Greek Ministry of Migration statistics via Movingto (May 2026)",
+     "url": "https://movingto.com/gr/greece-golden-visa-applications-fall-q1-2026"
+    },
+    {
+     "title": "Idealista, Spain closes golden visa",
+     "url": "https://www.idealista.com/en/news/node/838966"
+    },
+    {
+     "title": "European Commission, 8th Visa Suspension Mechanism report (Dec 2025)",
+     "url": "https://www.parlament.gv.at/dokument/XXVIII/EU/52000/imfname_11560506.pdf"
+    },
+    {
+     "title": "Singapore MTI, reply on GIP (Feb 2026)",
+     "url": "https://www.mti.gov.sg/newsroom/oral-reply-to-pq-on-permanent-residency-grants-under-the-global-investor-programme-and-cumulative-investment-from-these-gip-permanent-residents-from-2015-to-2025"
+    }
+   ]
+  }
+ },
+ "sources": [
+  {
+   "title": "European Commission, 8th Visa Suspension Mechanism report (Dec 2025)",
+   "url": "https://www.parlament.gv.at/dokument/XXVIII/EU/52000/imfname_11560506.pdf"
+  },
+  {
+   "title": "Regulation (EU) 2025/2441 (revised visa suspension mechanism)",
+   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ%3AL_202502441"
+  },
+  {
+   "title": "IMF, St Kitts and Nevis 2025 Article IV",
+   "url": "https://www.elibrary.imf.org/view/journals/002/2025/107/article-A001-en.xml"
+  },
+  {
+   "title": "Reuters via US News, EU pressure on Antigua (29 Oct 2026)",
+   "url": "https://www.usnews.com/news/world/articles/2026-10-29/eu-pressure-on-antiguas-golden-passport-trade-threatens-budget-cushion"
+  },
+  {
+   "title": "Caribpulse, Antigua CIU memo of 12 Nov 2026",
+   "url": "https://www.caribpulse.com/2026/11/14/antigua-and-barbuda-citizenship-by-investment-programme-remains-open-unit-says?postId=106368"
+  },
+  {
+   "title": "IMI Daily, Ireland visas for St Kitts and Saint Lucia",
+   "url": "https://www.imidaily.com/caribbean/ireland-cuts-visa-free-access-for-saint-kitts-saint-lucia-and-nicaragua/"
+  },
+  {
+   "title": "Case C-181/23 Commission v Malta (CJEU, 29 Apr 2025)",
+   "url": "https://www.mondaq.com/article/1623652"
+  },
+  {
+   "title": "Greek Ministry of Migration statistics via Movingto (May 2026)",
+   "url": "https://movingto.com/gr/greece-golden-visa-applications-fall-q1-2026"
+  },
+  {
+   "title": "Uglobal, Greek filings H1 2026",
+   "url": "https://uglobal.com/blog/high-thresholds-drive-sharp-drop-in-new-greek-residency-filings/"
+  },
+  {
+   "title": "AIMA / SEF ARI statistics (compiled by Global Citizen Solutions)",
+   "url": "https://www.globalcitizensolutions.com/pt/portugal-golden-visa-statistics/"
+  },
+  {
+   "title": "Il Sole 24 Ore, Portugal 2025 ARI record",
+   "url": "https://en.ilsole24ore.com/art/new-record-in-portugal-for-simplified-visas-for-major-investors-AJBzYWRB"
+  },
+  {
+   "title": "Idealista, Spain closes golden visa",
+   "url": "https://www.idealista.com/en/news/node/838966"
+  },
+  {
+   "title": "IMI Daily, Gulf golden visa guide 2026",
+   "url": "https://www.imidaily.com/analysis/gcc-golden-visa-guide-2026/"
+  },
+  {
+   "title": "Immigration New Zealand, Active Investor Plus statistics",
+   "url": "https://www.immigration.govt.nz/about-us/news-centre/investor-category"
+  },
+  {
+   "title": "Singapore MTI, reply on GIP (Feb 2026)",
+   "url": "https://www.mti.gov.sg/newsroom/oral-reply-to-pq-on-permanent-residency-grants-under-the-global-investor-programme-and-cumulative-investment-from-these-gip-permanent-residents-from-2015-to-2025"
+  },
+  {
+   "title": "Arton Capital, Caribbean price change 2024",
+   "url": "https://artoncapital.com/industry-news/caribbean-citizenship-by-investment-programs-price-hike-is-officially-in-place"
+  },
+  {
+   "title": "NTL Trust, Caribbean CBI 2026 post-MoA",
+   "url": "https://ntltrust.com/news/industry-updates/post-moa-comprehensive-update-on-the-caribbean-cbis/"
+  },
+  {
+   "title": "Immigrant Invest, State of CBI 2026",
+   "url": "https://immigrantinvest.com/reports/state-of-cbi-report/"
+  },
+  {
+   "title": "Sable International, Argentina programme status (Oct 2026)",
+   "url": "https://www.sableinternational.com/citizenship-by-investment/argentina-coming-soon"
+  },
+  {
+   "title": "Phnom Penh Post via Asia News Network (Jan 2026)",
+   "url": "https://asianews.network/cambodian-citizenship-available-to-3m-donors-1m-investors/"
+  },
+  {
+   "title": "IMI Daily, Paraguay Investor Pass and Panama change",
+   "url": "https://www.imidaily.com/opinion/what-paraguays-investor-pass-hints-at-the-future-of-temporary-residency/"
+  },
+  {
+   "title": "Immigration.ca, Start-Up Visa closed",
+   "url": "https://immigration.ca/?p=14"
+  },
+  {
+   "title": "Immigration World, EB-5 and Gold Card 2026",
+   "url": "https://www.immigrationworld.com/usa/eb-5-visa/"
+  },
+  {
+   "title": "Andersen Malta, MPRP requirements (May 2026)",
+   "url": "https://www.mt.andersen.com/insights/malta-permanent-residence-programme-requirements"
+  },
+  {
+   "title": "Henley & Partners, Hungary guest investor",
+   "url": "https://www.henleyglobal.com/residence-investment/hungary"
+  },
+  {
+   "title": "IMI Daily, Every golden visa still open in Europe 2026",
+   "url": "https://www.imidaily.com/analysis/every-golden-visa-still-open-in-europe-in-2026/"
+  },
+  {
+   "title": "IMI Daily, Saint Vincent eyes Q1 2027",
+   "url": "https://www.imidaily.com/caribbean/saint-vincent-pm-eyes-q1-2027-for-cbi-program-but-not-cbi-in-the-old-sense/"
+  },
+  {
+   "title": "Global Investments, Asia-Pacific residency compared (Jun 2026)",
+   "url": "https://www.globalinvestments.net/citizenship/guides/asia-pacific-residency-options-compared"
+  },
+  {
+   "title": "Henley & Partners, Mauritius residence",
+   "url": "https://henleyglobal.com/residence-investment/mauritius"
+  },
+  {
+   "title": "Global Citizen Solutions, Cyprus permanent residence 2026",
+   "url": "https://www.globalcitizensolutions.com/cyprus-permanent-residency/"
+  },
+  {
+   "title": "Republic of Türkiye Investment Office",
+   "url": "https://www.invest.gov.tr/en/InvestmentGuide/Pages/acquiring-property-and-citizenship.aspx"
+  },
+  {
+   "title": "Global Citizen Solutions, Portugal changes 2026",
+   "url": "https://www.globalcitizensolutions.com/pt-pt/novas-regras-do-golden-visa-portugal/"
+  },
+  {
+   "title": "Southeast Asia Globe, long-term residency compared (Sep 2026)",
+   "url": "https://seasia.co/2026/09/19/long-term-residency-in-southeast-asia-compared-which-one-is-better"
+  },
+  {
+   "title": "Henley & Partners, countries overview",
+   "url": "https://www.henleyglobal.com/countries-overview/"
+  }
+ ],
+ "db_review": "Checked against your partner's database (45 programmes) on 15 November 2026: 22 entries corrected or updated (amount filled in, status changed or rule tightened) and 8 programmes added (St Vincent & the Grenadines, Sierra Leone, Argentina, Italy, Latvia, Kuwait, US Gold Card, Paraguay). Malta's citizenship route and Canada are now closed, and Antigua's programme is being phased out."
+}
