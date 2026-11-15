@@ -41,6 +41,11 @@ const CSS=`
 #euPatterns .ep-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--ink2)}
 #euPatterns .ep-legend span{display:inline-flex;gap:6px;align-items:center}
 #euPatterns .ep-legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+#euPatterns .ep-comment{margin-top:14px;background:#f6f9fd;border:1px solid #dfe8f3;border-left:4px solid #17365c;border-radius:12px;padding:12px 16px;font-size:13.5px;line-height:1.5;color:#2c3f55}
+#euPatterns .ep-comment h4{margin:0 0 6px;font-size:14px;color:#17365c}
+#euPatterns .ep-comment p{margin:6px 0}
+#euPatterns .ep-comment small{display:block;margin-top:8px;color:#7a8796}
+#euPatterns .ep-comment small a{color:#1767c9}
 #epTip{position:fixed;z-index:9999;pointer-events:none;background:#0f2742;color:#fff;border-radius:10px;padding:9px 11px;font:13px/1.4 system-ui;box-shadow:0 8px 24px rgba(15,39,66,.25);max-width:290px;opacity:0;transition:opacity .12s}
 #epTip b{display:block;font-size:13.5px;margin-bottom:2px}
 #epTip .r{display:flex;justify-content:space-between;gap:14px}
@@ -55,12 +60,14 @@ function tip(html,ev){if(!tipEl){tipEl=document.createElement('div');tipEl.id='e
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const row=(a,b)=>`<div class="r"><span>${esc(a)}</span><span>${esc(b)}</span></div>`;
 
+function commentary(el,c){if(!c)return;el.querySelector('.ep-comment')?.remove();const b=document.createElement('div');b.className='ep-comment';
+ b.innerHTML=`<h4>${esc(c.title)}</h4>${c.points.map(p=>`<p><strong>${esc(p.head)}.</strong> ${esc(p.text)}</p>`).join('')}${c.sources?.length?`<small>Sources: ${c.sources.map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a>`).join(' · ')}</small>`:''}`;el.append(b)}
 function card(root,title,sub){const c=document.createElement('section');c.className='ep-card';c.innerHTML=`<h3>${esc(title)}</h3>${sub?`<p class="ep-sub">${esc(sub)}</p>`:''}`;root.append(c);return c}
 function widthOf(el){return Math.max(300,Math.min(1100,el.clientWidth-4))}
 
 // ---------- 1. Budget trend ----------
 function drawTrend(d3,el,data){
- el.querySelector('svg')?.remove();
+ el.querySelector('svg')?.remove();el.querySelector('.ep-comment')?.remove();
  const rows=data.annual_budgets.rows,W=widthOf(el),H=Math.round(Math.min(380,Math.max(280,W*.42))),m={t:W<560?50:26,r:W<560?16:110,b:30,l:44};
  const svg=d3.select(el).append('svg').attr('viewBox',`0 0 ${W} ${H}`).attr('role','img').attr('aria-label','EU annual budget 2010 to 2026, commitments and payments');
  const x=d3.scaleLinear().domain([2010,2026]).range([m.l,W-m.r]),y=d3.scaleLinear().domain([100,210]).range([H-m.b,m.t]);
@@ -90,6 +97,7 @@ function drawTrend(d3,el,data){
   .on('pointermove',ev=>{const [px]=d3.pointer(ev);const yr=Math.round(x.invert(px));const r=rows.find(d=>d.year===yr);if(!r)return;cross.attr('x1',x(yr)).attr('x2',x(yr)).attr('opacity',.35);dots.forEach((d,i)=>d.attr('cx',x(yr)).attr('cy',y(r[series[i].k])).attr('opacity',1));
    tip(`<b>${yr} EU budget</b>${row('Commitments',fmtB(r.commitments))}${row('Payments',fmtB(r.payments))}${row('Gap',fmtB(r.commitments-r.payments))}`,ev)})
   .on('pointerleave',()=>{tip(null);cross.attr('opacity',0);dots.forEach(d=>d.attr('opacity',0))});
+ commentary(el,data.annual_budgets.commentary);
 }
 
 // ---------- 2. Money flow (Sankey) ----------
