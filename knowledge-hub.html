@@ -82,7 +82,7 @@ function el(tag,txt,cls){let e=document.createElement(tag);e.textContent=safe(tx
 function render(){const q=$('query').value.toLowerCase().trim(),cat=$('category').value,sdg=Number($('sdg').value);let matches=records.filter(r=>(!cat||r.category===cat)&&(!sdg||(r.sdgs||[]).includes(sdg))&&(!q||[r.title,r.summary,r.country,r.source_reference,...(r.sectors||[])].join(' ').toLowerCase().includes(q)));$('count').textContent=matches.length+' matching reference records';$('results').replaceChildren();for(const r of matches){const d=el('div','','item'),b=el('button',r.title);b.onclick=()=>detail(r);d.append(b,el('div',[categories[r.category]||r.category,r.country,r.verification].filter(Boolean).join(' · '),'muted'),el('p',r.summary||'No summary yet.'));$('results').append(d)}}
 function detail(r){show('detailPanel',true);const d=$('detail');d.replaceChildren();d.append(el('h3',r.title),el('p',r.summary||''),el('p','Category: '+(categories[r.category]||r.category)),el('p','Verification: '+r.verification+(r.verified_at?' · '+r.verified_at:'')),el('p','Country: '+(r.country||'Not specified')),el('p','SDGs: '+(r.sdgs||[]).join(', ')),el('p','Source reference: '+(r.source_reference||'Not provided')));if(r.source_url&&/^https:\/\//i.test(r.source_url)){const a=el('a','Open original source');a.href=r.source_url;a.target='_blank';a.rel='noopener noreferrer';d.append(a)}d.append(el('h4','Additional details'),el('pre',JSON.stringify(r.details||{},null,2)));$('detailPanel').scrollIntoView({behavior:'smooth'})}
 async function load(){const {data,error}=await db.from('bov_hub_records').select('*').order('title').limit(1000);if(error){$('count').textContent='Unable to load: '+error.message;return}records=data||[];render()}
-async function session(){const {data:{user}}=await db.auth.getUser();if(!user){show('login',true);show('app',false);return}const {data,error}=await db.from('bov_hub_staff').select('role,active').eq('user_id',user.id).maybeSingle();if(error||!data?.active){show('login',false);show('app',false);show('setup',true);$('notice').textContent='This account is not authorised for the Knowledge Hub.';return}show('setup',false);show('login',false);show('app',true);$('who').textContent=user.email+' · '+data.role;phase6Role=data.role;$('p6save').disabled=!['admin','executive_leadership'].includes(data.role);await load();await phase6Load();await aLoadOpportunities();await docLoad();await aLoadProjects();$('aSaveReports').disabled=!['admin','executive_leadership'].includes(data.role);$('aSave').disabled=!['admin','executive_leadership'].includes(data.role)}
+async function session(){const {data:{user}}=await db.auth.getUser();if(!user){show('login',true);show('app',false);return}const {data,error}=await db.from('bov_hub_staff').select('role,active').eq('user_id',user.id).maybeSingle();if(error||!data?.active){show('login',false);show('app',false);show('setup',true);$('notice').textContent='This account is not authorised for the Knowledge Hub.';return}show('setup',false);show('login',false);show('app',true);$('who').textContent=user.email+' · '+data.role;phase6Role=data.role;$('p6save').disabled=!['admin','executive_leadership'].includes(data.role);await load();await phase6Load();await aLoadOpportunities();await docLoad();await aLoadProjects();aPrefillFromProject();$('aSaveReports').disabled=!['admin','executive_leadership'].includes(data.role);$('aSave').disabled=!['admin','executive_leadership'].includes(data.role)}
 Object.entries(categories).forEach(([key,value])=>{let b=el('button',value,'tile');b.onclick=()=>{$('category').value=key;render();$('results').scrollIntoView({behavior:'smooth'})};$('categories').append(b);const o=el('option',value);o.value=key;$('category').append(o)});names.forEach((n,i)=>{let o=el('option','SDG '+(i+1)+' · '+n);o.value=i+1;$('sdg').append(o)});['search','category','sdg'].forEach(id=>$(id).addEventListener(id==='search'?'click':'change',render));$('query').addEventListener('input',render);
 
 // Preliminary matching: staff-only UI; eligibility requires consultant review.
@@ -479,6 +479,27 @@ function aEuCallFits(x,areas,ev){
  }).filter(Boolean).sort((a,b)=>b.fit-a.fit||String(a.deadline||'9').localeCompare(String(b.deadline||'9')));
 }
 window.bovHubPatterns={loadEU:()=>aLoadEU(),areas:Object.keys(aAreaTerms)};
+async function aPrefillFromProject(){
+ const pid=new URLSearchParams(location.search).get('project');if(!pid)return;
+ const one=q=>q.then(r=>r.error?null:r.data).catch(()=>null);
+ const [p,sub,intake,docs]=await Promise.all([one(db.from('bov_projects').select('*').eq('id',pid).maybeSingle()),one(db.from('bov_client_submissions').select('*').eq('project_id',pid).maybeSingle()),one(db.from('bov_project_intake').select('*').eq('project_id',pid).maybeSingle()),null]);
+ if(!p){$('aStatus').textContent='Project not found for pre-filling.';return}
+ const s=sub||{},i=intake||{};
+ const set=(id,v)=>{if(v!=null&&v!==''&&$(id))$(id).value=v};
+ set('aName',p.project_name);set('aOrg',p.organisation_name);set('aCountry',p.country);
+ if(p.applicant_type&&[...$('aType').options].some(o=>o.value===p.applicant_type||o.text===p.applicant_type))$('aType').value=p.applicant_type;
+ const areas=s.project_areas?.length?s.project_areas:(i.sectors||[]);for(const c of aThemeChecks)c.checked=areas.includes(c.value);aSyncThemes();
+ set('aBudget',s.total_budget??i.total_investment_eur);set('aRequest',s.funding_requested??i.funding_requested_eur);
+ if(s.currency&&[...$('aCurrency').options].some(o=>(o.value||o.text)===s.currency))$('aCurrency').value=s.currency;
+ set('aDuration',s.duration_months??i.duration_months);
+ set('aDescription',[s.description||p.description,s.beneficiaries?'Beneficiaries: '+s.beneficiaries:'',(s.region||i.region)?'Location: '+[s.region||i.region,p.country].join(', '):'',s.jobs_created!=null?'Jobs created: '+s.jobs_created:''].filter(Boolean).join('\n'));
+ const {data:files}=await db.from('bov_hub_project_documents').select('file_name').ilike('project_name',aLikeEscape(p.project_name));
+ set('aDocuments',(files||[]).map(f=>f.file_name).join(', '));
+ if([...$('aProjectLink').options].some(o=>o.value===pid))$('aProjectLink').value=pid;
+ hubNavigate('assessment');
+ $('aStatus').textContent='Filled in from '+(sub?'the client submission':'the Workbench project')+'. Check the details, then click Find Matching Funding Programmes.';
+ $('aName').scrollIntoView({behavior:'smooth',block:'center'});
+}
 function aMatchSignature(x){return JSON.stringify([x.project_name,x.organisation_name,x.country,x.applicant_type,x.theme,x.project_description,x.documents_available,x.requested_funding,x.currency])}
 async function aComputeMatching(x,progress){
  const selected=[...document.querySelectorAll('#aThemeChoices input:checked')].map(c=>c.value);
