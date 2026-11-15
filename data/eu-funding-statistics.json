@@ -600,7 +600,42 @@
         "value": 82.47,
         "route": "other"
       }
-    ]
+    ],
+    "commentary": {
+      "title": "Commentary: what the flow shows",
+      "points": [
+        {
+          "head": "Most of the money is not in Brussels calls",
+          "text": "Of the €2.02 trillion, only about €170bn (8%) is reachable through open EU calls. About €1.18 trillion (59%) is spent through national and regional authorities: recovery-plan grants, the Regional Development Fund, the European Social Fund+, the Cohesion Fund and the farm funds (CAP)."
+        },
+        {
+          "head": "Two spending areas take four-fifths",
+          "text": "Cohesion, resilience & values (€1.2 trillion, of which €776.5bn from NextGenerationEU) and Natural resources & environment (€420bn) together account for about 80% of the package."
+        },
+        {
+          "head": "A fifth goes to governments only",
+          "text": "About €426bn (21%) is not open to ordinary applicants. Most of it is the €385.85bn of recovery loans to Member States; the rest includes the space programme, ITER, border and security funds."
+        },
+        {
+          "head": "Open calls are concentrated in research",
+          "text": "Horizon Europe alone is about €91.5bn of the €170bn open-call route, followed by Erasmus+ (€24.6bn) and the Connecting Europe Facility (€20.7bn)."
+        },
+        {
+          "head": "What it means for our clients",
+          "text": "For regional, agricultural, social and infrastructure projects, the main door is the national or regional managing authority, not Brussels. For research, innovation, education and culture, EU calls are the route."
+        }
+      ],
+      "sources": [
+        {
+          "title": "European Commission — 2021-2027 budget & NextGenerationEU: facts and figures",
+          "url": "https://op.europa.eu/en/publication-detail/-/publication/d3e77637-a963-11eb-9585-01aa75ed71a1"
+        },
+        {
+          "title": "European Commission — 2021-2027 headings",
+          "url": "https://commission.europa.eu/strategy-and-policy/eu-budget/long-term-eu-budget/2021-2027/spending/headings_en"
+        }
+      ]
+    }
   },
   "programmes": {
     "description": "Indicative 2021–2027 envelopes for the 47 programmes in the EU Programme Directory (EUR billion, current prices, as adopted Nov 2020, incl. NextGenerationEU top-ups). Components (EIC, EIT, Interreg…) are part of a parent programme and must not be added to it. Innovation Fund and Modernisation Fund are financed from the EU carbon market (ETS), outside the EU budget, for 2020/2021–2030, at an assumed €75/tCO2.",
@@ -946,7 +981,46 @@
         "route": "international",
         "theme": "International development"
       }
-    ]
+    ],
+    "commentary": {
+      "title": "Commentary: what the bubbles show",
+      "points": [
+        {
+          "head": "Huge differences in size",
+          "text": "The Recovery Facility (€723.8bn) and the farm guarantee fund (€291bn) dwarf programmes such as CERV (€1.56bn) or Justice (€0.3bn). Bubble area uses the square root of the budget, so the real gap is even larger than it looks."
+        },
+        {
+          "head": "Small but open to NGOs",
+          "text": "CERV, Creative Europe, LIFE, EU4Health and the Solidarity Corps are small, but NGOs and civil-society organisations can apply to them directly. Their calls are fewer and more targeted."
+        },
+        {
+          "head": "Parts are not extra money",
+          "text": "The European Innovation Council (€10.1bn) and EIT (€2.97bn) sit inside Horizon Europe; Interreg (about €8bn) and the European Urban Initiative sit inside the Regional Development Fund. Never add a part to its parent."
+        },
+        {
+          "head": "Two climate funds sit outside the budget",
+          "text": "The Innovation Fund (about €40bn, 2020–2030) and the Modernisation Fund (about €57bn, 2021–2030) are financed from the EU carbon market and depend on the carbon price (estimates assume €75 per tonne). The Modernisation Fund only supports 13 lower-income Member States."
+        }
+      ],
+      "sources": [
+        {
+          "title": "European Commission — 2021-2027 budget & NextGenerationEU: facts and figures",
+          "url": "https://op.europa.eu/en/publication-detail/-/publication/d3e77637-a963-11eb-9585-01aa75ed71a1"
+        },
+        {
+          "title": "European Commission — Innovation Fund",
+          "url": "https://climate.ec.europa.eu/eu-action/eu-funding-climate-action/innovation-fund/what-innovation-fund_en"
+        },
+        {
+          "title": "European Commission — Modernisation Fund",
+          "url": "https://climate.ec.europa.eu/areas-action/eu-funding-climate-action/modernisation-fund_en"
+        },
+        {
+          "title": "Horizon Europe budget breakdown",
+          "url": "https://BUSINESS.DIIA.GOV.UA/uploads/3/17384-horizon_europe_budget.pdf"
+        }
+      ]
+    }
   },
   "countries": {
     "description": "2021–2027 cohesion policy allocations (EUR million) and Recovery & Resilience Facility maximum grant allocations (EUR billion), by Member State, current prices.",
@@ -1224,6 +1298,37 @@
         "cohesion": 1920,
         "rrf": 3.3
       }
+    },
+    "commentary": {
+      "title": "Commentary: what the map shows",
+      "points": [
+        {
+          "head": "Italy, Spain and Poland lead",
+          "text": "Combining cohesion policy and recovery grants, Italy (€111bn), Spain (€105bn) and Poland (€99bn) receive the most, followed by France (€56bn), Romania (€45bn) and Germany (€44bn)."
+        },
+        {
+          "head": "Two different patterns",
+          "text": "Cohesion money goes mainly to the east and south: Poland alone has €75bn. Recovery grants were largest in Italy (€68.9bn) and Spain (€69.5bn), the countries hit hardest by COVID-19."
+        },
+        {
+          "head": "Wealthier countries receive little",
+          "text": "Luxembourg (€0.2bn), Denmark (€2.1bn) and Ireland (€2.2bn) receive the least. The Cohesion Fund only supports the 15 Member States whose income per person is below 90% of the EU average."
+        },
+        {
+          "head": "What it means for our clients",
+          "text": "Projects in Spain sit in the EU's second-largest envelope, so national and regional calls there are a major opportunity. The 'Open calls now' view counts live EU calls that name a country; most EU-wide calls name none."
+        }
+      ],
+      "sources": [
+        {
+          "title": "European Commission — 2021-2027 budget & NextGenerationEU: facts and figures",
+          "url": "https://op.europa.eu/en/publication-detail/-/publication/d3e77637-a963-11eb-9585-01aa75ed71a1"
+        },
+        {
+          "title": "European Parliament — Cohesion Fund factsheet",
+          "url": "https://www.europarl.europa.eu/factsheets/en/sheet/96/kohezijski-sklad"
+        }
+      ]
     }
   },
   "horizon_winners": {
@@ -1251,7 +1356,38 @@
         "he": 10.2
       }
     ],
-    "sme_note": "€7.4bn of Horizon Europe grants went to 10,077 SMEs (2021–2024); 51.1% of participants were newcomers."
+    "sme_note": "€7.4bn of Horizon Europe grants went to 10,077 SMEs (2021–2024); 51.1% of participants were newcomers.",
+    "commentary": {
+      "title": "Commentary: what the lines show",
+      "points": [
+        {
+          "head": "Universities still lead, but less",
+          "text": "Their share of Horizon grant money fell from 39.5% to 34.7%."
+        },
+        {
+          "head": "Research bodies and public bodies gain",
+          "text": "Research organisations rose from 25.0% to 27.6%, and 'other incl. public bodies' from 7.3% to 10.2%. Companies stayed roughly stable at about 28%."
+        },
+        {
+          "head": "Good news for newcomers and SMEs",
+          "text": "In 2021–2024, €7.4bn went to 10,077 SMEs, and 51.1% of participants were new compared with Horizon 2020."
+        },
+        {
+          "head": "Scale",
+          "text": "Horizon 2020 signed 35,426 grants worth €68.32bn over 2014–2020; Horizon Europe signed 15,148 grants worth €43.2bn in 2021–2024."
+        }
+      ],
+      "sources": [
+        {
+          "title": "Horizon Europe interim evaluation SWD(2025)110",
+          "url": "https://research-and-innovation.ec.europa.eu/statistics/framework-programme-facts-and-figures_en"
+        },
+        {
+          "title": "Horizon 2020 funding COM(2023)277",
+          "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:52023DC0277"
+        }
+      ]
+    }
   },
   "future": {
     "description": "2021–2027 package versus the Commission's July 2025 proposal for 2028–2034 (EUR billion, current prices). The proposal is under negotiation; breakdown is indicative.",
@@ -1291,7 +1427,50 @@
           }
         ]
       }
-    ]
+    ],
+    "commentary": {
+      "title": "Commentary: what is changing",
+      "points": [
+        {
+          "head": "Bigger, but not by as much as it looks",
+          "text": "The proposal is about €1.98 trillion (around 1.26% of EU national income), against €1.21 trillion for today's long-term budget. It also has to repay the NextGenerationEU borrowing, which is included in 'Other'."
+        },
+        {
+          "head": "One national plan per country",
+          "text": "The Commission proposes merging more than 540 programmes into 27 National and Regional Partnership Plans (about €865bn), bringing farm funds and cohesion policy together."
+        },
+        {
+          "head": "Research nearly doubles",
+          "text": "A new European Competitiveness Fund (about €409bn) would include Horizon Europe at €175bn, almost double today, with the European Innovation Council's share more than tripling. Global Europe would get about €200bn."
+        },
+        {
+          "head": "Still a proposal",
+          "text": "The European Parliament opposes the national-plan model, so the final shape may change during negotiations."
+        },
+        {
+          "head": "What it means for our clients",
+          "text": "If adopted, even more money would flow through national plans, so relationships with national and regional authorities become more important."
+        }
+      ],
+      "sources": [
+        {
+          "title": "Agence Europe — Commission confirms four-pillar budget plan",
+          "url": "https://agenceurope.eu/en/bulletin/article/13682/1"
+        },
+        {
+          "title": "EUalive — €1.98 trillion proposal",
+          "url": "https://eualive.net/eus-e1-98-trillion-budget-proposal-faces-fierce-criticism-from-political-groups/"
+        },
+        {
+          "title": "Science|Business — Horizon Europe budget to double",
+          "url": "https://sciencebusiness.net/news/planning-fp10/horizon-europe-budget-double-eu68b-will-remain-competitiveness-fund"
+        },
+        {
+          "title": "eucrim — Parliament position",
+          "url": "https://eucrim.eu/news/commission-proposal-on-multiannual-financial-framework-2028-2034/"
+        }
+      ]
+    }
   },
   "baseline_check": {
     "description": "Differences between the baseline research series (secondary source) and the official adopted payment figures.",
@@ -1359,5 +1538,27 @@
       "title": "Horizon Europe interim evaluation SWD(2025)110",
       "url": "https://research-and-innovation.ec.europa.eu/statistics/framework-programme-facts-and-figures_en"
     }
-  ]
+  ],
+  "opportunity_gap_commentary": {
+    "title": "Commentary: how to read this chart",
+    "points": [
+      {
+        "head": "Two measures side by side",
+        "text": "Left to right: how much 2021–2027 EU programme money stands behind each project area. Bottom to top: how many EU calls are open or forthcoming today in our nightly scan. Bubble size: the money stated in those calls."
+      },
+      {
+        "head": "The orange corner",
+        "text": "Areas with a large budget but few direct EU calls (bottom right) are usually funded through national and regional authorities. Check national and regional calls for them, not only the EU portal."
+      },
+      {
+        "head": "The top left",
+        "text": "Areas with many open calls but a smaller budget have plenty of chances, but each call is smaller and can be competitive."
+      },
+      {
+        "head": "A live picture",
+        "text": "The chart changes every night as calls open and close. It counts calls, not applicants, so it shows where opportunities are, not how crowded they are."
+      }
+    ],
+    "sources": []
+  }
 }

@@ -134,6 +134,7 @@ function drawFlow(d3,el,data,state){
   .attr('font-size',d=>d.kind==='total'?13:narrow?11:12.5).attr('font-weight',d=>d.kind==='heading'?600:800).attr('fill',C.ink)
   .text(d=>{const v=fmtB(d.value);if(d.kind==='total')return '€2.02 tn total';const pc=(d.value/total<.01?'<1':Math.round(d.value/total*100))+'%';if(d.kind==='route')return narrow?data.routes[d.route].short+' '+pc:d.name+' · '+v+' ('+pc+')';return narrow?(d.name.length>17?d.name.split(/[,&]/)[0].trim().slice(0,17):d.name):d.name+(d.y1-d.y0>14?' · '+v:'')})
   .attr('paint-order','stroke').attr('stroke','#fff').attr('stroke-width',3).attr('stroke-linejoin','round');
+ commentary(el,data.mff_2021_2027.commentary);
 }
 
 // ---------- 3. Programme bubbles ----------
@@ -175,6 +176,7 @@ function drawBubbles(d3,el,data,state,live){
  const first=nodes.find(n=>n.data.code===biggestOpen.code);if(first)show(first);
  const lg=document.createElement('div');lg.className='ep-legend';lg.style.marginTop='12px';lg.innerHTML=ROUTE_ORDER.filter(r=>r!=='other').map(r=>`<span><i style="background:${ROUTE_COLOR[r]}"></i>${esc(data.routes[r].short)}</span>`).join('')+'<span><i style="background:#fff;border:1.5px dashed #2a78d6"></i>Outside EU budget</span>';
  right.append(lg);
+ commentary(el,data.programmes.commentary);
  const note=document.createElement('div');note.className='ep-note';note.textContent='Bubble area grows with the square root of the budget so small programmes stay visible. Circles inside circles are parts of a larger programme.';right.append(note);
 }
 
@@ -199,12 +201,13 @@ function drawTiles(d3,el,data,state,live){
  const lg=document.createElement('div');lg.className='ep-legend';lg.style.cssText='justify-content:center;margin-top:10px';
  lg.innerHTML=`<span>Lowest</span>${SEQ.map(s=>`<i style="background:${s};width:22px;border-radius:2px"></i>`).join('')}<span>Highest · top ${unit(metric==='calls'?max:+max.toFixed(1))}</span>`;
  box.append(lg);
+ commentary(box,data.countries.commentary);
  if(metric==='calls'&&live?.callsAbroad){const n=document.createElement('div');n.className='ep-note';n.style.textAlign='center';n.textContent=`Plus ${live.callsAbroad} open calls that name countries outside the EU (e.g. Africa, neighbourhood). Most EU calls name no single country.`;box.append(n)}
 }
 
 // ---------- 5. Opportunity gap (live) ----------
 function drawGap(d3,el,data,live){
- el.querySelector('svg')?.remove();el.querySelector('.ep-note')?.remove();
+ el.querySelector('svg')?.remove();el.querySelector('.ep-note')?.remove();el.querySelector('.ep-comment')?.remove();
  if(!live?.areaStats?.length){const n=document.createElement('p');n.className='ep-note';n.textContent=live?.error?'Live EU call data is not available right now: '+live.error:'Loading live EU calls…';el.append(n);return}
  const pts=live.areaStats.filter(a=>a.budget>0),W=widthOf(el),H=Math.round(Math.min(440,Math.max(320,W*.5))),m={t:20,r:20,b:44,l:52};
  const x=d3.scaleLog().domain([d3.min(pts,d=>d.budget)*.7,d3.max(pts,d=>d.budget)*1.4]).range([m.l,W-m.r]);
@@ -230,6 +233,7 @@ function drawGap(d3,el,data,live){
  gg.append('text').attr('x',d=>d.lab[3]).attr('y',d=>d.lab[4]).attr('text-anchor',d=>d.lab[2]).attr('dy','0.35em').attr('font-size',11.5).attr('font-weight',600).attr('fill',C.ink).attr('paint-order','stroke').attr('stroke','#fff').attr('stroke-width',3).text(d=>d.area.replace(' and ',' & '));
  gg.on('pointermove',(ev,d)=>tip(`<b>${esc(d.area)}</b>${row('EU programme budget',fmtB(d.budget))}${row('Open/forthcoming calls',d.calls)}${row('Money in those calls',d.money?fmtB(d.money/1000):'not stated')}${d.top?`<div style="margin-top:4px;opacity:.85">Main programmes: ${esc(d.top)}</div>`:''}`,ev)).on('pointerleave',()=>tip(null));
  const n=document.createElement('p');n.className='ep-note';n.textContent=`Live from our nightly scan of the EU Funding & Tenders Portal (${live.callCount} open or forthcoming calls). Bubble size = money stated in those calls. Orange = big budget but few direct calls: money there mostly flows through national or regional authorities, so look for national calls too.`;el.append(n);
+ commentary(el,data.opportunity_gap_commentary);
 }
 
 // ---------- 6. Who wins (slope) ----------
@@ -254,6 +258,7 @@ function drawSlope(d3,el,data){
   const d=(r.he-r.h2020).toFixed(1);g.append('text').attr('x',xb+12).attr('y',yb[i]).attr('dy','0.35em').attr('font-size',12).attr('font-weight',700).attr('fill',cols[i]).text(`${r.he}%  ${d>0?'▲ +'+d:'▼ '+d}`);
   g.style('cursor','default').on('pointermove',ev=>tip(`<b>${esc(r.type)}</b>${row('Horizon 2020',r.h2020+'%')}${row('Horizon Europe 2021–24',r.he+'%')}`,ev)).on('pointerleave',()=>tip(null));
  });
+ commentary(el,data.horizon_winners.commentary);
 }
 
 // ---------- 7. Next budget ----------
@@ -274,6 +279,7 @@ function drawFuture(d3,el,data){
  const nt=document.createElement('p');nt.className='ep-note ep-mff';nt.style.cssText='margin-top:12px;font-size:13px;color:#52606f;border-top:1px solid #e6ebf1;padding-top:10px';
  nt.innerHTML='<strong>MFF = Multiannual Financial Framework</strong>: the EU\'s long-term budget, agreed for seven years at a time. It sets the maximum the EU can spend each year in each area; the yearly EU budgets are agreed within these limits. <strong>NextGenerationEU</strong> is a temporary recovery fund (2021–2026), financed by EU borrowing, added on top after COVID-19.';
  el.append(nt);
+ commentary(el,data.future.commentary);
 }
 
 // ---------- Live data from the nightly scan ----------
