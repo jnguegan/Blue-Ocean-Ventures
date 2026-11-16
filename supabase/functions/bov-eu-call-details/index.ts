@@ -54,18 +54,37 @@ async function getJson(url: string, init: RequestInit = {}): Promise<any> {
 }
 
 // Search API: one record by identifier or ccm2Id (fallback and cascade calls).
-async function searchRecord(key: "identifier" | "ccm2Id", value: string): Promise<any | null> {
-  const boundary = "----BOV" + crypto.randomUUID().replace(/-/g, "");
-  const query = { bool: { must: [{ terms: { [key]: [value] } }] } };
-  let body = "";
-  for (const [name, v] of Object.entries({ query, languages: ["en"] })) body += `--${boundary}\r\nContent-Disposition: form-data; name="${name}"; filename="${name}.json"\r\nContent-Type: application/json\r\n\r\n${JSON.stringify(v)}\r\n`;
-  body += `--${boundary}--\r\n`;
-  const j = await getJson(`${SEARCH_API}?apiKey=SEDIA&text=***&pageSize=5&pageNumber=1`, {
-    method: "POST", body: new TextEncoder().encode(body), headers: { "Content-Type": `multipart/form-data; boundary=${boundary}` },
-  });
-  const rows: any[] = j?.results || j?.items || j?.data?.results || [];
-  const hit = rows.find((r) => str(r?.metadata?.[key]) === value) || rows[0];
-  return hit ? (hit.metadata || hit) : null;
+// 1) POST with an exact filter (twice), 2) GET full-text search on the value, matched locally.
+const metaOf = (r: any) => r?.metadata || r;
+const rowsOf = (j: any): any[] => j?.results || j?.items || j?.data?.results || [];
+async function searchRecord(key: "identifier" | "ccm2Id", value: string, title = ""): Promise<any | null> {
+  const errors: string[] = [];
+  const match = (rows: any[]) => rows.map(metaOf).find((m) => list(m?.[key]).map(str).includes(value)) || null;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const boundary = "----BOV" + crypto.randomUUID().replace(/-/g, "");
+      const query = { bool: { must: [{ terms: { [key]: [value] } }] } };
+      let body = "";
+      for (const [name, v] of Object.entries({ query, languages: ["en"] })) body += `--${boundary}\r\nContent-Disposition: form-data; name="${name}"; filename="${name}.json"\r\nContent-Type: application/json\r\n\r\n${JSON.stringify(v)}\r\n`;
+      body += `--${boundary}--\r\n`;
+      const j = await getJson(`${SEARCH_API}?apiKey=SEDIA&text=***&pageSize=10&pageNumber=1`, {
+        method: "POST", body: new TextEncoder().encode(body), headers: { "Content-Type": `multipart/form-data; boundary=${boundary}` },
+      });
+      const hit = match(rowsOf(j));
+      if (hit) return hit;
+      errors.push(`POST: no exact ${key} match`);
+      break;
+    } catch (e) { errors.push(`POST#${attempt}: ${(e as Error).message}`); await new Promise((r) => setTimeout(r, 800)); }
+  }
+  for (const text of [key === "identifier" ? `"${value}"` : "", title ? `"${title}"` : ""].filter(Boolean)) {
+    try {
+      const j = await getJson(`${SEARCH_API}?apiKey=SEDIA&text=${encodeURIComponent(text)}&pageSize=50&pageNumber=1`);
+      const hit = match(rowsOf(j));
+      if (hit) return hit;
+      errors.push(`GET ${text.slice(0, 40)}: no match`);
+    } catch (e) { errors.push(`GET: ${(e as Error).message}`); }
+  }
+  throw Error(errors.join(" | "));
 }
 
 // ---------- parse an official topic record ----------
@@ -146,8 +165,7 @@ async function fetchDetails(call: any) {
   const ext = String(call.source_external_id || "");
   const errors: string[] = [];
   if (call.call_kind === "cascade" || ext.startsWith("cs-")) {
-    const meta = await searchRecord("ccm2Id", ext.replace(/^cs-/, ""));
-    if (!meta) throw Error("Call not found in the EU search index");
+    const meta = await searchRecord("ccm2Id", ext.replace(/^cs-/, ""), call.title || "");
     return { parsed: parseCascade(meta), source_url: SEARCH_API + " (ccm2Id " + ext.replace(/^cs-/, "") + ")" };
   }
   for (const id of [ext.toLowerCase(), ext]) {
@@ -158,7 +176,7 @@ async function fetchDetails(call: any) {
       errors.push("topicDetails empty");
     } catch (e) { errors.push(String((e as Error).message)); }
   }
-  const meta = await searchRecord("identifier", ext).catch((e) => { errors.push(String(e.message)); return null; });
+  const meta = await searchRecord("identifier", ext, call.title || "").catch((e) => { errors.push("search: " + String(e.message)); return null; });
   if (meta) return { parsed: parseTopic({}, meta), source_url: SEARCH_API + " (identifier " + ext + ")" };
   throw Error("Official record not reachable: " + errors.join(" | "));
 }
@@ -174,7 +192,7 @@ async function storeOne(db: any, call: any, userId: string | null) {
     const row = { ...base, ...parsed, title: parsed.title || call.title, programme: parsed.programme || call.programme, next_deadline: nextDeadline, source_url,
       fetch_status: partial ? "partial" : "ok", fetch_error: partial ? "Some sections were not published in the official record" : null };
     const { error } = await db.from("bov_eu_call_details").upsert(row, { onConflict: "call_id" });
-    if (error) throw Error("Database: " + error.message);
+    if (error) return { ok: false, dbError: true, error: "Database: " + error.message };
     // Refresh key figures used by matching, unless staff verified them.
     const { data: cur } = await db.from("bov_call_requirements").select("source").eq("call_id", call.id).maybeSingle();
     if (!cur || cur.source !== "staff_verified") {
@@ -193,7 +211,8 @@ async function storeOne(db: any, call: any, userId: string | null) {
     return { ok: true, row };
   } catch (e) {
     const msg = String((e as Error).message || e).slice(0, 500);
-    await db.from("bov_eu_call_details").upsert({ ...base, title: call.title, programme: call.programme, next_deadline: call.deadline, fetch_status: "failed", fetch_error: msg }, { onConflict: "call_id" });
+    const { error } = await db.from("bov_eu_call_details").upsert({ ...base, title: call.title, programme: call.programme, next_deadline: call.deadline, fetch_status: "failed", fetch_error: msg }, { onConflict: "call_id" });
+    if (error) return { ok: false, dbError: true, error: "Database: " + error.message + " (after: " + msg.slice(0, 200) + ")" };
     return { ok: false, error: msg };
   }
 }
@@ -229,11 +248,13 @@ Deno.serve(async (req: Request) => {
       const missing = (live || []).filter((c: any) => !stored.has(c.id) || (body.retry_failed && stored.get(c.id) === "failed"));
       if (body.mode === "status") return respond({ live: live?.length || 0, stored: (live || []).filter((c: any) => stored.has(c.id)).length, missing: missing.length });
       const limit = Math.max(1, Math.min(60, Number(body.limit) || 25));
-      let done = 0, failed = 0;
+      let done = 0, failed = 0, dbError = "";
+      const errors: string[] = [];
       const queue = missing.slice(0, limit);
-      const worker = async () => { while (queue.length && Date.now() - started < TIME_BUDGET_MS) { const c = queue.shift(); const r = await storeOne(db, c, u.user.id); r.ok ? done++ : failed++; } };
+      const worker = async () => { while (queue.length && !dbError && Date.now() - started < TIME_BUDGET_MS) { const c = queue.shift(); const r: any = await storeOne(db, c, u.user.id); if (r.ok) done++; else { failed++; if (r.dbError) dbError = r.error; else if (errors.length < 3) errors.push(`${c.source_external_id}: ${r.error}`); } } };
       await Promise.all([worker(), worker(), worker(), worker()]);
-      return respond({ ok: true, processed: done + failed, stored: done, failed, remaining: missing.length - done - failed });
+      if (dbError) return respond({ ok: false, error: dbError, processed: done + failed, stored: done, failed, remaining: missing.length - done }, 500);
+      return respond({ ok: true, processed: done + failed, stored: done, failed, remaining: missing.length - done - failed, errors });
     }
 
     if (typeof body.call_id !== "string" || !uuid.test(body.call_id)) return respond({ error: "call_id must be a UUID" }, 400);

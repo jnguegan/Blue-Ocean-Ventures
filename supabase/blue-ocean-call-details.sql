@@ -66,5 +66,8 @@ create policy bov_eu_call_saves_insert on public.bov_eu_call_saves for insert to
 drop policy if exists bov_eu_call_saves_delete on public.bov_eu_call_saves;
 create policy bov_eu_call_saves_delete on public.bov_eu_call_saves for delete to authenticated using (public.bov_hub_access() and (created_by = auth.uid() or public.bov_hub_admin()));
 
+grant all on public.bov_eu_call_details to service_role;
+grant all on public.bov_eu_call_saves to service_role;
+
 commit;
 select 'Call requirements storage ready' as result;

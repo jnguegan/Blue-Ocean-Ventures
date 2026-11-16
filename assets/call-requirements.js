@@ -276,8 +276,9 @@ export function mount(el, opts) {
         done += r.stored || 0; failed += r.failed || 0;
         if (total == null) total = (r.processed || 0) + (r.remaining || 0);
         $('crBar').style.width = total ? Math.min(100, Math.round(100 * (total - r.remaining) / total)) + '%' : '100%';
-        $('crFetchMsg').textContent = `Stored ${done} · failed ${failed} · remaining ${r.remaining}`;
+        $('crFetchMsg').textContent = `Stored ${done} · failed ${failed} · remaining ${r.remaining}` + ((r.errors || []).length ? ` · last error: ${r.errors[0]}` : '');
         if (!r.remaining || !r.processed) break;
+        if (!r.stored) { $('crFetchMsg').textContent += ' · paused: nothing could be stored in this round'; break; }
       }
       $('crFetchMsg').textContent += stop ? ' · stopped' : ' · finished';
     } catch (e) { $('crFetchMsg').textContent = 'Stopped: ' + e.message; }
