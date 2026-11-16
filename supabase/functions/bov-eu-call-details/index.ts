@@ -168,6 +168,19 @@ async function fetchDetails(call: any) {
     const meta = await searchRecord("ccm2Id", ext.replace(/^cs-/, ""), call.title || "");
     return { parsed: parseCascade(meta), source_url: SEARCH_API + " (ccm2Id " + ext.replace(/^cs-/, "") + ")" };
   }
+  // Old register rows (legacy-…): project-run calls whose link points to the parent EU topic.
+  if (ext.startsWith("legacy-")) {
+    const parent = String(call.official_url || "").match(/topic-details\/([^/?#;]+)/)?.[1];
+    if (!parent) throw Error("Old register entry without an EU topic link");
+    const j = await getJson(TOPIC_JSON + encodeURIComponent(parent.toLowerCase()) + ".json");
+    const td = j?.TopicDetails || j?.topicDetails || j;
+    const p = parseTopic(td, {});
+    const note = `<p><strong>This open call is run by an EU-funded project${call.programme ? ` (“${call.programme}”)` : ""}.</strong> The project sets its own eligibility, budget and deadline. The text below describes the parent EU topic <em>${p.title || parent}</em> that funds the project, for context only. Check the project's own call page for the rules that apply.</p>`;
+    return { parsed: { ...p, title: call.programme || call.title, call_identifier: parent.toUpperCase(), call_title: "Parent EU topic: " + (p.title || parent),
+      programme: "EU cascade funding (call run by an EU-funded project)", type_of_action: "Financial support to third parties",
+      deadline_dates: call.deadline ? [call.deadline] : [], total_budget_eur: null, grant_min_eur: null, grant_max_eur: null, expected_grants: null, budget: [],
+      description_html: note + (p.description_html || ""), _partial: true }, source_url: TOPIC_JSON + parent.toLowerCase() + ".json" };
+  }
   for (const id of [ext.toLowerCase(), ext]) {
     try {
       const j = await getJson(TOPIC_JSON + encodeURIComponent(id) + ".json");
@@ -188,14 +201,15 @@ async function storeOne(db: any, call: any, userId: string | null) {
   try {
     const { parsed, source_url } = await fetchDetails(call);
     const nextDeadline = parsed.deadline_dates.find((d: string) => d >= today) || parsed.deadline_dates.at(-1) || call.deadline || null;
-    const partial = !parsed.description_html || !parsed.conditions_html;
+    const partial = !!(parsed as any)._partial || !parsed.description_html || !parsed.conditions_html;
+    delete (parsed as any)._partial;
     const row = { ...base, ...parsed, title: parsed.title || call.title, programme: parsed.programme || call.programme, next_deadline: nextDeadline, source_url,
-      fetch_status: partial ? "partial" : "ok", fetch_error: partial ? "Some sections were not published in the official record" : null };
+      fetch_status: partial ? "partial" : "ok", fetch_error: partial ? (String(call.source_external_id).startsWith("legacy-") ? "Project-run call: details shown are those of the parent EU topic" : "Some sections were not published in the official record") : null };
     const { error } = await db.from("bov_eu_call_details").upsert(row, { onConflict: "call_id" });
     if (error) return { ok: false, dbError: true, error: "Database: " + error.message };
     // Refresh key figures used by matching, unless staff verified them.
     const { data: cur } = await db.from("bov_call_requirements").select("source").eq("call_id", call.id).maybeSingle();
-    if (!cur || cur.source !== "staff_verified") {
+    if ((!cur || cur.source !== "staff_verified") && !String(call.source_external_id).startsWith("legacy-")) {
       const k = keyFigures(parsed);
       const upd: Record<string, unknown> = { call_id: call.id, source: "auto_extracted", confidence: 0.7, updated_at: now };
       if (parsed.grant_min_eur) upd.grant_min = parsed.grant_min_eur;
