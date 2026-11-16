@@ -225,7 +225,7 @@ export function mount(el, opts) {
       <p class="cr-meta" style="margin:0 0 6px">${esc(d.programme || '')}${d.call_kind === 'cascade' ? ' · cascade call' : ''}</p>
       <h3>${esc(d.title)}</h3>
       <p class="cr-meta" style="margin:4px 0">${esc(d.source_external_id)}${d.call_identifier && d.call_identifier !== d.source_external_id ? ' · call ' + esc(d.call_identifier) : ''}${d.call_title ? ' · ' + esc(d.call_title) : ''}</p>
-      <p class="cr-meta">${fromStore ? 'Stored copy' : 'Read from the official source'} · last fetched ${esc(day(d.fetched_at))}${d.fetch_status === 'partial' ? ' · <span class="cr-tag warn">some sections not published by the EU</span>' : ''}</p>
+      <p class="cr-meta">${fromStore ? 'Stored copy' : 'Read from the official source'} · last fetched ${esc(day(d.fetched_at))}${d.fetch_status === 'partial' ? ` · <span class="cr-tag warn">${esc(d.fetch_error || 'some sections not published by the EU')}</span>` : ''}</p>
       <div class="cr-actions cr-noprint">
         ${d.official_url ? `<a class="btn" href="${esc(d.official_url)}" target="_blank" rel="noopener noreferrer" style="padding:9px 14px;border-radius:8px;background:#0b3a6e;color:#fff;text-decoration:none;font-weight:650">Official call page ↗</a>` : ''}
         <button type="button" id="crPrint">Print</button>
