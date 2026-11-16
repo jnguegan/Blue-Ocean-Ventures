@@ -74,6 +74,16 @@ const CSS = `
 #crRoot .cr-note{width:100%;font:inherit;padding:10px;border:1px solid #ccd8e7;border-radius:8px}
 #crRoot .cr-prog{background:var(--soft)}
 #crRoot .cr-progress{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0}#crRoot .cr-progress i{display:block;height:100%;background:#1f5fa8;width:0}
+#crRoot [hidden]{display:none!important}
+#crRoot .cr-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+#crRoot .cr-tabs button[aria-pressed=true]{background:#0b3a6e;color:#fff}
+#crRoot .cr-tabs button[aria-pressed=false]{background:#e8f0fa;color:#17365c}
+#crRoot .cr-filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--mut)}
+#crRoot .cr-filters select{padding:7px;min-width:0}
+#crRoot .cr-filters label{display:inline-flex;gap:6px;align-items:center;white-space:nowrap}
+#crRoot .cr-filters input[type=checkbox]{width:16px!important;min-width:16px!important;height:16px;padding:0;margin:0;flex:0 0 16px}
+#crRoot .cr-chips{margin-top:5px}#crRoot .cr-chips .cr-tag{margin:2px 4px 0 0}
+#crRoot .cr-focus{background:#f2f8f4;border-radius:10px;padding:12px 14px;margin:12px 0}
 @media print{#crRoot .cr-noprint{display:none!important}}
 `;
 
@@ -88,6 +98,17 @@ export function mount(el, opts) {
    <div class="cr-search cr-noprint"><input type="search" id="crQ" placeholder="Paste a call title, call ID (e.g. HORIZON-CL6-2026-…) or programme name" aria-label="Search EU calls" autocomplete="off">
     <label><input type="checkbox" id="crClosed" style="width:auto">Include closed calls</label><button type="button" id="crGo">Search</button></div>
    <p class="cr-meta" id="crMeta">Loading the call register…</p>
+   <div class="cr-card cr-noprint" id="crFocus" hidden><strong>Shortlists for Blue Ocean</strong>
+    <div class="cr-tabs"><button type="button" data-list="sme" aria-pressed="false">SME &amp; citizen opportunities</button><button type="button" data-list="africa" aria-pressed="false">Open to African organisations</button><button type="button" data-list="none" aria-pressed="false" class="btn alt">Hide</button></div>
+    <div class="cr-filters" id="crFilters" hidden>
+     <label>Deadline <select id="crFDays"><option value="">Any open date</option><option value="30">Next 30 days</option><option value="60">Next 60 days</option><option value="90">Next 90 days</option><option value="180">Next 6 months</option></select></label>
+     <label id="crFAfricaWrap">Africa <select id="crFAfrica"><option value="">Can apply or funded partner</option><option value="lead">African organisations can apply</option><option value="partner">Funded as partners</option><option value="focus">Africa mentioned in the call</option></select></label>
+     <label id="crFIndWrap"><input type="checkbox" id="crFInd">Open to individuals</label>
+     <label><input type="checkbox" id="crFSolo">Single applicant (no consortium)</label>
+    </div>
+    <p class="cr-meta" id="crFocusMsg"></p><div id="crFocusList"></div>
+    <p class="cr-meta" style="margin-top:8px">Tags are read automatically from the official text. "Funded as partners" follows the Horizon Europe rule that organisations from low- and middle-income countries, including most of Africa, receive funding inside a consortium; ministries, public bodies, NGOs, universities and companies all count unless the call restricts it. Always confirm on the official page.</p>
+   </div>
    <div id="crResults"></div>
    <div id="crDetail"></div>
    <div class="cr-card cr-noprint" id="crSavedCard"><strong>Saved requirements</strong><p class="muted" style="margin:4px 0 8px">Calls you saved with a note. Saved items stay even after the deadline.</p><div id="crSaved" class="muted">Nothing saved yet.</div></div>
@@ -95,7 +116,42 @@ export function mount(el, opts) {
     <div class="cr-actions"><button type="button" id="crFetchAll">Fetch all live calls</button><button type="button" id="crRetry" class="btn alt">Retry failed ones</button><button type="button" id="crStop" class="btn alt" hidden>Stop</button></div><div class="cr-progress"><i id="crBar"></i></div><p class="cr-meta" id="crFetchMsg"></p></div>
   </div>`;
   const $ = id => el.querySelector('#' + id);
-  let calls = [], programmes = [], stored = new Map(), saved = [], current = null, stop = false;
+  let calls = [], programmes = [], stored = new Map(), saved = [], current = null, stop = false, focus = null, list = 'none';
+  const AFR = { lead: ['ok', 'African organisations can apply'], partner: ['ok', 'African organisations funded as partners'], check: ['warn', 'Africa: check the conditions'], no: ['bad', 'Not open to African organisations'] };
+
+  async function loadFocus() {
+    const { data, error } = await db().from('bov_eu_call_details')
+      .select('call_id,title,source_external_id,programme,call_kind,next_deadline,grant_min_eur,grant_max_eur,total_budget_eur,fetch_status,focus_sme,focus_individual,public_only,eu_only,africa,africa_focus,africa_entities,effort,focus_reasons')
+      .neq('fetch_status', 'failed').or(`next_deadline.is.null,next_deadline.gte.${today()}`).limit(5000);
+    if (error) { $('crFocus').hidden = true; return; }
+    focus = data || [];
+    $('crFocus').hidden = false;
+    const n = k => focus.filter(k).length;
+    el.querySelector('[data-list=sme]').textContent = `SME & citizen opportunities (${n(r => r.focus_sme)})`;
+    el.querySelector('[data-list=africa]').textContent = `Open to African organisations (${n(r => r.africa === 'lead' || r.africa === 'partner' || (r.africa_focus && r.africa !== 'no'))})`;
+    if (list !== 'none') showList();
+  }
+
+  function showList() {
+    for (const b of el.querySelectorAll('[data-list]')) b.setAttribute('aria-pressed', String(b.dataset.list === list && list !== 'none'));
+    $('crFilters').hidden = list === 'none';
+    if (list === 'none' || !focus) { $('crFocusList').innerHTML = ''; $('crFocusMsg').textContent = ''; return; }
+    $('crFAfricaWrap').hidden = list !== 'africa'; $('crFIndWrap').hidden = list !== 'sme';
+    const days = Number($('crFDays').value) || 0, af = $('crFAfrica').value, solo = $('crFSolo').checked, ind = $('crFInd').checked;
+    let rows = focus.filter(r => list === 'sme' ? r.focus_sme
+      : af === 'lead' ? r.africa === 'lead' : af === 'partner' ? r.africa === 'partner' : af === 'focus' ? r.africa_focus && r.africa !== 'no'
+      : r.africa === 'lead' || r.africa === 'partner' || (r.africa_focus && r.africa !== 'no'));
+    if (days) rows = rows.filter(r => { const l = daysLeft(r.next_deadline); return l != null && l <= days; });
+    if (solo) rows = rows.filter(r => r.effort === 'solo');
+    if (ind && list === 'sme') rows = rows.filter(r => r.focus_individual);
+    rows.sort((a, b) => (list === 'africa' ? (b.africa_focus - a.africa_focus) || ((a.africa === 'lead' ? 0 : 1) - (b.africa === 'lead' ? 0 : 1)) : 0) || String(a.next_deadline || '9999').localeCompare(String(b.next_deadline || '9999')));
+    $('crFocusMsg').textContent = `${rows.length} open call${rows.length === 1 ? '' : 's'}` + (list === 'africa' ? ' · Africa-focused calls first' : ' · soonest deadline first');
+    $('crFocusList').innerHTML = rows.length ? '<div class="cr-list" style="max-height:560px">' + rows.map(r => {
+      const left = daysLeft(r.next_deadline), grant = r.grant_max_eur ? (r.grant_min_eur && r.grant_min_eur !== r.grant_max_eur ? `${eur(r.grant_min_eur)}–${eur(r.grant_max_eur)} per project` : `up to ${eur(r.grant_max_eur)} per project`) : r.total_budget_eur ? `${eur(r.total_budget_eur)} call budget` : '';
+      const chips = (r.focus_reasons || []).map(x => `<span class="cr-tag ${/only|needed/i.test(x) ? 'warn' : 'ok'}">${esc(x)}</span>`).join('');
+      return `<button type="button" class="cr-item" data-open="${r.call_id}">${esc(r.title)}${left != null ? `<span class="cr-tag ${left <= 30 ? 'warn' : 'ok'}">${left} days left</span>` : ''}<small>${esc(r.source_external_id)} · deadline ${esc(day(r.next_deadline) || 'see call')}${grant ? ' · ' + esc(grant) : ''}</small>${list === 'africa' && r.africa_entities ? `<small>Who in Africa: ${esc(r.africa_entities)}</small>` : ''}<div class="cr-chips">${chips}</div></button>`;
+    }).join('') + '</div>' : '';
+  }
 
   async function fn(body) {
     const { data: { session } } = await db().auth.getSession();
@@ -243,6 +299,7 @@ export function mount(el, opts) {
         ${fact('Grant per project', esc(grant))}
         ${fact('Expected grants', esc(d.expected_grants || ''))}
       </div>
+      ${d.focus_reasons ? `<div class="cr-focus"><strong>Focus for Blue Ocean</strong><div class="cr-chips">${d.focus_sme ? '<span class="cr-tag ok">SME &amp; citizen opportunity</span>' : ''}${AFR[d.africa] ? `<span class="cr-tag ${AFR[d.africa][0]}">${AFR[d.africa][1]}</span>` : ''}${(d.focus_reasons || []).map(x => `<span class="cr-tag">${esc(x)}</span>`).join('')}</div>${d.africa_entities ? `<p style="margin:8px 0 0;font-size:14px"><strong>Which African organisations:</strong> ${esc(d.africa_entities)}</p>` : ''}<p class="cr-meta" style="margin:6px 0 0">Read automatically from the official text below. The conditions prevail.</p></div>` : ''}
       ${budgetRows.length > 1 ? sec('Budget by action', `<div style="overflow-x:auto"><table class="cr-budget"><tr><th>Action</th><th>Budget</th><th>Per project</th><th>Grants</th><th>Deadline</th></tr>${budgetRows.map(b => `<tr><td>${esc(b.action)}</td><td>${esc(eur(b.amount_eur))}</td><td>${esc(b.min_contribution_eur && b.max_contribution_eur && b.min_contribution_eur !== b.max_contribution_eur ? eur(b.min_contribution_eur) + ' – ' + eur(b.max_contribution_eur) : eur(b.max_contribution_eur || b.min_contribution_eur))}</td><td>${esc(b.expected_grants || '')}</td><td>${esc((b.deadlines || []).map(day).join(', '))}</td></tr>`).join('')}</table></div>`) : ''}
       ${reqFacts.length ? sec('Key requirements (for matching)', `<div class="cr-facts">${reqFacts.map(([k, v]) => fact(k, esc(v))).join('')}</div><p class="cr-meta">Source: ${esc(req.source === 'staff_verified' ? 'verified by staff' : req.source === 'auto_extracted' ? 'read from the official text' : 'programme defaults')}. The official conditions below prevail.</p>`) : ''}
       ${sec('What it funds', d.description_html ? `<div class="cr-body">${sanitize(d.description_html)}</div>` : '')}
@@ -284,18 +341,21 @@ export function mount(el, opts) {
     } catch (e) { $('crFetchMsg').textContent = 'Stopped: ' + e.message; }
     $('crStop').hidden = true; $('crFetchAll').disabled = $('crRetry').disabled = false;
     await loadBase().catch(() => {});
+    loadFocus().catch(() => {});
   }
 
   let t;
   $('crQ').addEventListener('input', () => { clearTimeout(t); t = setTimeout(search, 250); });
   $('crQ').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); search(); } });
   $('crGo').onclick = search; $('crClosed').onchange = search;
+  for (const id of ['crFDays', 'crFAfrica', 'crFSolo', 'crFInd']) $(id).onchange = showList;
   $('crFetchAll').onclick = () => fetchAll(false); $('crRetry').onclick = () => fetchAll(true); $('crStop').onclick = () => { stop = true; };
   el.addEventListener('click', async e => {
     const b = e.target.closest('button'); if (!b || !el.contains(b)) return;
     if (b.dataset.open) return open(b.dataset.open);
     if (b.dataset.refresh) return open(b.dataset.refresh, true);
     if (b.dataset.prog) return showProgramme(b.dataset.prog);
+    if (b.dataset.list) { list = b.dataset.list; return showList(); }
     if (!current) return;
     const id = current.det.call_id;
     if (b.id === 'crPrint') printCurrent();
@@ -319,10 +379,11 @@ export function mount(el, opts) {
       await loadSaved(); render(true);
     }
   });
-  el._crRefresh = () => { loadBase().catch(() => {}); loadSaved().catch(() => {}); };
+  el._crRefresh = () => { loadBase().catch(() => {}); loadSaved().catch(() => {}); loadFocus().catch(() => {}); };
   (async () => {
     for (let i = 0; i < 60; i++) { try { if (opts.db()) break; } catch {} await new Promise(r => setTimeout(r, 500)); }
     await loadBase().then(() => { if ($('crQ').value) search(); }).catch(e => { $('crMeta').textContent = 'Call register unavailable: ' + e.message; });
     loadSaved().catch(() => {});
+    loadFocus().catch(() => {});
   })();
 }
